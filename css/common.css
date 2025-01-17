@@ -24,6 +24,13 @@ header {
     z-index: 1000;
 }
 
+header h1 {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.5rem;
+    font-weight: normal;
+    margin: 0;
+}
+
 /* メインコンテンツ - スクロール可能エリア */
 main {
     flex: 1;
