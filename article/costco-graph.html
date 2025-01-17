@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>コストコ会員ガソリン節約効果シミュレーション</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .info-box {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .input-container {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .input-group label {
+            width: 250px;
+            margin-right: 10px;
+        }
+        .input-group input {
+            width: 100px;
+            padding: 5px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .breakeven {
+            color: #0056b3;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>コストコ会員ガソリン節約効果シミュレーター</h1>
+
+        <div class="input-container">
+            <div class="input-group">
+                <label for="membershipFee">年会費（円）:</label>
+                <input type="number" id="membershipFee" value="4840" min="0" step="10">
+            </div>
+            <div class="input-group">
+                <label for="priceGap">リットルあたりの価格差（円）:</label>
+                <input type="number" id="priceGap" value="15" min="0" step="1">
+            </div>
+        </div>
+    </div>
+    <div class="info-box">
+        <h2>シミュレーション結果</h2>
+        <p>年会費: <span id="feeDisplay">4,840</span>円</p>
+        <p>リットルあたりの価格差: <span id="gapDisplay">15</span>円</p>
+        <p>損益分岐点: <span id="breakevenDisplay" class="breakeven">480</span>リットル（月間<span id="monthlyBreakevenDisplay" class="breakeven">40</span>リットル）</p>
+    </div>
+        
+    <div class="chart-container">
+        <canvas id="savingsChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="monthlyChart"></canvas>
+    </div>
+</body>
+
+<script>
+    // グローバル変数でグラフのインスタンスを保持
+    let yearlyChart = null;
+    let monthlyChart = null;
+
+    // 計算ロジック
+    const calculateBreakeven = (年会費, 価格差) => {
+        return Math.ceil(年会費 / 価格差);
+    };
+
+    const 年間節約額計算 = (年間給油リットル, 年会費, 価格差) => {
+        return (年間給油リットル * 価格差) - 年会費;
+    };
+
+    // グラフの更新関数
+    const updateCharts = () => {
+        const 年会費 = Number(document.getElementById('membershipFee').value);
+        const 価格差 = Number(document.getElementById('priceGap').value);
+        const 損益分岐リットル = calculateBreakeven(年会費, 価格差);
+
+        // 表示の更新
+        document.getElementById('feeDisplay').textContent = 年会費.toLocaleString();
+        document.getElementById('gapDisplay').textContent = 価格差;
+        document.getElementById('breakevenDisplay').textContent = 損益分岐リットル.toLocaleString();
+        document.getElementById('monthlyBreakevenDisplay').textContent = Math.ceil(損益分岐リットル / 12).toLocaleString();
+
+        // データの生成
+        const リットル配列 = Array.from({length: 15}, (_, i) => i * 100);
+        const 節約額配列 = リットル配列.map(リットル => 年間節約額計算(リットル, 年会費, 価格差));
+        
+        const 月間リットル配列 = Array.from({length: 15}, (_, i) => i * 10);
+        const 月間節約額配列 = 月間リットル配列.map(月間リットル => 
+            年間節約額計算(月間リットル * 12, 年会費, 価格差) / 12
+        );
+
+        // グラフの更新
+        yearlyChart.data.datasets[0].data = 節約額配列;
+        yearlyChart.update();
+
+        monthlyChart.data.datasets[0].data = 月間節約額配列;
+        monthlyChart.update();
+    };
+
+    // 初期グラフの描画
+    window.onload = () => {
+        const yearlyCtx = document.getElementById('savingsChart').getContext('2d');
+        yearlyChart = new Chart(yearlyCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 15}, (_, i) => `${i * 100}L`),
+                datasets: [{
+                    label: '年間節約額',
+                    data: [],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '年間給油量と節約額の関係'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '節約額（円）'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '年間給油量（L）'
+                        }
+                    }
+                }
+            }
+        });
+
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        monthlyChart = new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 15}, (_, i) => `${i * 10}L`),
+                datasets: [{
+                    label: '月間節約額',
+                    data: [],
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '月間給油量と節約額の関係'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '月間節約額（円）'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '月間給油量（L）'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 入力値の変更を監視
+        document.getElementById('membershipFee').addEventListener('input', updateCharts);
+        document.getElementById('priceGap').addEventListener('input', updateCharts);
+
+        // 初期表示
+        updateCharts();
+    };
+</script>
+</html>
