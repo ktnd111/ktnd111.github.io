@@ -5,12 +5,25 @@
     box-sizing: border-box;
 }
 
+/* スクロールバー非表示 */
+::-webkit-scrollbar {
+    display: none;
+}
+
+html {
+    -ms-overflow-style: none;  /* IE, Edge 対応 */
+    scrollbar-width: none;     /* Firefox 対応 */
+    font-size: 16px;          /* ベースフォントサイズを固定 */
+}
+
 body {
     font-family: 'Arial', sans-serif;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     background-color: #f5f5f5;
+    overflow-x: hidden;       /* 横スクロール防止 */
+    position: relative;       /* フッターの位置決めの基準点 */
 }
 
 /* ヘッダー固定 */
@@ -25,11 +38,12 @@ header {
 }
 
 header h1 {
-    font-family: 'Arial', sans-serif !important;
-    font-size: 1.5rem !important;
-    font-weight: normal !important;
-    margin: 0 !important;
-    color: white !important;
+    font-size: 24px;         /* 絶対値で指定 */
+    font-weight: normal;
+    margin: 0;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    line-height: 1.2;        /* 行高を固定 */
 }
 
 /* メインコンテンツ - スクロール可能エリア */
@@ -48,11 +62,14 @@ footer {
     padding: 1rem;
     position: fixed;
     bottom: 0;
-    width: 100%;
+    left: 0;              /* 左端に固定 */
+    right: 0;             /* 右端に固定 */
+    height: 60px;         /* 高さを固定 */
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;        /* 重なり順を指定 */
 }
 
 /* GitHubリンク */
