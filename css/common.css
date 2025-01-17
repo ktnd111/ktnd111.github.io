@@ -1,0 +1,66 @@
+/* リセットCSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* ヘッダー固定 */
+header {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+/* メインコンテンツ - スクロール可能エリア */
+main {
+    flex: 1;
+    padding: 1rem;
+    margin-top: 60px;  /* ヘッダーの高さ分 */
+    margin-bottom: 60px;  /* フッターの高さ分 */
+    overflow-y: auto;
+}
+
+/* フッター固定 */
+footer {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* GitHubリンク */
+.github-link {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: opacity 0.3s ease;
+}
+
+.github-link:hover {
+    opacity: 0.8;
+}
+
+.github-link i {
+    font-size: 1.5rem;
+}
