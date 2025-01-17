@@ -99,3 +99,10 @@ footer {
     color: #666;
     font-size: 0.9rem;
 }
+
+.article-date {
+    color: #888;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
