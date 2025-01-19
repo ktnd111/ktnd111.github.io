@@ -46,6 +46,16 @@ header h1 {
     line-height: 1.2;        /* 行高を固定 */
 }
 
+header h1 a {
+    color: white;            /* リンクの文字色を白に設定 */
+    text-decoration: none;   /* 下線を削除 */
+    transition: opacity 0.3s ease; /* ホバーエフェクトのアニメーション */
+}
+
+header h1 a:hover {
+    opacity: 0.8;           /* ホバー時に少し透明に */
+}
+
 /* メインコンテンツ - スクロール可能エリア */
 main {
     flex: 1;
