@@ -116,47 +116,47 @@
     <div id="footer-component"></div>
 
 <script>
-    // グローバル変数でグラフのインスタンスを保持
-    let yearlyChart = null;
-    let monthlyChart = null;
+// グローバル変数でグラフのインスタンスを保持
+let yearlyChart = null;
+let monthlyChart = null;
 
-    // 計算ロジック
-    const calculateBreakeven = (年会費, 価格差) => {
-        return Math.ceil(年会費 / 価格差);
-    };
+// 計算ロジック
+const calculateBreakeven = (membershipFee, priceGap) => {
+    return Math.ceil(membershipFee / priceGap);
+};
 
-    const 年間節約額計算 = (年間給油リットル, 年会費, 価格差) => {
-        return (年間給油リットル * 価格差) - 年会費;
-    };
+const calculateYearlySavings = (annualFuelLiters, membershipFee, priceGap) => {
+    return (annualFuelLiters * priceGap) - membershipFee;
+};
 
-    // グラフの更新関数
-    const updateCharts = () => {
-        const 年会費 = Number(document.getElementById('membershipFee').value);
-        const 価格差 = Number(document.getElementById('priceGap').value);
-        const 損益分岐リットル = calculateBreakeven(年会費, 価格差);
+// グラフの更新関数
+const updateCharts = () => {
+    const membershipFee = Number(document.getElementById('membershipFee').value);
+    const priceGap = Number(document.getElementById('priceGap').value);
+    const breakevenLiters = calculateBreakeven(membershipFee, priceGap);
 
-        // 表示の更新
-        document.getElementById('feeDisplay').textContent = 年会費.toLocaleString();
-        document.getElementById('gapDisplay').textContent = 価格差;
-        document.getElementById('breakevenDisplay').textContent = 損益分岐リットル.toLocaleString();
-        document.getElementById('monthlyBreakevenDisplay').textContent = Math.ceil(損益分岐リットル / 12).toLocaleString();
+    // 表示の更新
+    document.getElementById('feeDisplay').textContent = membershipFee.toLocaleString();
+    document.getElementById('gapDisplay').textContent = priceGap;
+    document.getElementById('breakevenDisplay').textContent = breakevenLiters.toLocaleString();
+    document.getElementById('monthlyBreakevenDisplay').textContent = Math.ceil(breakevenLiters / 12).toLocaleString();
 
-        // データの生成
-        const リットル配列 = Array.from({length: 15}, (_, i) => i * 100);
-        const 節約額配列 = リットル配列.map(リットル => 年間節約額計算(リットル, 年会費, 価格差));
-        
-        const 月間リットル配列 = Array.from({length: 15}, (_, i) => i * 10);
-        const 月間節約額配列 = 月間リットル配列.map(月間リットル => 
-            年間節約額計算(月間リットル * 12, 年会費, 価格差) / 12
-        );
+    // データの生成
+    const litersArray = Array.from({length: 15}, (_, i) => i * 100);
+    const savingsArray = litersArray.map(liters => calculateYearlySavings(liters, membershipFee, priceGap));
+    
+    const monthlyLitersArray = Array.from({length: 15}, (_, i) => i * 10);
+    const monthlySavingsArray = monthlyLitersArray.map(monthlyLiters => 
+        calculateYearlySavings(monthlyLiters * 12, membershipFee, priceGap) / 12
+    );
 
-        // グラフの更新
-        yearlyChart.data.datasets[0].data = 節約額配列;
-        yearlyChart.update();
+    // グラフの更新
+    yearlyChart.data.datasets[0].data = savingsArray;
+    yearlyChart.update();
 
-        monthlyChart.data.datasets[0].data = 月間節約額配列;
-        monthlyChart.update();
-    };
+    monthlyChart.data.datasets[0].data = monthlySavingsArray;
+    monthlyChart.update();
+};
 
     // グラフの初期化関数
     function initializeCharts() {
