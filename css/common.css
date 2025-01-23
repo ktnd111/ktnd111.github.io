@@ -61,25 +61,20 @@ main {
     flex: 1;
     padding: 1rem;
     margin-top: 60px;  /* ヘッダーの高さ分 */
-    margin-bottom: 60px;  /* フッターの高さ分 */
     overflow-y: auto;
 }
 
-/* フッター固定 */
+/* フッター */
 footer {
     background-color: #333;
     color: white;
     padding: 1rem;
-    position: fixed;
-    bottom: 0;
-    left: 0;              /* 左端に固定 */
-    right: 0;             /* 右端に固定 */
     height: 60px;         /* 高さを固定 */
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;        /* 重なり順を指定 */
+    margin-top: auto;    /* フッターを下部に配置 */
 }
 
 /* GitHubリンク */

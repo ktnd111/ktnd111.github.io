@@ -34,18 +34,6 @@ main {
     overflow-y: auto;
 }
 
-/* フッター */
-footer {
-    background-color: #333;
-    color: white;
-    padding: 1rem;
-    width: 100%;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: auto; /* フッターを下部に配置 */
-}
 
 .github-link {
     color: white;
