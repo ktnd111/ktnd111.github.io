@@ -22,13 +22,15 @@ header {
     top: 0;
     width: 100%;
     z-index: 1000;
+    height: fit-content;
 }
 
 /* メインコンテンツ - スクロール可能エリア */
 main {
     flex: 1;
     padding: 1rem;
-    margin-top: 60px;  /* ヘッダーの高さ分 */
+    padding-top: 2rem; /* ヘッダーとの間隔を追加 */
+    margin-top: max(60px, calc(3rem + 2rem)); /* ヘッダーの最小高さ + パディング + 追加の余白 */
     margin-bottom: 60px;  /* フッターの高さ分 */
     overflow-y: auto;
 }
