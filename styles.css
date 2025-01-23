@@ -31,22 +31,20 @@ main {
     padding: 1rem;
     padding-top: 2rem; /* ヘッダーとの間隔を追加 */
     margin-top: max(60px, calc(3rem + 2rem)); /* ヘッダーの最小高さ + パディング + 追加の余白 */
-    margin-bottom: 60px;  /* フッターの高さ分 */
     overflow-y: auto;
 }
 
-/* フッター固定 */
+/* フッター */
 footer {
     background-color: #333;
     color: white;
     padding: 1rem;
-    position: fixed;
-    bottom: 0;
     width: 100%;
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: auto; /* フッターを下部に配置 */
 }
 
 .github-link {
