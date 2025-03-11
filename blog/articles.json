@@ -1,0 +1,11 @@
+[
+    {
+        "title": "LINQの実行タイミングと変数未代入の落とし穴",
+        "path": "blog/articlesMd/tech-article.md",
+        "date": "2025-03-10",
+        "summary": "LINQの遅延評価と変数未代入のバグについて実体験をもとに解説します。",
+        "tags": ["C#", "LINQ", "デバッグ", "テスト設計"],
+        "category": "プログラミング",
+        "background": "tech"
+    }
+]
