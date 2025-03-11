@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記事アーカイブ - TECH BLOG</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292e;
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        header {
+            margin-bottom: 30px;
+        }
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card {
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .card-title a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        .card-title a:hover {
+            text-decoration: underline;
+        }
+        .card-text {
+            color: #586069;
+        }
+        .article-meta {
+            color: #586069;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            background-color: #fff;
+            border-top: 1px solid #eaecef;
+            color: #586069;
+        }
+        .archive-year {
+            margin-top: 30px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        .filter-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="text-center mb-4">記事アーカイブ</h1>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light rounded mb-4">
+                <div class="container-fluid">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="index.html">ホーム</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="blog.html">ブログ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="archive.html">アーカイブ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="about.html">このサイトについて</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <section>
+                <div class="filter-container">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <input type="text" id="search-input" class="form-control" placeholder="記事を検索...">
+                        </div>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <select id="year-filter" class="form-select">
+                                <option value="all">すべての年</option>
+                                <!-- 年のオプションはJavaScriptで動的に生成 -->
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button id="reset-filter" class="btn btn-outline-secondary w-100">リセット</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="articles-container">
+                    <p class="text-center">読み込み中...</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center">
+            <p>&copy; 2025 TECH BLOG. Powered by GitHub Pages.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const articlesContainer = document.getElementById('articles-container');
+            const searchInput = document.getElementById('search-input');
+            const yearFilter = document.getElementById('year-filter');
+            const resetFilterBtn = document.getElementById('reset-filter');
+            
+            let allArticles = [];
+            
+            // 外部JSONファイルから記事データを読み込む
+            fetch('articles.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('記事データの読み込みに失敗しました');
+                    }
+                    return response.json();
+                })
+                .then(articles => {
+                    allArticles = articles;
+                    
+                    if (articles.length > 0) {
+                        // 日付でソートして最新順に並び替え
+                        articles.sort((a, b) => {
+                            const dateA = new Date(a.date);
+                            const dateB = new Date(b.date);
+                            return dateB - dateA; // 降順（新しい順）
+                        });
+                        
+                        // 年のフィルターオプションを生成
+                        const years = [...new Set(articles.map(article => {
+                            const date = new Date(article.date);
+                            return date.getFullYear();
+                        }))].sort((a, b) => b - a); // 降順
+                        
+                        years.forEach(year => {
+                            const option = document.createElement('option');
+                            option.value = year;
+                            option.textContent = year + '年';
+                            yearFilter.appendChild(option);
+                        });
+                        
+                        // 記事を表示
+                        displayArticles(articles);
+                    } else {
+                        articlesContainer.innerHTML = '<p class="text-center">記事がありません。</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    articlesContainer.innerHTML = '<p class="text-center alert alert-danger">記事データの読み込みに失敗しました。しばらくしてからもう一度お試しください。</p>';
+                });
+            
+            // 記事を表示する関数
+            function displayArticles(articles) {
+                if (articles.length === 0) {
+                    articlesContainer.innerHTML = '<p class="text-center">該当する記事がありません。</p>';
+                    return;
+                }
+                
+                articlesContainer.innerHTML = '';
+                
+                // 年ごとにグループ化
+                const groupedByYear = {};
+                articles.forEach(article => {
+                    const date = new Date(article.date);
+                    const year = date.getFullYear();
+                    
+                    if (!groupedByYear[year]) {
+                        groupedByYear[year] = [];
+                    }
+                    
+                    groupedByYear[year].push(article);
+                });
+                
+                // 年ごとに表示
+                Object.keys(groupedByYear).sort((a, b) => b - a).forEach(year => {
+                    const yearSection = document.createElement('div');
+                    yearSection.innerHTML = `<h2 class="archive-year">${year}年</h2>`;
+                    articlesContainer.appendChild(yearSection);
+                    
+                    const yearArticles = document.createElement('div');
+                    yearArticles.className = 'row';
+                    articlesContainer.appendChild(yearArticles);
+                    
+                    groupedByYear[year].forEach(article => {
+                        const articleElement = document.createElement('div');
+                        articleElement.className = 'col-md-6 col-lg-4 mb-4';
+                        
+                        articleElement.innerHTML = `
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h3 class="card-title"><a href="article.html?article=${encodeURIComponent(article.path)}">${article.title}</a></h3>
+                                    <div class="article-meta">
+                                        <i class="far fa-calendar-alt"></i> ${article.date}
+                                    </div>
+                                    <p class="card-text">${article.summary}</p>
+                                </div>
+                                <div class="card-footer bg-transparent border-0">
+                                    <a href="article.html?article=${encodeURIComponent(article.path)}" class="btn btn-outline-primary btn-sm">続きを読む &raquo;</a>
+                                </div>
+                            </div>
+                        `;
+                        
+                        yearArticles.appendChild(articleElement);
+                    });
+                });
+            }
+            
+            // 検索とフィルター処理
+            function filterArticles() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedYear = yearFilter.value;
+                
+                const filteredArticles = allArticles.filter(article => {
+                    const matchesSearch = article.title.toLowerCase().includes(searchTerm) || 
+                                         article.summary.toLowerCase().includes(searchTerm);
+                    
+                    let matchesYear = true;
+                    if (selectedYear !== 'all') {
+                        const articleYear = new Date(article.date).getFullYear().toString();
+                        matchesYear = articleYear === selectedYear;
+                    }
+                    
+                    return matchesSearch && matchesYear;
+                });
+                
+                displayArticles(filteredArticles);
+            }
+            
+            // イベントリスナー
+            searchInput.addEventListener('input', filterArticles);
+            yearFilter.addEventListener('change', filterArticles);
+            resetFilterBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                yearFilter.value = 'all';
+                displayArticles(allArticles);
+            });
+        });
+    </script>
+</body>
+</html>
