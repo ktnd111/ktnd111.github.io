@@ -49,12 +49,43 @@
             font-size: 0.9em;
             margin-bottom: 10px;
         }
-        footer {
-            margin-top: 40px;
-            padding: 20px 0;
-            background-color: #fff;
-            border-top: 1px solid #eaecef;
-            color: #586069;
+        .article-tags {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .article-tag {
+            display: inline-block;
+            background-color: #f1f8ff;
+            color: #0366d6;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border-radius: 12px;
+        }
+        /* 背景色のバリエーション */
+        .card-bg-tech {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+        }
+        .card-bg-web {
+            background: linear-gradient(135deg, #f8f9fa 0%, #daeaf1 100%);
+        }
+        .card-bg-design {
+            background: linear-gradient(135deg, #fdfcfb 0%, #f2e6e6 100%);
+        }
+        .card-bg-performance {
+            background: linear-gradient(135deg, #f6f8f9 0%, #f1e5ec 100%);
+        }
+        .category-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -141,14 +172,29 @@
                             const articleElement = document.createElement('div');
                             articleElement.className = 'col-md-6 col-lg-4 mb-4';
                             
+                            // タグのHTMLを生成
+                            let tagsHtml = '';
+                            if (article.tags && article.tags.length > 0) {
+                                tagsHtml = '<div class="article-tags">';
+                                article.tags.forEach(tag => {
+                                    tagsHtml += `<span class="article-tag">${tag}</span>`;
+                                });
+                                tagsHtml += '</div>';
+                            }
+                            
+                            // 背景色クラスを決定
+                            const bgClass = article.background ? `card-bg-${article.background}` : '';
+                            
                             articleElement.innerHTML = `
-                                <div class="card h-100">
+                                <div class="card h-100 ${bgClass}">
+                                    ${article.category ? `<div class="category-badge">${article.category}</div>` : ''}
                                     <div class="card-body">
                                         <h3 class="card-title"><a href="article.html?article=${encodeURIComponent(article.path)}">${article.title}</a></h3>
                                         <div class="article-meta">
                                             <i class="far fa-calendar-alt"></i> ${article.date}
                                         </div>
                                         <p class="card-text">${article.summary}</p>
+                                        ${tagsHtml}
                                     </div>
                                     <div class="card-footer bg-transparent border-0">
                                         <a href="article.html?article=${encodeURIComponent(article.path)}" class="btn btn-outline-primary btn-sm">続きを読む &raquo;</a>

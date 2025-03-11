@@ -69,6 +69,56 @@
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+        .article-tags {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .article-tag {
+            display: inline-block;
+            background-color: #f1f8ff;
+            color: #0366d6;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border-radius: 12px;
+        }
+        /* 背景色のバリエーション */
+        .card-bg-tech {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+        }
+        .card-bg-web {
+            background: linear-gradient(135deg, #f8f9fa 0%, #daeaf1 100%);
+        }
+        .card-bg-design {
+            background: linear-gradient(135deg, #fdfcfb 0%, #f2e6e6 100%);
+        }
+        .card-bg-performance {
+            background: linear-gradient(135deg, #f6f8f9 0%, #f1e5ec 100%);
+        }
+        .category-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .tag-filter {
+            margin-top: 10px;
+        }
+        .tag-filter .btn {
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+        .tag-filter .btn.active {
+            background-color: #0366d6;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -117,6 +167,9 @@
                             <button id="reset-filter" class="btn btn-outline-secondary w-100">リセット</button>
                         </div>
                     </div>
+                    <div class="tag-filter mt-3" id="tag-filter">
+                        <!-- タグフィルターボタンはJavaScriptで動的に生成 -->
+                    </div>
                 </div>
                 
                 <div id="articles-container">
@@ -137,8 +190,10 @@
             const searchInput = document.getElementById('search-input');
             const yearFilter = document.getElementById('year-filter');
             const resetFilterBtn = document.getElementById('reset-filter');
+            const tagFilter = document.getElementById('tag-filter');
             
             let allArticles = [];
+            let activeTagFilter = null;
             
             // 外部JSONファイルから記事データを読み込む
             fetch('articles.json')
@@ -172,6 +227,40 @@
                             yearFilter.appendChild(option);
                         });
                         
+                        // タグの一覧を取得してフィルターに追加
+                        const allTags = new Set();
+                        articles.forEach(article => {
+                            if (article.tags) {
+                                article.tags.forEach(tag => allTags.add(tag));
+                            }
+                        });
+                        
+                        if (allTags.size > 0) {
+                            const allTagBtn = document.createElement('button');
+                            allTagBtn.className = 'btn btn-sm btn-outline-secondary active';
+                            allTagBtn.textContent = 'すべて';
+                            allTagBtn.dataset.tag = 'all';
+                            tagFilter.appendChild(allTagBtn);
+                            
+                            allTagBtn.addEventListener('click', function() {
+                                setActiveTagFilter('all');
+                                filterArticles();
+                            });
+                            
+                            Array.from(allTags).sort().forEach(tag => {
+                                const tagBtn = document.createElement('button');
+                                tagBtn.className = 'btn btn-sm btn-outline-secondary';
+                                tagBtn.textContent = tag;
+                                tagBtn.dataset.tag = tag;
+                                tagFilter.appendChild(tagBtn);
+                                
+                                tagBtn.addEventListener('click', function() {
+                                    setActiveTagFilter(tag);
+                                    filterArticles();
+                                });
+                            });
+                        }
+                        
                         // 記事を表示
                         displayArticles(articles);
                     } else {
@@ -182,6 +271,20 @@
                     console.error('Error:', error);
                     articlesContainer.innerHTML = '<p class="text-center alert alert-danger">記事データの読み込みに失敗しました。しばらくしてからもう一度お試しください。</p>';
                 });
+            
+            // タグフィルターの状態を設定
+            function setActiveTagFilter(tag) {
+                activeTagFilter = tag === 'all' ? null : tag;
+                
+                const buttons = tagFilter.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    if (btn.dataset.tag === tag) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
             
             // 記事を表示する関数
             function displayArticles(articles) {
@@ -219,14 +322,29 @@
                         const articleElement = document.createElement('div');
                         articleElement.className = 'col-md-6 col-lg-4 mb-4';
                         
+                        // タグのHTMLを生成
+                        let tagsHtml = '';
+                        if (article.tags && article.tags.length > 0) {
+                            tagsHtml = '<div class="article-tags">';
+                            article.tags.forEach(tag => {
+                                tagsHtml += `<span class="article-tag">${tag}</span>`;
+                            });
+                            tagsHtml += '</div>';
+                        }
+                        
+                        // 背景色クラスを決定
+                        const bgClass = article.background ? `card-bg-${article.background}` : '';
+                        
                         articleElement.innerHTML = `
-                            <div class="card h-100">
+                            <div class="card h-100 ${bgClass}">
+                                ${article.category ? `<div class="category-badge">${article.category}</div>` : ''}
                                 <div class="card-body">
                                     <h3 class="card-title"><a href="article.html?article=${encodeURIComponent(article.path)}">${article.title}</a></h3>
                                     <div class="article-meta">
                                         <i class="far fa-calendar-alt"></i> ${article.date}
                                     </div>
                                     <p class="card-text">${article.summary}</p>
+                                    ${tagsHtml}
                                 </div>
                                 <div class="card-footer bg-transparent border-0">
                                     <a href="article.html?article=${encodeURIComponent(article.path)}" class="btn btn-outline-primary btn-sm">続きを読む &raquo;</a>
@@ -254,7 +372,12 @@
                         matchesYear = articleYear === selectedYear;
                     }
                     
-                    return matchesSearch && matchesYear;
+                    let matchesTag = true;
+                    if (activeTagFilter) {
+                        matchesTag = article.tags && article.tags.includes(activeTagFilter);
+                    }
+                    
+                    return matchesSearch && matchesYear && matchesTag;
                 });
                 
                 displayArticles(filteredArticles);
@@ -266,6 +389,7 @@
             resetFilterBtn.addEventListener('click', function() {
                 searchInput.value = '';
                 yearFilter.value = 'all';
+                setActiveTagFilter('all');
                 displayArticles(allArticles);
             });
         });
