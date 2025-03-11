@@ -147,12 +147,12 @@
                     console.log('記事情報:', article);
                     console.log('取得しようとしているパス:', article.path);
                     
-                    // 記事のMarkdownを取得
-                    // パスがhttp://やhttps://で始まらない場合は、相対パスとして処理
+                    // 記事のMarkdownファイルを取得
+                    // articlePathはファイル名だけを含むと仮定して、直接articlesMdフォルダから取得する
                     const fetchPath = article.path.startsWith('http://') || article.path.startsWith('https://') 
                         ? article.path 
-                        : `articlesMd/${article.path}`;
-                        
+                        : `articlesMd/${articlePath}`;
+                    
                     console.log('Fetchに使用するパス:', fetchPath);
                     
                     return fetch(fetchPath)
