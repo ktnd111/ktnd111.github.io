@@ -145,13 +145,16 @@
                     }
                     
                     console.log('記事情報:', article);
-                    console.log('取得しようとしているパス:', article.path);
                     
-                    // 記事のMarkdownファイルを取得
-                    // articlePathはファイル名だけを含むと仮定して、直接articlesMdフォルダから取得する
-                    const fetchPath = article.path.startsWith('http://') || article.path.startsWith('https://') 
-                        ? article.path 
-                        : `articlesMd/${articlePath}`;
+                    // URLのクエリパラメータから記事ファイル名を抽出
+                    const fileName = articlePath.includes('articlesMd/') 
+                        ? articlePath.replace('articlesMd/', '') 
+                        : articlePath;
+                    
+                    // 記事のパスを構築
+                    const fetchPath = fileName.startsWith('http://') || fileName.startsWith('https://') 
+                        ? fileName 
+                        : `articlesMd/${fileName}`;
                     
                     console.log('Fetchに使用するパス:', fetchPath);
                     
