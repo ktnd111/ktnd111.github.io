@@ -144,7 +144,6 @@
                         throw new Error('指定された記事が見つかりませんでした');
                     }
                     
-<<<<<<< HEAD
                     console.log('記事情報:', article);
                     console.log('取得しようとしているパス:', articlePath);
                     
@@ -161,13 +160,6 @@
                             if (!response.ok) {
                                 console.error('Fetch失敗:', response.status, response.statusText);
                                 throw new Error(`記事の内容を取得できませんでした (${response.status})`);
-=======
-                    // 記事のMarkdownを取得
-                    return fetch(articlePath)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('記事の内容を取得できませんでした');
->>>>>>> 54659e9b1a645d2ff3ef660e151798d0b241269c
                             }
                             return response.text().then(markdown => {
                                 return { article, markdown };
