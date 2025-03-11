@@ -16,14 +16,5 @@
         "tags": ["JavaScript", "非同期処理", "Promise", "async/await"],
         "category": "フロントエンド",
         "background": "web"
-    },
-    {
-        "title": "Dockerコンテナ運用のベストプラクティス",
-        "path": "articles/docker-best-practices.html",
-        "date": "2025-02-25",
-        "summary": "本番環境でのDockerコンテナ運用におけるベストプラクティスをまとめました。",
-        "tags": ["Docker", "コンテナ", "DevOps", "CI/CD"],
-        "category": "インフラ",
-        "background": "server"
     }
 ]
