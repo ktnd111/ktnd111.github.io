@@ -151,14 +151,25 @@
                         ? articlePath.replace('articlesMd/', '') 
                         : articlePath;
                     
-                    // 記事のパスを構築
+                    console.log('ファイル名:', fileName);
+                    
+                    // 記事のパスを構築 - 相対パスに修正
+                    // GitHub Pagesのルートからの絶対パスではなく、現在のページからの相対パスを使用
                     const fetchPath = fileName.startsWith('http://') || fileName.startsWith('https://') 
                         ? fileName 
                         : `articlesMd/${fileName}`;
                     
                     console.log('Fetchに使用するパス:', fetchPath);
                     
-                    return fetch(fetchPath)
+                    // 記事ファイルが存在するか確認するためのオプション
+                    const fetchOptions = {
+                        method: 'GET',
+                        headers: {
+                            'Cache-Control': 'no-cache'
+                        }
+                    };
+                    
+                    return fetch(fetchPath, fetchOptions)
                         .then(response => {
                             if (!response.ok) {
                                 console.error('Fetch失敗:', response.status, response.statusText);
