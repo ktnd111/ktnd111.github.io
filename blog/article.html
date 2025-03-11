@@ -75,7 +75,7 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item">
-                                <a class="nav-link" href="index.html">ホーム</a>/a>
+                                <a class="nav-link" href="index.html">ホーム</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="blog.html">ブログ</a>
@@ -145,17 +145,10 @@
                     }
                     
                     console.log('記事情報:', article);
-                    console.log('取得しようとしているパス:', articlePath);
                     
                     // 記事のMarkdownを取得
-                    // パスがhttp://やhttps://で始まらない場合は、相対パスとして処理
-                    const fetchPath = articlePath.startsWith('http://') || articlePath.startsWith('https://') 
-                        ? articlePath 
-                        : `articles/${articlePath}`;
-                        
-                    console.log('Fetchに使用するパス:', fetchPath);
-                    
-                    return fetch(fetchPath)
+                    // パスをそのまま使用（articlesMdフォルダのパスが含まれているため）
+                    return fetch(article.path)
                         .then(response => {
                             if (!response.ok) {
                                 console.error('Fetch失敗:', response.status, response.statusText);
