@@ -146,21 +146,6 @@
                     
                     console.log('記事情報:', article);
                     
-                    // URLのクエリパラメータから記事ファイル名を抽出
-                    const fileName = articlePath.includes('articlesMd/') 
-                        ? articlePath.replace('articlesMd/', '') 
-                        : articlePath;
-                    
-                    console.log('ファイル名:', fileName);
-                    
-                    // 記事のパスを構築 - 相対パスに修正
-                    // GitHub Pagesのルートからの絶対パスではなく、現在のページからの相対パスを使用
-                    const fetchPath = fileName.startsWith('http://') || fileName.startsWith('https://') 
-                        ? fileName 
-                        : `articlesMd/${fileName}`;
-                    
-                    console.log('Fetchに使用するパス:', fetchPath);
-                    
                     // 記事ファイルが存在するか確認するためのオプション
                     const fetchOptions = {
                         method: 'GET',
@@ -169,19 +154,20 @@
                         }
                     };
                     
-                    return fetch(fetchPath, fetchOptions)
+                    // HTMLファイルを直接読み込む
+                    return fetch(article.path, fetchOptions)
                         .then(response => {
                             if (!response.ok) {
                                 console.error('Fetch失敗:', response.status, response.statusText);
                                 throw new Error(`記事の内容を取得できませんでした (${response.status})`);
                             }
-                            return response.text().then(markdown => {
-                                return { article, markdown };
+                            return response.text().then(htmlContent => {
+                                return { article, htmlContent };
                             });
                         });
                 })
                 .then(data => {
-                    const { article, markdown } = data;
+                    const { article, htmlContent } = data;
                     
                     // タグのHTMLを生成
                     let tagsHtml = '';
@@ -193,15 +179,9 @@
                         tagsHtml += '</div>';
                     }
                     
-                    // Markdownをレンダリング
-                    marked.setOptions({
-                        highlight: function(code, lang) {
-                            return hljs.highlightAuto(code).value;
-                        },
-                        breaks: true
-                    });
-                    
-                    const renderedContent = marked.parse(markdown);
+                    // HTML記事からbody部分のコンテンツを抽出
+                    const contentMatch = htmlContent.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                    const articleContent = contentMatch ? contentMatch[1] : htmlContent;
                     
                     // 記事を表示
                     articleContainer.innerHTML = `
@@ -214,14 +194,9 @@
                             ${tagsHtml}
                         </div>
                         <div class="markdown-body">
-                            ${renderedContent}
+                            ${articleContent}
                         </div>
                     `;
-                    
-                    // コードブロックのシンタックスハイライトを適用
-                    document.querySelectorAll('pre code').forEach((block) => {
-                        hljs.highlightBlock(block);
-                    });
                     
                     // ページタイトルを更新
                     document.title = `${article.title} | TECH BLOG`;

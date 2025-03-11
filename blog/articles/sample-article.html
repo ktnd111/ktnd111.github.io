@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>sample-article.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="linq%E3%81%AE%E5%AE%9F%E8%A1%8C%E3%82%BF%E3%82%A4%E3%83%9F%E3%83%B3%E3%82%B0%E3%81%A8%E5%A4%89%E6%95%B0%E6%9C%AA%E4%BB%A3%E5%85%A5%E3%81%AE%E8%90%BD%E3%81%A8%E3%81%97%E7%A9%B4">LINQの実行タイミングと変数未代入の落とし穴</h1>
+<p>こんにちは、今回はC#のLINQにおける遅延評価のパターンと、それによって生じる可能性のあるバグについて、実際に経験した事例をもとに解説します。</p>
+<h2 id="%E9%81%85%E5%BB%B6%E8%A9%95%E4%BE%A1%E3%81%A8%E3%81%AF">遅延評価とは？</h2>
+<p>LINQの大きな特徴の一つとして「遅延評価（Lazy Evaluation）」があります。これは、LINQのクエリが実際に<strong>結果が必要になるまで実行されない</strong>という性質です。</p>
+<p>例えば、以下のようなコードがあります：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// データソース定義</span>
+<span class="hljs-keyword">var</span> numbers = <span class="hljs-keyword">new</span> List&lt;<span class="hljs-keyword">int</span>&gt; { <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span> };
+
+<span class="hljs-comment">// クエリ定義</span>
+<span class="hljs-keyword">var</span> evenNumbers = numbers.Where(n =&gt; n % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>);
+
+<span class="hljs-comment">// この時点ではまだフィルタリングは実行されていない</span>
+
+<span class="hljs-comment">// クエリ実行</span>
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> num <span class="hljs-keyword">in</span> evenNumbers)
+{
+    Console.WriteLine(num);  <span class="hljs-comment">// ここでクエリが実行される</span>
+}
+</div></code></pre>
+<p>このコードでは、<code>Where</code>で偶数をフィルタリングするクエリを定義していますが、実際にフィルタリングが行われるのは<code>foreach</code>ループでイテレーションを開始したときです。</p>
+<h2 id="%E5%AE%9F%E9%9A%9B%E3%81%AB%E9%81%AD%E9%81%87%E3%81%97%E3%81%9F%E3%83%90%E3%82%B0">実際に遭遇したバグ</h2>
+<p>先日、以下のようなコードを書いていました：</p>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">public</span> IEnumerable&lt;UserDto&gt; <span class="hljs-title">GetActiveUsers</span>(<span class="hljs-params"></span>)</span>
+{
+    <span class="hljs-keyword">var</span> query = _dbContext.Users.AsQueryable();
+    
+    <span class="hljs-comment">// 条件に応じてクエリを構築</span>
+    <span class="hljs-keyword">if</span> (ShouldFilterByRole)
+    {
+        <span class="hljs-keyword">string</span> roleFilter = <span class="hljs-literal">null</span>;  <span class="hljs-comment">// 後で値を設定するつもり</span>
+        
+        <span class="hljs-comment">// 設定忘れ！</span>
+        <span class="hljs-comment">// roleFilter = GetUserRoleFilter();</span>
+        
+        query = query.Where(u =&gt; u.Role == roleFilter);
+    }
+    
+    <span class="hljs-comment">// 常に有効なユーザーのみを返す</span>
+    query = query.Where(u =&gt; u.IsActive);
+    
+    <span class="hljs-keyword">return</span> query.Select(u =&gt; <span class="hljs-keyword">new</span> UserDto
+    {
+        Id = u.Id,
+        Name = u.Name,
+        Email = u.Email,
+        Role = u.Role
+    });
+}
+</div></code></pre>
+<p>一見、問題ないように見えますが、<code>roleFilter</code>に値を設定し忘れています。通常なら、この変数が<code>null</code>のままであることでNULL参照の例外が発生するはずです。</p>
+<p>しかし、テストを実行したところ、例外は発生せず、不思議なことに結果は常に空のリストでした。なぜでしょうか？</p>
+<h2 id="%E9%81%85%E5%BB%B6%E8%A9%95%E4%BE%A1%E3%81%8C%E5%8E%9F%E5%9B%A0">遅延評価が原因</h2>
+<p>これは、LINQの遅延評価が原因です。</p>
+<ol>
+<li><code>GetActiveUsers</code>メソッドでは、クエリを構築するだけで、実際には実行していません</li>
+<li>実際のクエリ実行は、戻り値の<code>IEnumerable&lt;UserDto&gt;</code>がイテレートされるときに行われます</li>
+<li>その時点で、<code>roleFilter</code>は依然として<code>null</code>です</li>
+<li>SQLクエリでは、<code>Role = null</code>の条件は、NULLの比較特性により常に偽となります</li>
+<li>結果として、どのレコードも条件に一致せず、空の結果が返されます</li>
+</ol>
+<h2 id="%E6%94%B9%E5%96%84%E7%AD%96">改善策</h2>
+<p>このような問題を回避するためには、以下のような対策が考えられます：</p>
+<ol>
+<li><strong>変数の初期化チェック</strong>：重要な変数が初期化されているかを明示的に確認する</li>
+<li><strong>即時評価の使用</strong>：必要に応じて<code>ToList()</code>や<code>ToArray()</code>などで即時評価を強制する</li>
+<li><strong>コードレビュー</strong>：このような落とし穴に気づけるよう、コードレビューを徹底する</li>
+<li><strong>単体テスト</strong>：様々なパターンをカバーする単体テストを作成する</li>
+</ol>
+<h2 id="%E5%AE%9F%E8%A3%85%E4%BE%8B">実装例</h2>
+<p>改善したコードは以下のようになります：</p>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;UserDto&gt; <span class="hljs-title">GetActiveUsers</span>(<span class="hljs-params"></span>)  <span class="hljs-comment">// IEnumerableではなくListを返す</span></span>
+{
+    <span class="hljs-keyword">var</span> query = _dbContext.Users.AsQueryable();
+    
+    <span class="hljs-comment">// 条件に応じてクエリを構築</span>
+    <span class="hljs-keyword">if</span> (ShouldFilterByRole)
+    {
+        <span class="hljs-keyword">string</span> roleFilter = GetUserRoleFilter();  <span class="hljs-comment">// 必ず初期化</span>
+        
+        <span class="hljs-keyword">if</span> (roleFilter == <span class="hljs-literal">null</span>)
+        {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentNullException(<span class="hljs-keyword">nameof</span>(roleFilter), <span class="hljs-string">"Role filter cannot be null"</span>);
+        }
+        
+        query = query.Where(u =&gt; u.Role == roleFilter);
+    }
+    
+    <span class="hljs-comment">// 常に有効なユーザーのみを返す</span>
+    query = query.Where(u =&gt; u.IsActive);
+    
+    <span class="hljs-comment">// ToListで即時評価を強制</span>
+    <span class="hljs-keyword">return</span> query.Select(u =&gt; <span class="hljs-keyword">new</span> UserDto
+    {
+        Id = u.Id,
+        Name = u.Name,
+        Email = u.Email,
+        Role = u.Role
+    }).ToList();
+}
+</div></code></pre>
+<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+<p>LINQの遅延評価は非常に強力な機能ですが、このように予期せぬ動作につながることもあります。特に、クエリ実行時点での変数の状態に依存するコードを書く場合は注意が必要です。</p>
+<p>実際に経験してみると、C#とLINQの理解がより深まりますね。みなさんも同様のバグに遭遇したことはありますか？コメントで共有していただけると嬉しいです。</p>
+<p>次回は、Entity Frameworkにおけるクエリの最適化についてお話しする予定です。お楽しみに！</p>
+
+</body>
+</html>

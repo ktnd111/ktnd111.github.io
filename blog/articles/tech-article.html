@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>tech-article.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="linq%E3%81%AE%E5%AE%9F%E8%A1%8C%E3%82%BF%E3%82%A4%E3%83%9F%E3%83%B3%E3%82%B0%E3%81%A8%E5%A4%89%E6%95%B0%E6%9C%AA%E4%BB%A3%E5%85%A5%E3%81%AE%E8%90%BD%E3%81%A8%E3%81%97%E7%A9%B4">LINQの実行タイミングと変数未代入の落とし穴</h1>
+<p>システム開発において単体テストは通過したのに結合テストで初めて発見されるバグは珍しくありません。
+今回は私が経験したコード実装における思わぬバグについて共有します。このケースはLINQの実行タイミングと変数の扱いに関する落とし穴に加え、テスト設計の重要性も浮き彫りにした事例です。</p>
+<h2 id="%E3%83%90%E3%82%B0%E3%81%AE%E6%A6%82%E8%A6%81">バグの概要</h2>
+<p>システム改修の際に、コードの一部を修正した結果、予期せぬ問題が発生しました。単体テストでは問題なく通過したにもかかわらず、結合テストで初めてバグが発覚しました。</p>
+<p>具体的には、DisplayRank（表示順位）が1〜3のデータだけを取得して処理するはずが、すべてのデータが処理されてしまうという問題でした。単体テストでは気づかなかったのですが、E2Eテストでは「1, 2, 2, 3」といった不正なデータ順序が検出され、大きな混乱を招きました。</p>
+<h2 id="%E5%95%8F%E9%A1%8C%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%89">問題のコード</h2>
+<p>問題となったコードは次のようなものでした。</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// DBからEntity Frameworkでデータを取得</span>
+<span class="hljs-keyword">var</span> articles = GetArticles();
+
+<span class="hljs-comment">// 誤ったコード</span>
+articles.Where(a =&gt; a.DisplayRank &gt;= <span class="hljs-number">1</span> &amp;&amp; a.DisplayRank &lt;= <span class="hljs-number">3</span>).OrderBy(a =&gt; a.DisplayRank);
+<span class="hljs-comment">// その後の処理</span>
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> item <span class="hljs-keyword">in</span> articles)
+{
+    <span class="hljs-comment">// 処理内容</span>
+}
+</div></code></pre>
+<h2 id="%E4%BD%95%E3%81%8C%E5%95%8F%E9%A1%8C%E3%81%A0%E3%81%A3%E3%81%9F%E3%81%AE%E3%81%8B">何が問題だったのか</h2>
+<p>上記のコードには2つの重大な問題があります。</p>
+<ol>
+<li>
+<p><strong>LINQ式の結果を変数に代入していない</strong>
+LINQ式の結果が左辺の変数に代入されていないため、クエリは実行されますが結果は破棄されています。</p>
+</li>
+<li>
+<p><strong>元のコレクションに対してループ処理</strong>
+フィルタリングした結果ではなく、元の<code>news</code>コレクションに対して<code>foreach</code>ループを実行しているため、フィルタリングが無効になっています。</p>
+</li>
+</ol>
+<h2 id="%E6%AD%A3%E3%81%97%E3%81%84%E3%82%B3%E3%83%BC%E3%83%89">正しいコード</h2>
+<p>正しく実装すると次のようになります。</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// DBからEntity Frameworkでデータを取得</span>
+<span class="hljs-keyword">var</span> articles = GetArticles();
+
+<span class="hljs-comment">// 正しいコード</span>
+<span class="hljs-keyword">var</span> filteredArticles = articles.Where(a =&gt; a.DisplayRank &gt;= <span class="hljs-number">1</span> &amp;&amp; a.DisplayRank &lt;= <span class="hljs-number">3</span>)
+                        .OrderBy(a =&gt; a.DisplayRank)
+                        .ToList(); <span class="hljs-comment">// 実行を確定させる</span>
+<span class="hljs-comment">// フィルタリングされたコレクションに対して処理</span>
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> item <span class="hljs-keyword">in</span> filteredArticles)
+{
+    <span class="hljs-comment">// 処理内容</span>
+}
+</div></code></pre>
+<h2 id="%E3%81%AA%E3%81%9C%E5%8D%98%E4%BD%93%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E6%A4%9C%E5%87%BA%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%8B%E3%81%A3%E3%81%9F%E3%81%AE%E3%81%8B">なぜ単体テストで検出できなかったのか</h2>
+<p>単体テストでは、おそらく次のような理由で問題が検出できませんでした。</p>
+<ol>
+<li>テストデータが少なく、フィルタリングの有無による違いが明確に現れなかった</li>
+<li>テストケースが実際の利用シナリオを十分にカバーしていなかった</li>
+<li>テスト環境と実環境でのデータ構造や量に違いがあった</li>
+</ol>
+<h2 id="%E6%95%99%E8%A8%93">教訓</h2>
+<p>このバグから学べる教訓は以下の通りです。</p>
+<ol>
+<li>
+<p><strong>LINQの遅延評価を理解する</strong>
+LINQは実際に結果が必要になるまで評価を遅延させます。<code>ToList()</code>などのメソッドを呼び出すまでクエリは実行されません。</p>
+</li>
+<li>
+<p><strong>変数への代入を確認する</strong>
+特にLINQのような式の結果は、必ず変数に代入して使用するようにしましょう。</p>
+</li>
+<li>
+<p><strong>コードレビューの重要性</strong>
+些細なミスも複数の目で確認することで発見できる可能性が高まります。</p>
+</li>
+<li>
+<p><strong>統合テストの設計</strong>
+単体テストだけでなく、実際の利用シナリオに基づいた統合テストを設計することが重要です。</p>
+</li>
+</ol>
+<h2 id="%E5%8A%B9%E6%9E%9C%E7%9A%84%E3%81%AA%E3%83%86%E3%82%B9%E3%83%88%E8%A8%AD%E8%A8%88%E3%81%AE%E9%87%8D%E8%A6%81%E6%80%A7">効果的なテスト設計の重要性</h2>
+<p>今回のバグは、単体テストでは検出できなかったものの、結合テストで発覚しました。この経験から、テスト設計の重要性について考えてみましょう。</p>
+<h3 id="%E5%8D%98%E4%BD%93%E3%83%86%E3%82%B9%E3%83%88%E3%81%AE%E8%90%BD%E3%81%A8%E3%81%97%E7%A9%B4">単体テストの落とし穴</h3>
+<p>当初の単体テストでは、以下のようなアプローチを取っていました。</p>
+<pre class="hljs"><code><div>[<span class="hljs-meta">Fact</span>]
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">FilterArticles_ReturnsCorrectData</span>(<span class="hljs-params"></span>)</span>
+{
+    <span class="hljs-comment">// Arrange</span>
+    <span class="hljs-keyword">var</span> articles = SetupTestArticles(); <span class="hljs-comment">// DisplayRank 1,2,3の記事を用意</span>
+    <span class="hljs-keyword">var</span> service = <span class="hljs-keyword">new</span> ArticleService();
+    
+    <span class="hljs-comment">// 挿入処理を実行</span>
+    service.InsertNewArticle(<span class="hljs-keyword">new</span> Article { Title = <span class="hljs-string">"新記事"</span>, DisplayRank = <span class="hljs-number">1</span> });
+    
+    <span class="hljs-comment">// 既存のデータが変わっていることだけを確認していた</span>
+    <span class="hljs-comment">// ただし、フィルタリングの結果を直接検証していなかった</span>
+}
+</div></code></pre>
+<p>このテストでは、「データが変わる」という事実は確認できましたが、「正しくフィルタリングされるか」という核心部分を検証していませんでした。</p>
+<h3 id="%E3%82%88%E3%82%8A%E5%8A%B9%E6%9E%9C%E7%9A%84%E3%81%AA%E3%83%86%E3%82%B9%E3%83%88%E8%A8%AD%E8%A8%88">より効果的なテスト設計</h3>
+<p>さまざまな実装がありますが、シンプルな実装を考えてみます。
+動作としては、1→2→3→nullの順に表示ランクを調整しています。</p>
+<pre class="hljs"><code><div>[<span class="hljs-meta">Theory</span>]
+[<span class="hljs-meta">InlineData(1)</span>]
+[<span class="hljs-meta">InlineData(2)</span>]
+[<span class="hljs-meta">InlineData(3)</span>]
+[<span class="hljs-meta">InlineData(null)</span>]
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">InsertArticle_ShiftsRanksCorrectly</span>(<span class="hljs-params"><span class="hljs-keyword">int</span>? newRank</span>)</span>
+{
+    <span class="hljs-comment">// Arrange - DisplayRank 1,2,3の記事を用意</span>
+    <span class="hljs-keyword">var</span> existingArticles = SetupTestArticles();
+    <span class="hljs-keyword">var</span> service = <span class="hljs-keyword">new</span> ArticleService();
+    
+    <span class="hljs-comment">// Act - 新しい記事を挿入</span>
+    service.InsertNewArticle(<span class="hljs-keyword">new</span> Article { Title = <span class="hljs-string">"新記事"</span>, DisplayRank = newRank });
+    
+    <span class="hljs-comment">// Assert - 期待値の設定</span>
+    <span class="hljs-keyword">int</span>? expectedRank1, expectedRank2, expectedRank3;
+    
+    <span class="hljs-keyword">if</span> (newRank == <span class="hljs-number">1</span>)
+    {
+        expectedRank1 = <span class="hljs-number">2</span>;
+        expectedRank2 = <span class="hljs-number">3</span>;
+        expectedRank3 = <span class="hljs-literal">null</span>;
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (newRank == <span class="hljs-number">2</span>)
+    {
+        expectedRank1 = <span class="hljs-number">1</span>;
+        expectedRank2 = <span class="hljs-number">3</span>;
+        expectedRank3 = <span class="hljs-literal">null</span>;
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (newRank == <span class="hljs-number">3</span>)
+    {
+        expectedRank1 = <span class="hljs-number">1</span>;
+        expectedRank2 = <span class="hljs-number">2</span>;
+        expectedRank3 = <span class="hljs-literal">null</span>;
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-comment">// newRank == null</span>
+    {
+        expectedRank1 = <span class="hljs-number">1</span>;
+        expectedRank2 = <span class="hljs-number">2</span>;
+        expectedRank3 = <span class="hljs-number">3</span>;
+    }
+    
+    <span class="hljs-comment">// 各記事のランクを確認</span>
+    <span class="hljs-comment">// ...</span>
+    
+    <span class="hljs-comment">// フィルタリングの結果も明示的に確認</span>
+    <span class="hljs-keyword">var</span> filteredArticles = service.GetArticlesByRank(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>);
+    Assert.Equal(<span class="hljs-number">3</span>, filteredArticles.Count); <span class="hljs-comment">// ランク1-3の記事が正確に3つあるべき</span>
+}
+</div></code></pre>
+<p>このアプローチの利点：</p>
+<ol>
+<li>複数のテストケースを効率的に実行できる</li>
+<li>各ケースの期待値を明示的に設定し、正確に検証できる</li>
+<li>フィルタリングの結果そのものを検証している</li>
+</ol>
+<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+<p>一見単純なミスに思えますが、LINQの遅延評価の特性と相まって発見が難しいバグになりました。このような経験は、コードの書き方だけでなくテスト設計の重要性も教えてくれます。</p>
+<p>特に重要なのは以下の点です：</p>
+<ol>
+<li>LINQは変数に代入して利用する</li>
+<li>フィルタリングの結果を明示的に検証するテストを書く</li>
+<li>複数のケースを網羅的にテストする（<code>Theory</code>と<code>InlineData</code>の活用）</li>
+<li>データの変化だけでなく、処理の結果も検証する</li>
+</ol>
+<p>普段気をつけていても起こりうるミスなので、複数の検証ステップを設けることが大切です。テストは「動作すること」だけでなく「正しく動作すること」を確認するものであることを忘れないようにしましょう。</p>
+
+</body>
+</html>

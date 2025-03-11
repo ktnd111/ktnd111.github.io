@@ -339,7 +339,7 @@
                             <div class="card h-100 ${bgClass}">
                                 ${article.category ? `<div class="category-badge">${article.category}</div>` : ''}
                                 <div class="card-body">
-                                    <h3 class="card-title"><a href="article.html?article=${encodeURIComponent(article.path.replace('articlesMd/', ''))}">${article.title}</a></h3>
+                                    <h3 class="card-title"><a href="article.html?article=${encodeURIComponent(article.path)}">${article.title}</a></h3>
                                     <div class="article-meta">
                                         <i class="far fa-calendar-alt"></i> ${article.date}
                                     </div>
@@ -347,7 +347,7 @@
                                     ${tagsHtml}
                                 </div>
                                 <div class="card-footer bg-transparent border-0">
-                                    <a href="article.html?article=${encodeURIComponent(article.path.replace('articlesMd/', ''))}" class="btn btn-outline-primary btn-sm">続きを読む &raquo;</a>
+                                    <a href="article.html?article=${encodeURIComponent(article.path)}" class="btn btn-outline-primary btn-sm">続きを読む &raquo;</a>
                                 </div>
                             </div>
                         `;
