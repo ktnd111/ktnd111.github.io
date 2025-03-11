@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH BLOG</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292e;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            border-bottom: 1px solid #eaecef;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+        nav {
+            margin-bottom: 20px;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            gap: 15px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #0366d6;
+        }
+        .article-list {
+            margin-bottom: 30px;
+        }
+        .article-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eaecef;
+        }
+        .article-meta {
+            color: #586069;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eaecef;
+            color: #586069;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>TECH BLOG</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="archive.html">アーカイブ</a></li>
+                <li><a href="about.html">このサイトについて</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="article-list">
+            <h2>最新の記事</h2>
+            <div id="articles-container">
+                <p>読み込み中...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 TECH BLOG. Powered by GitHub Pages.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const articlesContainer = document.getElementById('articles-container');
+            
+            // 外部JSONファイルから記事データを読み込む
+            fetch('articles.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('記事データの読み込みに失敗しました');
+                    }
+                    return response.json();
+                })
+                .then(articles => {
+                    if (articles.length > 0) {
+                        articlesContainer.innerHTML = '';
+                        
+                        articles.forEach(article => {
+                            const articleElement = document.createElement('div');
+                            articleElement.className = 'article-item';
+                            
+                            articleElement.innerHTML = `
+                                <h3><a href="article.html?article=${encodeURIComponent(article.path)}">${article.title}</a></h3>
+                                <div class="article-meta">${article.date}</div>
+                                <p>${article.summary}</p>
+                                <a href="article.html?article=${encodeURIComponent(article.path)}">続きを読む &raquo;</a>
+                            `;
+                            
+                            articlesContainer.appendChild(articleElement);
+                        });
+                    } else {
+                        articlesContainer.innerHTML = '<p>記事がありません。</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    articlesContainer.innerHTML = '<p>記事データの読み込みに失敗しました。しばらくしてからもう一度お試しください。</p>';
+                });
+        });
+    </script>
+</body>
+</html>
