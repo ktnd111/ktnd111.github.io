@@ -1,7 +1,7 @@
 [
     {
         "title": "LINQの実行タイミングと変数未代入の落とし穴",
-        "path": "blog/articlesMd/tech-article.md",
+        "path": "articlesMd/tech-article.md",
         "date": "2025-03-10",
         "summary": "LINQの遅延評価と変数未代入のバグについて実体験をもとに解説します。",
         "tags": ["C#", "LINQ", "デバッグ", "テスト設計"],
@@ -10,7 +10,7 @@
     },
     {
         "title": "JavaScriptのモダンな非同期処理パターンサンプル",
-        "path": "blog/articlesMd/sample-article-md.md",
+        "path": "articlesMd/sample-article-md.md",
         "date": "2025-03-05",
         "summary": "Promiseからasync/awaitまで、JavaScriptの非同期処理パターンを解説します。",
         "tags": ["JavaScript", "非同期処理", "Promise", "async/await"],
@@ -19,7 +19,7 @@
     },
     {
         "title": "Dockerコンテナ運用のベストプラクティス",
-        "path": "blog/articlesMd/docker-best-practices.md",
+        "path": "articlesMd/docker-best-practices.md",
         "date": "2025-02-25",
         "summary": "本番環境でのDockerコンテナ運用におけるベストプラクティスをまとめました。",
         "tags": ["Docker", "コンテナ", "DevOps", "CI/CD"],
