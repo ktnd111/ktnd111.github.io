@@ -1,11 +1,119 @@
 [
     {
-        "title": "LINQの実行タイミングと変数未代入の落とし穴",
-        "path": "articles/tech-article.html",
-        "date": "2025-03-10",
-        "summary": "LINQの遅延評価と変数未代入のバグについて実体験をもとに解説します。",
-        "tags": ["C#", "LINQ", "デバッグ", "テスト設計"],
-        "category": "プログラミング",
-        "background": "tech"
+      "title": "LINQの実行タイミングと変数未代入の落とし穴",
+      "path": "articles/tech-article.html",
+      "date": "2025-03-10",
+      "summary": "LINQの遅延評価と変数未代入のバグについて実体験をもとに解説します。",
+      "tags": ["C#", "LINQ", "デバッグ", "テスト設計"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "ASP.NET CoreのDI完全ガイド",
+      "path": "articles/csharp-aspnet-dependency-injection.html",
+      "date": "2025-02-20",
+      "summary": "ASP.NET CoreのDependency Injectionの基本から応用まで詳しく解説します。",
+      "tags": ["C#", "ASP.NET Core", "DI", "設計パターン"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "ASP.NET Coreのエラーハンドリング：専用コントローラーvs既存コントローラー",
+      "path": "articles/csharp-aspnet-error-handle.html",
+      "date": "2025-01-17",
+      "summary": "ASP.NET Coreアプリケーションにおけるエラーハンドリングの実装方法を比較検討します。",
+      "tags": ["C#", "ASP.NET Core", "エラーハンドリング"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "C# AWS ALB⇔Lambda Mock Test Tool ローカル環境下でデバッグする",
+      "path": "articles/csharp-aws-lambda-mocktesttool.html",
+      "date": "2025-01-28",
+      "summary": "AWS Lambdaを使ったサーバーレスアプリケーションをローカル環境でテストする方法を解説します。",
+      "tags": ["AWS", "C#", "Lambda", "ALB", "Visual Studio"],
+      "category": "クラウド",
+      "background": "tech"
+    },
+    {
+      "title": "C# 12で進化したコレクション操作の基本と応用",
+      "path": "articles/csharp-cs12-collections.html",
+      "date": "2025-02-03",
+      "summary": "C# 12で追加された新しいコレクション操作機能の使い方を基本から応用まで解説します。",
+      "tags": ["C#", "コレクション", "C# 12"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "C#におけるEnum Flags属性の実践ガイド",
+      "path": "articles/csharp-enum-flags-guide.html",
+      "date": "2025-01-15",
+      "summary": "C#でEnum Flags属性を使ったビットフラグの実装方法と活用例を紹介します。",
+      "tags": ["C#", "Enum", "Flag"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "C# LINQ入門 - データ操作の基本構文",
+      "path": "articles/csharp-linq-basic-sentense.html",
+      "date": "2025-01-16",
+      "summary": "C#のLINQを使ったデータ操作の基本的な構文と使い方を初心者向けに解説します。",
+      "tags": ["C#", "LINQ"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "C# LINQ入門 データベースからデータを取得する基本構文",
+      "path": "articles/csharp-linq-beginner.html",
+      "date": "2025-01-09",
+      "summary": "C#のLINQを使ってデータベースからデータを取得する基本的な方法を解説します。",
+      "tags": ["C#", "LINQ"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "[Moq & xUnit] BlobClient.OpenReadAsyncをモック化する方法",
+      "path": "articles/csharp-moq-xunit-openreadasync.html",
+      "date": "2025-02-21",
+      "summary": "C#のテストフレームワークを使用してAzure Storage Blobsクライアントのモック化方法を紹介します。",
+      "tags": ["C#", "xUnit", "Moq", "テスト", "Azure"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "デスクトップアプリからWebアプリへ：開発パラダイムの転換と理解",
+      "path": "articles/csharp-paradigm-shift.html",
+      "date": "2025-02-10",
+      "summary": "デスクトップアプリケーション開発とWebアプリケーション開発の違いと移行における考え方を解説します。",
+      "tags": ["C#", "Web開発", "アーキテクチャ"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "C#プログラマーのためのPHP入門ガイド",
+      "path": "articles/csharp-php-guide.html",
+      "date": "2025-02-13",
+      "summary": "C#プログラマーがPHPを学ぶ際に知っておくべき違いと基本的な概念を解説します。",
+      "tags": ["PHP", "C#"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "C# switch式の実践例",
+      "path": "articles/csharp-switch-expression.html",
+      "date": "2025-01-14",
+      "summary": "C# 8.0から導入されたswitch式の基本的な使い方と実践的な応用例を紹介します。",
+      "tags": ["C#", "パターンマッチング"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "PowerShellでファイルを一括リネームする",
+      "path": "articles/powershell-rename.html",
+      "date": "2025-01-09",
+      "summary": "PowerShellを使用したファイルの一括リネーム方法と実践的な例を紹介します。",
+      "tags": ["PowerShell", "効率化", "Windows"],
+      "category": "生産性",
+      "background": "tech"
     }
-]
+  ]
