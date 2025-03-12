@@ -151,7 +151,7 @@ LINQ式の結果が左辺の変数に代入されていないため、クエリ�
 <li>テスト環境と実環境でのデータ構造や量に違いがあった</li>
 </ul>
 <h2 id="%E6%95%99%E8%A8%93">教訓</h2>
-<p>このバグから学べる教訓は以下の通りです：</p>
+<p>このバグから学べる教訓は以下の通りです。</p>
 <ol>
 <li>
 <p><strong>LINQの遅延評価を理解する</strong> 🔍<br>
@@ -173,7 +173,7 @@ LINQは実際に結果が必要になるまで評価を遅延させます。<cod
 <h2 id="%E5%8A%B9%E6%9E%9C%E7%9A%84%E3%81%AA%E3%83%86%E3%82%B9%E3%83%88%E8%A8%AD%E8%A8%88%E3%81%AE%E9%87%8D%E8%A6%81%E6%80%A7">効果的なテスト設計の重要性</h2>
 <p>今回のバグは、単体テストでは検出できなかったものの、結合テストで発覚しました。この経験から、テスト設計の重要性について考えてみましょう。</p>
 <h3 id="%E5%8D%98%E4%BD%93%E3%83%86%E3%82%B9%E3%83%88%E3%81%AE%E8%90%BD%E3%81%A8%E3%81%97%E7%A9%B4">単体テストの落とし穴</h3>
-<p>当初の単体テストでは、以下のようなアプローチを取っていました：</p>
+<p>当初の単体テストでは、以下のようなアプローチを取っていました。</p>
 <pre class="hljs"><code><div>[<span class="hljs-meta">Fact</span>]
 <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">FilterArticles_ReturnsCorrectData</span>(<span class="hljs-params"></span>)</span>
 {
@@ -233,7 +233,6 @@ LINQは実際に結果が必要になるまで評価を遅延させます。<cod
 </ul>
 <h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
 <p>一見単純なミスに思えますが、LINQの遅延評価の特性と相まって発見が難しいバグになりました。このような経験は、コードの書き方だけでなくテスト設計の重要性も教えてくれます。</p>
-<p>特に重要なのは以下の点です：</p>
 <ol>
 <li><strong>LINQは変数に代入して利用する</strong> ✅</li>
 <li><strong>フィルタリングの結果を明示的に検証するテストを書く</strong> 🧪</li>
