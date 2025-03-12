@@ -15,7 +15,7 @@
       "summary": "ASP.NET CoreのDependency Injectionの基本から応用まで詳しく解説します。",
       "tags": ["C#", "ASP.NET Core", "DI", "設計パターン"],
       "category": "プログラミング",
-      "background": "tech"
+      "background": "web"
     },
     {
       "title": "ASP.NET Coreのエラーハンドリング：専用コントローラーvs既存コントローラー",
@@ -24,7 +24,7 @@
       "summary": "ASP.NET Coreアプリケーションにおけるエラーハンドリングの実装方法を比較検討します。",
       "tags": ["C#", "ASP.NET Core", "エラーハンドリング"],
       "category": "プログラミング",
-      "background": "tech"
+      "background": "web"
     },
     {
       "title": "C# AWS ALB⇔Lambda Mock Test Tool ローカル環境下でデバッグする",
@@ -33,7 +33,7 @@
       "summary": "AWS Lambdaを使ったサーバーレスアプリケーションをローカル環境でテストする方法を解説します。",
       "tags": ["AWS", "C#", "Lambda", "ALB", "Visual Studio"],
       "category": "クラウド",
-      "background": "tech"
+      "background": "web"
     },
     {
       "title": "C# 12で進化したコレクション操作の基本と応用",
@@ -114,6 +114,6 @@
       "summary": "PowerShellを使用したファイルの一括リネーム方法と実践的な例を紹介します。",
       "tags": ["PowerShell", "効率化", "Windows"],
       "category": "生産性",
-      "background": "tech"
+      "background": "performance"
     }
   ]
