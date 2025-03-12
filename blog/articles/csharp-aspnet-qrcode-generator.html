@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>csharp-aspnet-qrcode-generator.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p>ASP.NET Core Razorページを使用して、シンプルなQRコードジェネレーターを作成する方法を解説します。
+このアプリケーションではユーザーが入力したテキストからQRコードを生成し、表示およびダウンロードすることができます。</p>
+<p>demoページはこちら。（F1コールドスタートなので起動に時間がかかる場合があります）
+https://testapps-1-f4ahh8bxazbgfnac.japanwest-01.azurewebsites.net/QrCodeGenerator</p>
+<h2 id="%E5%BF%85%E8%A6%81%E3%81%AA%E7%92%B0%E5%A2%83">必要な環境</h2>
+<ul>
+<li>.NET 8.0</li>
+<li>Visual Studio 2022</li>
+<li>QRCoder NuGetパッケージ</li>
+</ul>
+<h2 id="%E5%AE%9F%E8%A3%85%E6%89%8B%E9%A0%86">実装手順</h2>
+<h3 id="1-nuget%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB">1. NuGetパッケージのインストール</h3>
+<p>QRコード生成に必要な<code>QRCoder</code>パッケージをインストールします。</p>
+<pre class="hljs"><code><div>dotnet add package QRCoder
+</div></code></pre>
+<p>もしくは、Nugetパッケージマネージャーからでも構いません。</p>
+<h3 id="2-razor%E3%83%9A%E3%83%BC%E3%82%B8%E3%81%AE%E4%BD%9C%E6%88%90">2. Razorページの作成</h3>
+<p>QRコードジェネレーター用のページを作成します。ここではコードの重要な部分にフォーカスして説明します。</p>
+<h4 id="qrcodegeneratorcshtml">QrCodeGenerator.cshtml</h4>
+<pre class="hljs"><code><div>@page
+@model TestApp1Azure.Pages.QrCodeGeneratorModel
+@{
+    ViewData[&quot;Title&quot;] = &quot;QrCodeGenerator&quot;;
+}
+&lt;style&gt;
+    .input-field {
+        width: 300px;
+        padding: 5px;
+        margin-right: 10px;
+    }
+&lt;/style&gt;
+
+&lt;h3&gt;@ViewData[&quot;Title&quot;]&lt;/h3&gt;
+
+&lt;form method=&quot;post&quot;&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;inputText&quot;&gt;Text for QR Code:&lt;/label&gt;
+        &lt;input type=&quot;text&quot; asp-for=&quot;InputText&quot; id=&quot;inputText&quot; class=&quot;input-field&quot; /&gt;
+        &lt;button type=&quot;submit&quot;&gt;Generate&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/form&gt;
+
+@if (!string.IsNullOrEmpty(Model.QrCodeImage))
+{
+    &lt;div&gt;
+        &lt;hr /&gt;
+        &lt;h4&gt;Generated QR Code:&lt;/h4&gt;
+        &lt;img src=&quot;@Model.QrCodeImage&quot; alt=&quot;QR Code&quot; style=&quot;width: 300px; height: 300px;&quot; /&gt;
+        &lt;div class=&quot;mt-3&quot;&gt;
+            &lt;form method=&quot;post&quot; asp-page-handler=&quot;Download&quot;&gt;
+                &lt;input type=&quot;hidden&quot; asp-for=&quot;InputText&quot; /&gt;
+                &lt;button type=&quot;submit&quot; class=&quot;btn btn-primary&quot;&gt;Download QR Code&lt;/button&gt;
+            &lt;/form&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+}
+
+</div></code></pre>
+<h4 id="qrcodegeneratorcshtmlcs">QrCodeGenerator.cshtml.cs</h4>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">QrCodeGeneratorModel</span> : <span class="hljs-title">PageModel</span>
+{
+    [<span class="hljs-meta">BindProperty</span>]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span>? InputText { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span>? QrCodeImage { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">OnGet</span>(<span class="hljs-params"></span>)</span>
+    {
+        InputText = <span class="hljs-string">""</span>;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">OnPost</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">string</span>.IsNullOrEmpty(InputText))
+        {
+            QrCodeImage = GenerateQRCode(InputText);
+        }
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> IActionResult <span class="hljs-title">OnPostDownload</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">string</span>.IsNullOrEmpty(InputText))
+        {
+            <span class="hljs-keyword">return</span> RedirectToPage();
+        }
+
+        <span class="hljs-keyword">var</span> qrCodeBytes = GenerateQRCodeBytes(InputText);
+        <span class="hljs-keyword">return</span> File(qrCodeBytes, <span class="hljs-string">"image/png"</span>, <span class="hljs-string">"qrcode.png"</span>);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">string</span> <span class="hljs-title">GenerateQRCode</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> text</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> qrCodeBytes = GenerateQRCodeBytes(text);
+        <span class="hljs-keyword">return</span> <span class="hljs-string">$"data:image/png;base64,<span class="hljs-subst">{Convert.ToBase64String(qrCodeBytes)}</span>"</span>;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">GenerateQRCodeBytes</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> text</span>)</span>
+    {
+        <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> qrGenerator = <span class="hljs-keyword">new</span> QRCodeGenerator();
+        <span class="hljs-keyword">var</span> qrCodeData = qrGenerator.CreateQrCode(text, QRCodeGenerator.ECCLevel.Q);
+        <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> qrCode = <span class="hljs-keyword">new</span> PngByteQRCode(qrCodeData);
+        <span class="hljs-keyword">return</span> qrCode.GetGraphic(<span class="hljs-number">20</span>);
+    }
+}
+</div></code></pre>
+<h2 id="%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88%E8%A7%A3%E8%AA%AC">コードのポイント解説</h2>
+<h3 id="%E2%91%A0%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E5%85%A5%E5%8A%9B%E3%81%A8%E8%A1%A8%E7%A4%BA">①ユーザー入力と表示</h3>
+<ul>
+<li>シンプルなフォームで入力を受け付け、POSTメソッドでサーバーにデータを送信します。</li>
+<li>条件付きレンダリング（<code>@if</code>）を使用して、QRコードが生成された場合のみ表示部分を表示します。</li>
+</ul>
+<h3 id="%E2%91%A1qr%E3%82%B3%E3%83%BC%E3%83%89%E7%94%9F%E6%88%90%E3%81%AE%E6%A0%B8%E5%BF%83%E9%83%A8%E5%88%86">②QRコード生成の核心部分</h3>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">GenerateQRCodeBytes</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> text</span>)</span>
+{
+    <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> qrGenerator = <span class="hljs-keyword">new</span> QRCodeGenerator();
+    <span class="hljs-keyword">var</span> qrCodeData = qrGenerator.CreateQrCode(text, QRCodeGenerator.ECCLevel.Q);
+    <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> qrCode = <span class="hljs-keyword">new</span> PngByteQRCode(qrCodeData);
+    <span class="hljs-keyword">return</span> qrCode.GetGraphic(<span class="hljs-number">20</span>);
+}
+</div></code></pre>
+<p>このメソッドが実際にQRコードを生成する核心部分です。</p>
+<ul>
+<li><code>QRCodeGenerator</code>インスタンスを作成し、入力テキストからQRコードデータを生成します。</li>
+<li>エラー訂正レベルは<code>ECCLevel.Q</code>（中程度）に設定しています。</li>
+<li><code>PngByteQRCode</code>クラスを使用してPNG形式のQRコードを生成します。</li>
+<li>サイズパラメーター（20）はモジュールのピクセルサイズを指定します。</li>
+</ul>
+<h3 id="%E2%91%A2base64%E3%82%A8%E3%83%B3%E3%82%B3%E3%83%BC%E3%83%89%E3%81%A8ui%E8%A1%A8%E7%A4%BA">③Base64エンコードとUI表示</h3>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">string</span> <span class="hljs-title">GenerateQRCode</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> text</span>)</span>
+{
+    <span class="hljs-keyword">var</span> qrCodeBytes = GenerateQRCodeBytes(text);
+    <span class="hljs-keyword">return</span> <span class="hljs-string">$"data:image/png;base64,<span class="hljs-subst">{Convert.ToBase64String(qrCodeBytes)}</span>"</span>;
+}
+</div></code></pre>
+<ul>
+<li>生成したQRコードをBase64エンコードして、HTMLで直接表示できる形式に変換します。</li>
+<li><code>data:image/png;base64,</code>プレフィックスを付けることで、ブラウザがこれを画像として認識します。</li>
+</ul>
+<h3 id="%E2%91%A3%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E6%A9%9F%E8%83%BD">④ダウンロード機能</h3>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">public</span> IActionResult <span class="hljs-title">OnPostDownload</span>(<span class="hljs-params"></span>)</span>
+{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">string</span>.IsNullOrEmpty(InputText))
+    {
+        <span class="hljs-keyword">return</span> RedirectToPage();
+    }
+
+    <span class="hljs-keyword">var</span> qrCodeBytes = GenerateQRCodeBytes(InputText);
+    <span class="hljs-keyword">return</span> File(qrCodeBytes, <span class="hljs-string">"image/png"</span>, <span class="hljs-string">"qrcode.png"</span>);
+}
+</div></code></pre>
+<ul>
+<li>ダウンロードボタンがクリックされると、このハンドラーが呼び出されます。</li>
+<li><code>File()</code>メソッドを使用して、QRコードをPNGファイルとしてダウンロードできるようにします。</li>
+<li>適切なMIMEタイプ（<code>image/png</code>）とファイル名（<code>qrcode.png</code>）を指定しています。</li>
+</ul>
+<h3 id="%E2%91%A4%E3%82%B3%E3%83%BC%E3%83%89%E8%A8%AD%E8%A8%88%E3%81%AE%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88">⑤コード設計のポイント</h3>
+<ul>
+<li>QRコード生成ロジックを共通メソッドに分離し、表示とダウンロードの両方で再利用しています。</li>
+<li><code>using</code>ステートメントでリソースの適切な解放を保証しています。</li>
+<li>フォームの入力値とプロパティの自動バインディングに<code>[BindProperty]</code>属性を活用しています。</li>
+</ul>
+<h2 id="%E5%8F%82%E8%80%83%E8%B3%87%E6%96%99">参考資料</h2>
+<h3 id="qrcoder%E9%96%A2%E9%80%A3">QRCoder関連</h3>
+<ul>
+<li><a href="https://github.com/codebude/QRCoder">QRCoder GitHub リポジトリ</a> - QRCoderライブラリの公式ソースコード</li>
+<li><a href="https://www.nuget.org/packages/QRCoder/">QRCoder NuGet パッケージ</a> - NuGet上のQRCoderパッケージ</li>
+</ul>
+<h3 id="aspnet-core-razor-pages%E9%96%A2%E9%80%A3">ASP.NET Core Razor Pages関連</h3>
+<ul>
+<li><a href="https://learn.microsoft.com/ja-jp/aspnet/core/razor-pages/">ASP.NET Core Razor Pagesの概要</a> - Microsoftの公式ドキュメント</li>
+<li><a href="https://learn.microsoft.com/ja-jp/aspnet/core/mvc/views/razor">Razor構文リファレンス</a> - Razor構文の詳細な解説</li>
+<li><a href="https://learn.microsoft.com/ja-jp/aspnet/core/razor-pages/handler-methods">ASP.NET Core でのページハンドラーメソッド</a> - OnGet、OnPostなどのハンドラーメソッドの詳細</li>
+</ul>
+<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+<p>ASP.NET CoreとQRCoderパッケージを使用してシンプルながらも実用的なQRコードジェネレーターを簡単に実装しました。</p>
+<p>QRCoderライブラリは豊富な機能を提供しており、今回の基本実装を拡張して、カラーQRコードや特殊なフォーマットへの対応も可能です。</p>
+<hr>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
+ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。
+https://onewedge.co.jp/</p>
+
+</body>
+</html>
