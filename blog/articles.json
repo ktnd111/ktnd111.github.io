@@ -24,8 +24,7 @@
       "summary": "ASP.NET Coreアプリケーションにおけるエラーハンドリングの実装方法を比較検討します。",
       "tags": ["C#", "ASP.NET Core", "エラーハンドリング"],
       "category": "プログラミング",
-      "background": "web",
-      "isCompanyPost": true
+      "background": "web"
     },
     {
       "title": "C# AWS ALB⇔Lambda Mock Test Tool ローカル環境下でデバッグする",
@@ -115,7 +114,6 @@
       "summary": "PowerShellを使用したファイルの一括リネーム方法と実践的な例を紹介します。",
       "tags": ["PowerShell", "効率化", "Windows"],
       "category": "生産性",
-      "background": "performance",
-      "isCompanyPost": true
+      "background": "performance"
     }
   ]
