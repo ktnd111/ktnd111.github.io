@@ -5,6 +5,11 @@
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
 body {
     font-family: 'Arial', sans-serif;
     display: flex;
@@ -27,13 +32,16 @@ header {
 
 /* メインコンテンツ - スクロール可能エリア */
 main {
-    flex: 1;
+    flex: 1 0 auto;
     padding: 1rem;
     padding-top: 2rem; /* ヘッダーとの間隔を追加 */
     margin-top: max(60px, calc(3rem + 2rem)); /* ヘッダーの最小高さ + パディング + 追加の余白 */
     overflow-y: auto;
 }
 
+#footer-component {
+    flex-shrink: 0;
+}
 
 .github-link {
     color: white;
