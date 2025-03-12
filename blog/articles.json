@@ -9,6 +9,24 @@
       "background": "tech"
     },
     {
+        "title": "Azure DevOps Pipelinesの落とし穴と解決策",
+        "path": "articles/devops-pipelines-pit.html",
+        "date": "2025-03-05",
+        "summary": "Azure DevOps Pipelinesを使い始める際に直面する課題と、セルフホストエージェントのセットアップ方法を解説します。",
+        "tags": ["Azure DevOps", "CI/CD", "パイプライン", "セルフホストエージェント","★"],
+        "category": "DevOps",
+        "background": "web"
+      },
+      {
+        "title": "ASP.NET CoreでシンプルなQRコードジェネレーターを作る",
+        "path": "articles/csharp-aspnet-qrcode-generator.html",
+        "date": "2025-03-01",
+        "summary": "ASP.NET Core Razorページを使って、テキストからQRコードを生成・ダウンロードできるウェブアプリケーションの実装方法を解説します。",
+        "tags": ["C#", "ASP.NET Core", "QRコード", "Razor Pages","★"],
+        "category": "プログラミング",
+        "background": "web"
+      },
+    {
       "title": "ASP.NET CoreのDI完全ガイド",
       "path": "articles/csharp-aspnet-dependency-injection.html",
       "date": "2025-02-20",
@@ -31,7 +49,7 @@
       "path": "articles/csharp-aws-lambda-mocktesttool.html",
       "date": "2025-01-28",
       "summary": "AWS Lambdaを使ったサーバーレスアプリケーションをローカル環境でテストする方法を解説します。",
-      "tags": ["AWS", "C#", "Lambda", "ALB", "Visual Studio"],
+      "tags": ["AWS", "C#", "Lambda", "ALB", "Visual Studio","★"],
       "category": "クラウド",
       "background": "web"
     },
@@ -40,7 +58,7 @@
       "path": "articles/csharp-cs12-collections.html",
       "date": "2025-02-03",
       "summary": "C# 12で追加された新しいコレクション操作機能の使い方を基本から応用まで解説します。",
-      "tags": ["C#", "コレクション", "C# 12"],
+      "tags": ["C#", "コレクション", "C# 12","★"],
       "category": "プログラミング",
       "background": "tech"
     },
@@ -49,7 +67,7 @@
       "path": "articles/csharp-enum-flags-guide.html",
       "date": "2025-01-15",
       "summary": "C#でEnum Flags属性を使ったビットフラグの実装方法と活用例を紹介します。",
-      "tags": ["C#", "Enum", "Flag"],
+      "tags": ["C#", "Enum", "Flag","★"],
       "category": "プログラミング",
       "background": "tech"
     },
@@ -76,7 +94,7 @@
       "path": "articles/csharp-moq-xunit-openreadasync.html",
       "date": "2025-02-21",
       "summary": "C#のテストフレームワークを使用してAzure Storage Blobsクライアントのモック化方法を紹介します。",
-      "tags": ["C#", "xUnit", "Moq", "テスト", "Azure"],
+      "tags": ["C#", "xUnit", "Moq", "テスト", "Azure","★"],
       "category": "プログラミング",
       "background": "tech"
     },
@@ -94,7 +112,7 @@
       "path": "articles/csharp-php-guide.html",
       "date": "2025-02-13",
       "summary": "C#プログラマーがPHPを学ぶ際に知っておくべき違いと基本的な概念を解説します。",
-      "tags": ["PHP", "C#"],
+      "tags": ["PHP", "C#","★"],
       "category": "プログラミング",
       "background": "tech"
     },
@@ -103,7 +121,7 @@
       "path": "articles/csharp-switch-expression.html",
       "date": "2025-01-14",
       "summary": "C# 8.0から導入されたswitch式の基本的な使い方と実践的な応用例を紹介します。",
-      "tags": ["C#", "パターンマッチング"],
+      "tags": ["C#", "パターンマッチング","★"],
       "category": "プログラミング",
       "background": "tech"
     },
@@ -112,7 +130,7 @@
       "path": "articles/powershell-rename.html",
       "date": "2025-01-09",
       "summary": "PowerShellを使用したファイルの一括リネーム方法と実践的な例を紹介します。",
-      "tags": ["PowerShell", "効率化", "Windows"],
+      "tags": ["PowerShell", "効率化", "Windows","★"],
       "category": "生産性",
       "background": "performance"
     }
