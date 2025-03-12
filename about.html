@@ -3,81 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KTND111's Personal.GITHUB.IO</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>このブログについて | TECH BLOG</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="js/scp-warning.js"></script>
-    <script src="js/horror-link.js"></script>
-    <script src="js/loadComponents.js"></script>
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-        
         body {
-            display: flex;
-            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292e;
+            padding-top: 20px;
+            background-color: #f8f9fa;
         }
-        
-        main {
-            flex: 1 0 auto;
+        header {
+            margin-bottom: 30px;
         }
-        
-        #footer-component {
-            flex-shrink: 0;
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .content-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .section-title {
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #0366d6;
+        }
+        .disclaimer-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0366d6;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            background-color: #fff;
+            border-top: 1px solid #eaecef;
+            color: #586069;
+        }
+        .profile-image {
+            max-width: 150px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        .social-links {
+            margin-top: 20px;
+        }
+        .social-links a {
+            display: inline-block;
+            margin-right: 15px;
+            color: #0366d6;
+            font-size: 1.5rem;
         }
     </style>
 </head>
 <body>
     <div id="header-component"></div>
 
-    <main>
-        <div class="article-list">
-            <a href="blog/techBlog.html" class="article-link">
-                <time class="article-date">2025年3月12日（木）</time>
-                <h2 class="article-title">TECH BLOG</h2>
-                <p class="article-description">TECH記事をあつめたブログです。</p>
-            </a>
-
-            <a href="https://testapps-1-f4ahh8bxazbgfnac.japanwest-01.azurewebsites.net/" class="article-link">
-                <time class="article-date">2025年2月24日（月）</time>
-                <h2 class="article-title">Azure Web Apps デモ <i class="fas fa-external-link-alt" aria-hidden="true"></i></h2>
-                <p class="article-description">AzureにデプロイしたWebアプリケーションのデモサイトです。<span class="external-link-note">（外部サイト）</span></p>
-            </a>
-            <a href="article/scp-nn-108.html" class="article-link horror-link">
-                <time class="article-date">20▓▓年▓月▓日（土）</time>
-                <h2 class="article-title">SCP-NN-108</h2>
-                <p class="article-description">※警告: 本ファイルの閲覧にはレベル2以上のクリアランスが必要です。</p>
-            </a>
-            <a href="article/costco-graph.html" class="article-link">
-                <time class="article-date">2025年1月17日（金）</time>
-                <h2 class="article-title">コストコ会員ガソリン節約効果シミュレーター</h2>
-                <p class="article-description">ガソリン代のためだけにコストコ会員になったらお得なんでしょうか？シミュレートしてみましょう。</p>
-            </a>
-        </div>
-    </main>
-
-    <!-- SCPファイル警告ポップアップ -->
-    <div id="scp-modal" class="scp-modal">
-        <div class="scp-modal-content">
-            <div class="scp-modal-header">
-                <span class="scp-logo">SCP Foundation</span>
-                <div class="scp-warning-icon">⚠</div>
-            </div>
-            <div class="scp-modal-body">
-                <h3>セキュリティクリアランス確認</h3>
-                <p>警告: このファイルはSCP財団の機密情報です。</p>
-                <p>レベル2以上のクリアランスを持つ職員のみがアクセスできます。</p>
-                <div class="scp-modal-buttons">
-                    <button id="scp-proceed" class="scp-button proceed">続行</button>
-                    <button id="scp-cancel" class="scp-button cancel">キャンセル</button>
+    <div class="container">
+        <main>
+            <div class="content-container">
+                <h2 class="section-title">このブログについて</h2>
+                <p>
+                    「KTND111's Personal.GITHUB.IO.TECH BLOG」へようこそ。このブログでは、主にプログラミング、ウェブ開発、テクノロジーに関する記事を公開しています。
+                    GitHub Pagesを活用して個人的な技術メモやナレッジベースとして運用しています。
+                </p>
+                
+                <h3 class="mt-4 mb-3">筆者について</h3>
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <img src="../images/IMG_21862.jpg" alt="プロフィール画像" class="profile-image">
+                    </div>
+                    <div class="col-md-9">
+                        <p>
+                            KTND111 - ソフトウェアエンジニア / テクニカルライター / サバゲーマー
+                        </p>
+                        <p>
+                            普段はソフトウェア開発に携わりながら、学んだ知識や解決した問題を記事にしてシェアしています。
+                            主な関心領域は、フロントエンド開発、クラウドコンピューティング、DevOps、パフォーマンス最適化です。
+                        </p>
+                        <div class="social-links">
+                            <a href="https://github.com/ktnd111" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div class="content-container">
+                <h2 class="section-title">免責事項</h2>
+                
+                <div class="disclaimer-box">
+                    <p><strong>コンテンツの正確性について</strong></p>
+                    <p>
+                        当ブログの情報は、可能な限り正確な情報を提供するよう努めていますが、技術の進化や環境の変化により、記載内容が最新でなくなっている場合があります。
+                        情報の正確性、完全性、有用性等については保証いたしかねます。
+                    </p>
+                </div>
+                
+                <div class="disclaimer-box">
+                    <p><strong>コードサンプルと動作保証</strong></p>
+                    <p>
+                        ブログ内で公開しているコードサンプルやチュートリアルは、筆者の環境で動作確認を行っていますが、
+                        すべての環境での動作を保証するものではありません。実際の使用の際は、ご自身の責任においてテストを行ってください。
+                    </p>
+                </div>
+                
+                <div class="disclaimer-box">
+                    <p><strong>サードパーティサービスについて</strong></p>
+                    <p>
+                        記事内で紹介しているサードパーティのサービスやツールについては、
+                        その使用によって生じるいかなる損害についても当ブログは責任を負いかねます。
+                        各サービスの利用規約をご確認の上、ご利用ください。
+                    </p>
+                </div>
+                
+                <div class="disclaimer-box">
+                    <p><strong>著作権と引用について</strong></p>
+                    <p>
+                        当ブログのコンテンツは、特に明記がない限り筆者が著作権を保有しています。
+                        記事の引用や共有は、出典を明記いただければ可能です。ただし、商用目的での無断転載は禁止しています。
+                        また、コードサンプルについては、オープンソースライセンス（MIT License）の下で自由にご利用いただけます。
+                    </p>
+                </div>
+            </div>
+
+            <div class="content-container">
+                <h2 class="section-title">コンタクト</h2>
+                <p>
+                    記事の内容に関するご質問、技術的なディスカッション、または誤りの指摘などがございましたら、
+                    以下の方法でご連絡ください：
+                </p>
+                <ul>
+                    <li>GitHub Issue: <a href="https://github.com/ktnd111/ktnd111.github.io/issues" target="_blank">こちら</a>から新しいIssueを作成</li>
+                    <li>メール: <a href="mailto:contact@example.com">contact@example.com</a>（実際のメールアドレスに変更してください）</li>
+                </ul>
+                <p>
+                    できる限り迅速に対応いたしますが、返信にお時間をいただく場合もございます。あらかじめご了承ください。
+                </p>
+            </div>
+        </main>
     </div>
 
     <div id="footer-component"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/loadComponents.js"></script>
 </body>
 </html>
