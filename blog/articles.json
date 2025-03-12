@@ -7,14 +7,5 @@
         "tags": ["C#", "LINQ", "デバッグ", "テスト設計"],
         "category": "プログラミング",
         "background": "tech"
-    },
-    {
-        "title": "JavaScriptのモダンな非同期処理パターンサンプル",
-        "path": "articles/sample-article.html",
-        "date": "2025-03-05",
-        "summary": "Promiseからasync/awaitまで、JavaScriptの非同期処理パターンを解説します。",
-        "tags": ["JavaScript", "非同期処理", "Promise", "async/await"],
-        "category": "フロントエンド",
-        "background": "web"
     }
 ]
