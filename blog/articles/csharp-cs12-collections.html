@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>csharp-cs12-collections.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p>C# 12ではこのコレクションの扱い方がさらに進化し、より直感的に書けるようになりました。
+この記事では日常的によく使うコレクション操作について、基本から実践的なテクニックまでを解説します。新しい機能を使いこなしてより読みやすく効率的なコードが書けるようになりましょう。</p>
+<div class="message">
+<p>プレビュー機能を含み、一部機能は開発環境側のオプション設定が必要になる場合があります。</p>
+</div>
+<h2 id="%E3%82%B3%E3%83%AC%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E8%A6%81%E7%B4%A0%E3%81%AB%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%81%99%E3%82%8B%E6%96%B0%E3%81%97%E3%81%84%E6%96%B9%E6%B3%95">コレクションの要素にアクセスする新しい方法</h2>
+<p>配列やリストの特定の要素にアクセスする方法も、より直感的になりました。中でも便利なのは後ろからの要素取得です。（C# 8より導入されています）</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> numbers = [<span class="hljs-number">10</span>, <span class="hljs-number">20</span>, <span class="hljs-number">30</span>, <span class="hljs-number">40</span>, <span class="hljs-number">50</span>];
+
+<span class="hljs-comment">// 後ろから数えて1番目の要素（最後の要素）</span>
+<span class="hljs-keyword">var</span> last = numbers[^<span class="hljs-number">1</span>];     <span class="hljs-comment">// 50</span>
+
+<span class="hljs-comment">// 後ろから数えて2番目の要素</span>
+<span class="hljs-keyword">var</span> secondLast = numbers[^<span class="hljs-number">2</span>]; <span class="hljs-comment">// 40</span>
+
+<span class="hljs-comment">// 特定の範囲の要素を取得する</span>
+<span class="hljs-keyword">var</span> slice1 = numbers[<span class="hljs-number">1.</span><span class="hljs-number">.3</span>];   <span class="hljs-comment">// [20, 30]</span>
+<span class="hljs-keyword">var</span> slice2 = numbers[.<span class="hljs-number">.2</span>];    <span class="hljs-comment">// [10, 20]</span>
+<span class="hljs-keyword">var</span> slice3 = numbers[<span class="hljs-number">3.</span>.];    <span class="hljs-comment">// [40, 50]</span>
+</div></code></pre>
+<h3 id="%E7%AF%84%E5%9B%B2%E6%8C%87%E5%AE%9A%E3%81%AE%E8%A9%B3%E3%81%97%E3%81%84%E8%AA%AC%E6%98%8E">範囲指定の詳しい説明</h3>
+<p>範囲指定（<code>1..3</code>のような書き方）については図で説明するとよりわかりやすいでしょう。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> items = [<span class="hljs-number">10</span>, <span class="hljs-number">20</span>, <span class="hljs-number">30</span>, <span class="hljs-number">40</span>, <span class="hljs-number">50</span>];
+<span class="hljs-comment">//          ↑   ↑   ↑   ↑   ↑</span>
+<span class="hljs-comment">// インデックス 0   1   2   3   4</span>
+
+<span class="hljs-comment">// items[1..3] は「インデックス1から始めて、3の手前まで」という意味</span>
+<span class="hljs-keyword">var</span> example = items[<span class="hljs-number">1.</span><span class="hljs-number">.3</span>];  <span class="hljs-comment">// [20, 30]</span>
+</div></code></pre>
+<p>重要なポイントは次の2つです</p>
+<ol>
+<li>開始位置のインデックスの要素は含まれます</li>
+<li>終了位置のインデックスの要素は含まれません（その手前までが対象です）</li>
+</ol>
+<h2 id="%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E7%9F%A5%E3%81%A3%E3%81%A6%E3%81%8A%E3%81%8F%E3%81%B9%E3%81%8D%E3%81%93%E3%81%A8">パフォーマンスについて知っておくべきこと</h2>
+<p>コレクションを扱う際、特に大量のデータを処理する場合はパフォーマンスについて意識することが大切です。以下で主な注意点と対策を説明します。</p>
+<h3 id="%E7%AF%84%E5%9B%B2%E6%8C%87%E5%AE%9A%E3%81%A8%E3%83%A1%E3%83%A2%E3%83%AA%E4%BD%BF%E7%94%A8">範囲指定とメモリ使用</h3>
+<p>範囲指定（<code>list[1..3]</code>のような書き方）を使うと新しい配列やリストが作られます。少量のデータなら問題ありませんが、大量のデータの場合は注意が必要です。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> numbers = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-comment">/* .. たくさんのデータ .. */</span>];
+
+<span class="hljs-comment">// 方法1：新しい配列を作成（メモリを多く使う）</span>
+<span class="hljs-keyword">var</span> slice = numbers[<span class="hljs-number">1.</span><span class="hljs-number">.1000</span>];  
+
+<span class="hljs-comment">// 方法2：イテレータを使用（メモリ効率が良い）</span>
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> item <span class="hljs-keyword">in</span> numbers.Skip(<span class="hljs-number">1</span>).Take(<span class="hljs-number">999</span>))
+{
+    <span class="hljs-comment">// 処理</span>
+}
+</div></code></pre>
+<h3 id="%E3%83%87%E3%83%BC%E3%82%BF%E9%87%8F%E3%81%AB%E3%82%88%E3%82%8B%E4%BD%BF%E3%81%84%E5%88%86%E3%81%91%E3%81%AE%E7%9B%AE%E5%AE%89">データ量による使い分けの目安</h3>
+<p>一般的な使い分けの目安は以下の通りです。</p>
+<ul>
+<li>
+<p>数十～数百程度の小さいデータの場合</p>
+<ul>
+<li>範囲指定（<code>list[1..3]</code>）を使う</li>
+<li>コードが読みやすい</li>
+<li>少量のメモリ使用なら問題ない</li>
+</ul>
+</li>
+<li>
+<p>数千以上の大きいデータの場合</p>
+<ul>
+<li><code>Skip/Take</code>を使う</li>
+<li>メモリ使用量が少ない</li>
+<li>処理が効率的</li>
+</ul>
+</li>
+</ul>
+<h2 id="%E3%82%88%E3%82%8A%E7%B0%A1%E5%8D%98%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E3%82%B3%E3%83%AC%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E4%BD%9C%E3%82%8A%E6%96%B9">より簡単になったコレクションの作り方</h2>
+<p>これまでのC#では配列やリストを作る際に少し冗長な書き方が必要でしたが、C# 12から簡単に書けるようになりました。</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 従来の書き方</span>
+<span class="hljs-keyword">var</span> numbers1 = <span class="hljs-keyword">new</span> List&lt;<span class="hljs-keyword">int</span>&gt; { <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span> };
+<span class="hljs-keyword">var</span> array1 = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[] { <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span> };
+
+<span class="hljs-comment">// C# 12（プレビュー版）での新しい書き方</span>
+<span class="hljs-keyword">var</span> numbers2 = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>];     <span class="hljs-comment">// とてもシンプル！</span>
+<span class="hljs-keyword">int</span>[] array2 = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>];     <span class="hljs-comment">// 配列も同じように書けます</span>
+</div></code></pre>
+<p>一目見ただけで新しい書き方がどれだけシンプルになったかがわかりますね。角括弧（<code>[]</code>）を使うだけで、コレクションを作れるようになりました。</p>
+<h3 id="%E3%82%B3%E3%83%AC%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E7%B5%90%E5%90%88%E3%83%86%E3%82%AF%E3%83%8B%E3%83%83%E3%82%AF">コレクションの結合テクニック</h3>
+<p>さらに便利なのが<strong>既存のコレクションを組み合わせて新しいコレクションを作れる</strong>ことです。JavaScriptのスプレッド演算子（<code>...</code>）に似た機能で、とても直感的に書けます。
+C#では <code>..</code> で表現します。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> fruits1 = [<span class="hljs-string">"りんご"</span>, <span class="hljs-string">"みかん"</span>];
+<span class="hljs-keyword">var</span> fruits2 = [<span class="hljs-string">"バナナ"</span>, <span class="hljs-string">"ぶどう"</span>];
+
+<span class="hljs-comment">// 二つのコレクションを結合</span>
+<span class="hljs-keyword">var</span> allFruits = [..fruits1, ..fruits2];  
+<span class="hljs-comment">// 結果：["りんご", "みかん", "バナナ", "ぶどう"]</span>
+
+<span class="hljs-comment">// 途中に新しい要素を追加することもできます</span>
+<span class="hljs-keyword">var</span> specialFruits = [<span class="hljs-string">"メロン"</span>, ..fruits1, <span class="hljs-string">"マンゴー"</span>];
+<span class="hljs-comment">// 結果：["メロン", "りんご", "みかん", "マンゴー"]</span>
+</div></code></pre>
+<p>この書き方を使えば、複数のコレクションを自由に組み合わせることができます。新しい要素の追加も自由自在です。</p>
+<h2 id="%E3%82%B3%E3%83%AC%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0">コレクションのパターンマッチング</h2>
+<p>C#ではコレクションの内容に基づいて処理を分岐させることができます。特にデータの構造に応じて異なる処理を行いたい場合に便利です。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> numbers = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];
+<span class="hljs-keyword">var</span> message = numbers <span class="hljs-keyword">switch</span>
+{
+    [<span class="hljs-meta"></span>] =&gt; <span class="hljs-string">"空のリストです"</span>,
+    [<span class="hljs-meta">var only</span>] =&gt; <span class="hljs-string">$"要素が1つだけです：<span class="hljs-subst">{only}</span>"</span>,
+    [<span class="hljs-meta">var first, var second</span>] =&gt; <span class="hljs-string">$"要素が2つあります：<span class="hljs-subst">{first}</span>と<span class="hljs-subst">{second}</span>"</span>,
+    _ =&gt; <span class="hljs-string">"要素が3つ以上あります"</span>
+};
+</div></code></pre>
+<p>このパターンマッチングは以下のような場合に特に役立ちます。</p>
+<ul>
+<li>データの検証</li>
+<li>条件分岐が必要な処理</li>
+<li>エラーハンドリング</li>
+</ul>
+<h2 id="%E5%AE%9F%E8%B7%B5%E7%9A%84%E3%81%AA%E4%BD%BF%E7%94%A8%E4%BE%8B">実践的な使用例</h2>
+<p>実際のプログラミングでよくある場面での使用例を見てみましょう。</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// ユーザーデータの処理</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">User</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Name { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+    <span class="hljs-keyword">public</span> List&lt;<span class="hljs-keyword">string</span>&gt; Hobbies { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+
+<span class="hljs-comment">// C# 12の新しい書き方を使用</span>
+<span class="hljs-keyword">var</span> user = <span class="hljs-keyword">new</span> User
+{
+    Name = <span class="hljs-string">"田中太郎"</span>,
+    Hobbies = [<span class="hljs-string">"読書"</span>, <span class="hljs-string">"プログラミング"</span>, <span class="hljs-string">"写真"</span>]  <span class="hljs-comment">// とてもシンプル！</span>
+};
+
+<span class="hljs-comment">// 趣味のリストを拡張</span>
+<span class="hljs-keyword">var</span> additionalHobbies = [<span class="hljs-string">"旅行"</span>, <span class="hljs-string">"料理"</span>];
+user.Hobbies = [..user.Hobbies, ..additionalHobbies];
+
+<span class="hljs-comment">// 最新の3つの趣味だけを取得</span>
+<span class="hljs-keyword">var</span> recentHobbies = user.Hobbies[^<span class="hljs-number">3.</span>.];
+</div></code></pre>
+<h2 id="%E3%81%BE%E3%81%A8%E3%82%81%E3%82%B7%E3%83%BC%E3%83%B3%E5%88%A5%E3%83%BB%E6%9C%80%E9%81%A9%E3%81%AA%E4%BD%BF%E3%81%84%E6%96%B9%E3%82%AC%E3%82%A4%E3%83%89">まとめ：シーン別・最適な使い方ガイド</h2>
+<p>C# 12のコレクション操作について学んできました。さいごに、「どんな時にどの機能を使うべきか」をシーン別にまとめてみました。実践で使える具体的なパターンとして覚えておくと良いでしょう。</p>
+<h3 id="%E3%82%B7%E3%83%BC%E3%83%B31%E3%82%B7%E3%83%B3%E3%83%97%E3%83%AB%E3%81%AA%E3%82%B3%E3%83%AC%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E4%BD%9C%E6%88%90">シーン1：シンプルなコレクションの作成</h3>
+<p>🎯 <strong>こんな時には角括弧構文を使おう</strong>（プレビュー版機能）</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 配列やリストの初期化</span>
+<span class="hljs-keyword">var</span> items = [<span class="hljs-string">"項目1"</span>, <span class="hljs-string">"項目2"</span>, <span class="hljs-string">"項目3"</span>];  <span class="hljs-comment">// シンプルで読みやすい</span>
+</div></code></pre>
+<h3 id="%E3%82%B7%E3%83%BC%E3%83%B32%E6%97%A2%E5%AD%98%E3%81%AE%E3%82%B3%E3%83%AC%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E7%B5%90%E5%90%88">シーン2：既存のコレクションの結合</h3>
+<p>🎯 <strong>こんな時にはスプレッド演算子を使おう</strong></p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> baseList = [<span class="hljs-string">"基本"</span>, <span class="hljs-string">"項目"</span>];
+<span class="hljs-keyword">var</span> additions = [<span class="hljs-string">"追加"</span>, <span class="hljs-string">"項目"</span>];
+<span class="hljs-keyword">var</span> combined = [..baseList, ..additions];  <span class="hljs-comment">// 明確で直感的</span>
+</div></code></pre>
+<h3 id="%E3%82%B7%E3%83%BC%E3%83%B33%E3%82%B3%E3%83%AC%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E6%9C%AB%E5%B0%BE%E3%81%B8%E3%81%AE%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9">シーン3：コレクションの末尾へのアクセス</h3>
+<p>🎯 <strong>こんな時には後ろからのインデックスを使おう</strong></p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> items = [<span class="hljs-string">"古い"</span>, <span class="hljs-string">"やや古い"</span>, <span class="hljs-string">"新しい"</span>, <span class="hljs-string">"最新"</span>];
+<span class="hljs-keyword">var</span> latest = items[^<span class="hljs-number">1</span>];      <span class="hljs-comment">// 最後の要素を取得</span>
+<span class="hljs-keyword">var</span> recent = items[^<span class="hljs-number">2.</span>.];    <span class="hljs-comment">// 最新の2つを取得</span>
+</div></code></pre>
+<h3 id="%E3%82%B7%E3%83%BC%E3%83%B34%E3%83%87%E3%83%BC%E3%82%BF%E9%87%8F%E3%81%AB%E3%82%88%E3%82%8B%E4%BD%BF%E3%81%84%E5%88%86%E3%81%91">シーン4：データ量による使い分け</h3>
+<p>🎯 <strong>少量のデータ（数百件まで）の場合</strong></p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> smallList = [<span class="hljs-comment">/* 数百件のデータ */</span>];
+<span class="hljs-keyword">var</span> slice = smallList[<span class="hljs-number">1.</span><span class="hljs-number">.3</span>];  <span class="hljs-comment">// 範囲指定を使う</span>
+</div></code></pre>
+<p>🎯 <strong>大量のデータ（数千件以上）の場合</strong></p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> largeList = [<span class="hljs-comment">/* 数千件以上のデータ */</span>];
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> item <span class="hljs-keyword">in</span> largeList.Skip(<span class="hljs-number">1</span>).Take(<span class="hljs-number">2</span>))  <span class="hljs-comment">// Skip/Takeを使う</span>
+{
+    <span class="hljs-comment">// 処理</span>
+}
+</div></code></pre>
+<h3 id="%E3%82%B7%E3%83%BC%E3%83%B35%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E6%A7%8B%E9%80%A0%E3%81%AB%E5%BF%9C%E3%81%98%E3%81%9F%E5%87%A6%E7%90%86">シーン5：データの構造に応じた処理</h3>
+<p>🎯 <strong>こんな時にはパターンマッチングを使おう</strong></p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> result = dataList <span class="hljs-keyword">switch</span>
+{
+    [<span class="hljs-meta"></span>] =&gt; <span class="hljs-string">"データなし"</span>,
+    [<span class="hljs-meta">var single</span>] =&gt; <span class="hljs-string">$"1件のみ：<span class="hljs-subst">{single}</span>"</span>,
+    [<span class="hljs-meta">var first, var second, ..</span>] =&gt; <span class="hljs-string">"複数件あり"</span>
+};
+</div></code></pre>
+<h3 id="%E5%AE%9F%E8%A3%85%E6%99%82%E3%81%AE%E9%BB%84%E9%87%91%E3%83%AB%E3%83%BC%E3%83%AB">実装時の黄金ルール</h3>
+<ol>
+<li>
+<p><strong>読みやすさ優先の場面</strong></p>
+<ul>
+<li>小規模なデータ処理</li>
+<li>コードレビューが頻繁に行われる部分</li>
+<li>チーム開発の主要機能
+→ 新しい角括弧構文やパターンマッチングを積極的に使用</li>
+</ul>
+</li>
+<li>
+<p><strong>パフォーマンス優先の場面</strong></p>
+<ul>
+<li>大量データの処理</li>
+<li>ループ内での繰り返し処理</li>
+<li>リアルタイム処理が必要な部分
+→ Skip/Take や従来のループ処理を使用</li>
+</ul>
+</li>
+<li>
+<p><strong>メンテナンス性優先の場面</strong></p>
+<ul>
+<li>頻繁に仕様変更が入る部分</li>
+<li>複雑なビジネスロジック</li>
+<li>長期運用が予想される機能
+→ パターンマッチングと明確な命名を組み合わせて使用</li>
+</ul>
+</li>
+</ol>
+<p>これらのパターンを意識しながら実装することで、より良いコードが書けるようになると思います。新しい機能はまずは小規模な範囲で試してみることをお勧めします。その上で、チームやプロジェクトの特性に合わせて、徐々に適用範囲を広げていくのがベストプラクティスです。</p>
+<hr>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
+ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。
+https://onewedge.co.jp/</p>
+
+</body>
+</html>

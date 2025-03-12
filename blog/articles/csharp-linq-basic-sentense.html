@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>csharp-linq-basic-sentense.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p>LINQ（Language Integrated Query）は、C#でデータベースやコレクションを簡潔に操作できるツールです。本記事ではLINQの基本構文を具体例とともに紹介し、データ操作に役立つメソッドの使い方を解説します。</p>
+<hr>
+<h2 id="linq%E3%81%A8%E3%81%AF">LINQとは？</h2>
+<p>LINQは、C#や.NET環境で使用できる統合クエリ言語です。データベース（Entity Framework Coreを使用）、コレクション、XMLなど、さまざまなデータソースに対して同じ構文でクエリを記述できます。</p>
+<h3 id="linq%E3%82%92%E4%BD%BF%E3%81%86%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88">LINQを使うメリット</h3>
+<ul>
+<li><strong>コードが簡潔になる</strong>: 複雑なデータ操作を数行で記述可能。</li>
+<li><strong>統一された構文</strong>: 複数のデータソースに対して一貫性のある書き方。</li>
+<li><strong>高い可読性</strong>: SQLライクなスタイルでデータ操作が直感的に理解可能。</li>
+</ul>
+<h2 id="%E5%9F%BA%E6%9C%AC%E6%A7%8B%E6%96%87%E3%81%A8%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89%E3%81%AE%E8%A7%A3%E8%AA%AC">基本構文とメソッドの解説</h2>
+<p>以下にLINQの代表的なメソッドを紹介し、実際のデータ操作例を示します。</p>
+<h2 id="%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B%E3%83%87%E3%83%BC%E3%82%BF%E3%81%8A%E3%82%88%E3%81%B3%E3%82%BD%E3%83%BC%E3%82%B9">使用するデータおよびソース</h2>
+<p>https://github.com/ktnd111/Learning-Linq</p>
+<p>環境セットアップなど、細かい手順は下記記事を参照してください。
+https://zenn.dev/articles/e8d48dd2c7b88f/edit</p>
+<h3 id="where-%E6%9D%A1%E4%BB%B6%E6%A4%9C%E7%B4%A2">Where: 条件検索</h3>
+<p>指定した条件に一致するデータをフィルタリングします。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> booksByOrwell = context.Books
+    .Where(b =&gt; b.Author.Name == <span class="hljs-string">"George Orwell"</span>)
+    .ToList();
+
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> book <span class="hljs-keyword">in</span> booksByOrwell)
+{
+    Console.WriteLine(book.Title);
+}
+</div></code></pre>
+<p>結果:</p>
+<pre class="hljs"><code><div>1984
+Animal Farm
+</div></code></pre>
+<h3 id="orderby--orderbydescending-%E4%B8%A6%E3%81%B9%E6%9B%BF%E3%81%88">OrderBy / OrderByDescending: 並べ替え</h3>
+<p>データを昇順または降順に並べ替えます。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> sortedBooks = context.Books
+    .OrderBy(b =&gt; b.Title)
+    .ToList();
+
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> book <span class="hljs-keyword">in</span> sortedBooks)
+{
+    Console.WriteLine(book.Title);
+}
+</div></code></pre>
+<p>結果:</p>
+<pre class="hljs"><code><div>1984
+Animal Farm
+Clean Code
+</div></code></pre>
+<h3 id="select-%E5%BF%85%E8%A6%81%E3%81%AA%E5%88%97%E3%81%AE%E6%8A%BD%E5%87%BA">Select: 必要な列の抽出</h3>
+<p>データの一部を取得する際に使用します。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> bookTitles = context.Books
+    .Select(b =&gt; b.Title)
+    .ToList();
+
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> title <span class="hljs-keyword">in</span> bookTitles)
+{
+    Console.WriteLine(title);
+}
+</div></code></pre>
+<p>結果:</p>
+<pre class="hljs"><code><div>1984
+Animal Farm
+Clean Code
+</div></code></pre>
+<h3 id="count-%E3%83%87%E3%83%BC%E3%82%BF%E4%BB%B6%E6%95%B0%E3%81%AE%E5%8F%96%E5%BE%97">Count: データ件数の取得</h3>
+<p>指定した条件のデータ件数を取得します。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> count = context.Books
+    .Count(b =&gt; b.Author.Name == <span class="hljs-string">"George Orwell"</span>);
+
+Console.WriteLine(<span class="hljs-string">$"George Orwell's books: <span class="hljs-subst">{count}</span>"</span>);
+</div></code></pre>
+<p>結果:</p>
+<pre class="hljs"><code><div>George Orwell's books: 2
+</div></code></pre>
+<h3 id="groupby-%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E3%82%B0%E3%83%AB%E3%83%BC%E3%83%97%E5%8C%96">GroupBy: データのグループ化</h3>
+<p>データを特定のキーでグループ化します。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> booksGroupedByAuthor = context.Books
+    .GroupBy(b =&gt; b.Author.Name)
+    .Select(<span class="hljs-keyword">group</span> =&gt; <span class="hljs-keyword">new</span>
+    {
+        Author = <span class="hljs-keyword">group</span>.Key,
+        BookCount = <span class="hljs-keyword">group</span>.Count()
+    });
+
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> <span class="hljs-keyword">group</span> <span class="hljs-keyword">in</span> booksGroupedByAuthor)
+{
+    Console.WriteLine(<span class="hljs-string">$"<span class="hljs-subst">{<span class="hljs-keyword">group</span>.Author}</span>: <span class="hljs-subst">{<span class="hljs-keyword">group</span>.BookCount}</span> books"</span>);
+}
+</div></code></pre>
+<p>結果:</p>
+<pre class="hljs"><code><div>George Orwell: 2 books
+Robert C. Martin: 1 book
+</div></code></pre>
+<h2 id="%E5%AE%9F%E8%B7%B5%E4%BE%8B-%E8%A4%87%E6%95%B0%E3%81%AE%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89%E3%82%92%E7%B5%84%E3%81%BF%E5%90%88%E3%82%8F%E3%81%9B%E3%82%8B">実践例: 複数のメソッドを組み合わせる</h2>
+<p>以下は、条件検索・並べ替え・グループ化を組み合わせた実践例です。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> sortedAuthorsWithBookCount = context.Authors
+    .Select(a =&gt; <span class="hljs-keyword">new</span>
+    {
+        Author = a.Name,
+        BookCount = a.Books.Count
+    })
+    .OrderByDescending(a =&gt; a.BookCount)
+    .ToList();
+
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> author <span class="hljs-keyword">in</span> sortedAuthorsWithBookCount)
+{
+    Console.WriteLine(<span class="hljs-string">$"<span class="hljs-subst">{author.Author}</span>: <span class="hljs-subst">{author.BookCount}</span> books"</span>);
+}
+</div></code></pre>
+<p>結果:</p>
+<pre class="hljs"><code><div>George Orwell: 2 books
+Robert C. Martin: 1 book
+</div></code></pre>
+<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+<p>本記事では、LINQを使ったデータ操作の基本構文を紹介しました。以下のメソッドについて解説しました：</p>
+<p>条件検索: Where
+並べ替え: OrderBy / OrderByDescending
+必要な列の抽出: Select
+集計: Count
+グループ化: GroupBy</p>
+<p>LINQは、データベースやコレクションを扱う際に非常に便利なツールです。実際のプロジェクトや業務で活用するために、この記事の内容をぜひ参考にしてください！</p>
+
+</body>
+</html>

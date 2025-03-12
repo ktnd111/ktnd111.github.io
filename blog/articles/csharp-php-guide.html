@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>csharp-php-guide.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p>このガイドはC#でのプログラミング経験がある方がPHPを学ぶための入門書です。C#との違いを中心に、PHPの基本的な概念と機能を説明していきます。</p>
+<h2 id="1-php%E3%81%AE%E7%89%B9%E5%BE%B4">1. PHPの特徴</h2>
+<h3 id="c%E3%81%A8%E3%81%AE%E4%B8%BB%E3%81%AA%E9%81%95%E3%81%84">C#との主な違い</h3>
+<p>PHPはWebアプリケーション開発に特化したスクリプト言語です。</p>
+<ul>
+<li>スクリプト言語であり、コンパイル不要で実行可能</li>
+<li>リクエストベースの実行モデル（各リクエストで新しいプロセスを開始）</li>
+<li>変数の型は動的と静的の両方をサポート（PHP 7.0以降）</li>
+<li>名前空間の区切り文字は<code>\</code>（C#は<code>.</code>）</li>
+<li>ファイルの拡張子は<code>.php</code></li>
+<li>Webサーバー上での動作が前提</li>
+</ul>
+<h3 id="%E5%9F%BA%E6%9C%AC%E7%9A%84%E3%81%AA%E6%A7%8B%E6%96%87%E3%81%A8%E5%9E%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0">基本的な構文と型システム</h3>
+<pre class="hljs"><code><div><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-keyword">declare</span>(strict_types=<span class="hljs-number">1</span>); <span class="hljs-comment">// 厳密な型チェックを有効化</span>
+
+<span class="hljs-comment">// 型宣言を使用したクラス定義（PHP 7.4以降）</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span> </span>{
+    <span class="hljs-keyword">private</span> string $name;
+    <span class="hljs-keyword">private</span> int $age;
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span><span class="hljs-params">(string $name, int $age)</span> </span>{
+        <span class="hljs-keyword">$this</span>-&gt;name = $name;
+        <span class="hljs-keyword">$this</span>-&gt;age = $age;
+    }
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getName</span><span class="hljs-params">()</span>: <span class="hljs-title">string</span> </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;name;
+    }
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getAge</span><span class="hljs-params">()</span>: <span class="hljs-title">int</span> </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;age;
+    }
+}
+
+<span class="hljs-comment">// Nullableな型の使用</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> </span>{
+    <span class="hljs-keyword">private</span> ?string $middleName; <span class="hljs-comment">// null許容の文字列</span>
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setMiddleName</span><span class="hljs-params">(?string $name)</span>: <span class="hljs-title">void</span> </span>{
+        <span class="hljs-keyword">$this</span>-&gt;middleName = $name;
+    }
+}
+</div></code></pre>
+<p>C#では<code>string?</code>と書きますが、PHPのでは<code>?string</code>になります。また、コンストラクタの宣言はクラス名で書かず、<code>__construct</code>のようですね。マジックメソッドと呼び、いくつか定義されています。（?string に関しては、厳密な型チェック機能をONにしていないと案外ザルらしいので注意です）</p>
+<p>C#では<code>.</code>でプロパティにアクセスできますが、PHPでは<code>-&gt;</code>と書きます。C#に慣れ親しんでいると文字数が気になりますが、ここは言語の特徴ということで…ひと目でわかる良い判断要素と捉えておくぐらいで良いかなと思います。
+<code>-&gt;</code>はプロパティへのアクセスのほかに、メソッド呼び出しにも使うためPHPでは頻出記号です。慣れるまでは大変かもしれませんが、IDE等の入力補完でいい感じにできれば最高です。</p>
+<p>C#を使っていると大体がVisualStudioを使用していますが、コンパイルエラーのおかげで型エラーはすぐに見つかりますが、PHPはランタイムエラーなので特性にも注意が必要そうです。とはいえ、IDEに備わっている機能である程度は静的解析が可能とのこと。</p>
+<p>MEMO:</p>
+<ul>
+<li>
+<p>動的型と静的型の共存</p>
+<ul>
+<li>C#では常に静的型付けですが、PHPではstrict_typesを有効にしてもなお動的型部分が混在します。ユニットテストや静的解析ツールを併用すると、エラーを早めに発見しやすくなります。</li>
+</ul>
+</li>
+<li>
+<p>名前空間の区切り文字</p>
+<ul>
+<li>C#は.を使いますが、PHPは\を使います。上記のように namespace MyApp\Models; と書き、そこにクラスを定義することが可能です。C#と同様 にプロジェクトをディレクトリで整理して名前空間と対応させると可読性が向上します。</li>
+</ul>
+</li>
+<li>
+<p>コンパイル不要の利点と注意点</p>
+<ul>
+<li>PHPは即時実行できる反面、コンパイル時にエラーを検出できないため、ローカル環境で実際に動かして確認するフローが必須です。（一部IDEで補完可能）</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-%E3%83%A1%E3%83%A2%E3%83%AA%E7%AE%A1%E7%90%86%E3%81%A8%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%97">2. メモリ管理とスコープ</h2>
+<h3 id="%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%83%A9%E3%82%A4%E3%83%95%E3%82%B5%E3%82%A4%E3%82%AF%E3%83%AB">リクエストライフサイクル</h3>
+<p>PHPのメモリ管理はC#と大きく異なります。</p>
+<ol>
+<li>
+<p>リクエストスコープ</p>
+<ul>
+<li>各HTTPリクエストで新しいプロセスが開始</li>
+<li>リクエスト終了時に自動的にメモリを解放</li>
+<li>グローバル変数は各リクエストで初期化</li>
+</ul>
+</li>
+<li>
+<p>永続的な接続（Persistent Connections）</p>
+</li>
+</ol>
+<pre class="hljs"><code><div><span class="hljs-comment">// データベースの永続的な接続</span>
+$db = <span class="hljs-keyword">new</span> PDO(
+    <span class="hljs-string">"mysql:host=localhost;dbname=testdb"</span>,
+    <span class="hljs-string">"username"</span>,
+    <span class="hljs-string">"password"</span>,
+    [PDO::ATTR_PERSISTENT =&gt; <span class="hljs-keyword">true</span>]
+);
+</div></code></pre>
+<ol start="3">
+<li>セッション管理</li>
+</ol>
+<pre class="hljs"><code><div><span class="hljs-comment">// セッションの開始</span>
+session_start();
+
+<span class="hljs-comment">// セッション変数の設定</span>
+$_SESSION[<span class="hljs-string">'user_id'</span>] = <span class="hljs-number">123</span>;
+
+<span class="hljs-comment">// セッションの破棄</span>
+session_destroy();
+</div></code></pre>
+<h2 id="3-%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%8F%E3%83%B3%E3%83%89%E3%83%AA%E3%83%B3%E3%82%B0">3. エラーハンドリング</h2>
+<h3 id="%E4%BE%8B%E5%A4%96%E5%87%A6%E7%90%86%E3%81%AE%E9%81%95%E3%81%84">例外処理の違い</h3>
+<p>PHPには<code>Error</code>と<code>Exception</code>の2種類のエラー型があります。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">try</span> {
+    <span class="hljs-comment">// 通常の例外</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-keyword">Exception</span>(<span class="hljs-string">"一般的なエラー"</span>);
+} <span class="hljs-keyword">catch</span> (<span class="hljs-keyword">Exception</span> $e) {
+    <span class="hljs-comment">// 例外処理</span>
+    error_log($e-&gt;getMessage());
+} <span class="hljs-keyword">catch</span> (Error $e) {
+    <span class="hljs-comment">// 致命的なエラー（PHPエンジンによるエラー）</span>
+    error_log(<span class="hljs-string">"致命的なエラー: "</span> . $e-&gt;getMessage());
+} <span class="hljs-keyword">finally</span> {
+    <span class="hljs-comment">// クリーンアップ処理</span>
+}
+</div></code></pre>
+<h3 id="%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E4%BE%8B%E5%A4%96">カスタム例外</h3>
+<pre class="hljs"><code><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DatabaseException</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Exception</span> </span>{
+    <span class="hljs-keyword">private</span> $sqlState;
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span><span class="hljs-params">(string $message, string $sqlState = <span class="hljs-string">""</span>)</span> </span>{
+        <span class="hljs-keyword">parent</span>::__construct($message);
+        <span class="hljs-keyword">$this</span>-&gt;sqlState = $sqlState;
+    }
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getSqlState</span><span class="hljs-params">()</span>: <span class="hljs-title">string</span> </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;sqlState;
+    }
+}
+</div></code></pre>
+<p>MEMO:</p>
+<ul>
+<li>ExceptionとErrorの分離
+<ul>
+<li>C#では基本的にSystem.Exceptionクラスを継承する形で例外を扱います。一方、PHPはErrorとExceptionを分けているため、致命的エラーはcatch(Error $e)のように別途捕捉が必要になります。</li>
+</ul>
+</li>
+<li>finallyブロックの存在
+<ul>
+<li>C#のtry-catch-finallyとほぼ同様に使えるため、リソース開放や後処理はfinallyに書くのが定石です。</li>
+</ul>
+</li>
+<li>カスタム例外
+<ul>
+<li>ドメイン固有の例外を定義するという手法はC#と同じです。トラブルシューティングしやすいよう、独自のプロパティを持たせるなど工夫が可能です。</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E5%AF%BE%E7%AD%96">4. セキュリティ対策</h2>
+<h3 id="%E3%82%AF%E3%83%AD%E3%82%B9%E3%82%B5%E3%82%A4%E3%83%88%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0xss%E5%AF%BE%E7%AD%96">クロスサイトスクリプティング（XSS）対策</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">// 出力時のエスケープ処理</span>
+$userInput = <span class="hljs-string">"&lt;script&gt;alert('XSS');&lt;/script&gt;"</span>;
+<span class="hljs-keyword">echo</span> htmlspecialchars($userInput, ENT_QUOTES, <span class="hljs-string">'UTF-8'</span>);
+</div></code></pre>
+<h3 id="sql%E3%82%A4%E3%83%B3%E3%82%B8%E3%82%A7%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%AF%BE%E7%AD%96">SQLインジェクション対策</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">// プリペアドステートメントの使用</span>
+$stmt = $pdo-&gt;prepare(<span class="hljs-string">"SELECT * FROM users WHERE id = :id"</span>);
+$stmt-&gt;execute([<span class="hljs-string">'id'</span> =&gt; $userId]);
+</div></code></pre>
+<p>MEMO:</p>
+<ul>
+<li>XSS対策
+<ul>
+<li>C#のRazorビューでも自動的にHTMLエスケープされますが、PHPの場合は明示的にhtmlspecialchars()やテンプレートエンジンのエスケープ機能を使う必要があります。</li>
+</ul>
+</li>
+<li>SQLインジェクション対策
+<ul>
+<li>PDOのプリペアドステートメントは、C#のパラメータ化クエリと同様の仕組みです。必ずパラメータ化し、ユーザー入力を直接SQLに埋め込まないようにしましょう。</li>
+</ul>
+</li>
+</ul>
+<h2 id="6-%E3%83%A2%E3%83%80%E3%83%B3php%E3%81%AE%E9%96%8B%E7%99%BA%E3%83%97%E3%83%A9%E3%82%AF%E3%83%86%E3%82%A3%E3%82%B9---php%E3%81%AE%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E7%AE%A1%E7%90%86%E3%81%A8psr%E6%A8%99%E6%BA%96">6. モダンPHPの開発プラクティス - PHPのパッケージ管理とPSR標準</h2>
+<h3 id="composer%E3%81%AB%E3%82%88%E3%82%8B%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E7%AE%A1%E7%90%86">Composerによるパッケージ管理</h3>
+<p>PHPではパッケージ管理システムとして「Composer」が事実上の標準となっています。C#のNuGetに相当する仕組みで、ライブラリの依存関係を簡単に管理できるのが特徴です。</p>
+<h4 id="composerjson%E3%81%AE%E8%A8%AD%E5%AE%9A">composer.jsonの設定</h4>
+<p>プロジェクトのルートディレクトリに配置する設定ファイルです。ここに必要なパッケージやPHPのバージョンなどを定義します。</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"require"</span>: {
+        <span class="hljs-attr">"php"</span>: <span class="hljs-string">"^8.0"</span>,
+        <span class="hljs-attr">"monolog/monolog"</span>: <span class="hljs-string">"^2.0"</span>,
+        <span class="hljs-attr">"symfony/http-foundation"</span>: <span class="hljs-string">"^5.0"</span>
+    }
+}
+</div></code></pre>
+<h4 id="%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E3%81%A8%E3%82%AA%E3%83%BC%E3%83%88%E3%83%AD%E3%83%BC%E3%83%89">インストールとオートロード</h4>
+<p>Composerでは、以下の手順でライブラリを管理します。</p>
+<ol>
+<li><code>composer install</code> を実行すると、<code>vendor/</code> ディレクトリ配下に依存ライブラリがダウンロードされます。</li>
+<li>併せて <code>vendor/autoload.php</code> が生成され、これを require するだけでライブラリのクラスが自動的に使えるようになります。</li>
+</ol>
+<h3 id="psr%E6%A8%99%E6%BA%96%E3%81%A8%E3%82%AA%E3%83%BC%E3%83%88%E3%83%AD%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0-psr-4">PSR標準とオートローディング (PSR-4)</h3>
+<p>PHPでは、複数のPSR(PHP Standards Recommendation)によって「コーディング規約」や「名前空間の扱い方」が定義されています。PSR-4はその中でも特に重要で、「クラスとファイルをどのように対応させるか」を定めたオートローディング規約です。</p>
+<h4 id="psr-4%E3%81%AE%E6%A6%82%E8%A6%81">PSR-4の概要</h4>
+<p>名前空間とディレクトリ構造を 1:1 で対応させるルールを決め、require/include を手動で書かなくても クラスを呼び出すだけで自動読み込みできるようにする仕組みです。</p>
+<p>例）</p>
+<ul>
+<li>クラス名: <code>App\Services\UserService</code></li>
+<li>ファイルパス: <code>src/Services/UserService.php</code></li>
+</ul>
+<h4 id="composer%E8%A8%AD%E5%AE%9A">Composer設定</h4>
+<pre class="hljs"><code><div>{
+    <span class="hljs-attr">"autoload"</span>: {
+        <span class="hljs-attr">"psr-4"</span>: {
+            <span class="hljs-attr">"App\\"</span>: <span class="hljs-string">"src/"</span>
+        }
+    }
+}
+</div></code></pre>
+<h4 id="%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80%E6%A7%8B%E6%88%90%E4%BE%8B%E3%81%A8%E5%90%8D%E5%89%8D%E7%A9%BA%E9%96%93">フォルダ構成例と名前空間</h4>
+<pre class="hljs"><code><div>my-project/
+├─ src/
+│   ├─ Services/
+│   │   └─ UserService.php
+│   └─ Models/
+│       └─ User.php
+├─ composer.json
+└─ index.php
+</div></code></pre>
+<p>UserService.phpの実装例</p>
+<pre class="hljs"><code><div><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-keyword">namespace</span> <span class="hljs-title">App</span>\<span class="hljs-title">Services</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserService</span> </span>{
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-comment">// ...</span>
+    }
+}
+</div></code></pre>
+<p><code>namespace App\Services;</code> と定義すると、<code>new \App\Services\UserService()</code> と書くだけで <code>src/Services/UserService.php</code> が自動的に読み込まれます。
+この例では、composer.json の PSR-4 設定で App\ を名前空間のプレフィックスとして指定していますが、これは単なる例示です。実際のプロジェクトでは、組織の構造やプロジェクトの性質を反映して、会社名（例：Acme\）やプロジェクト名（例：MyProject\）、あるいは機能領域（例：Core\）をプレフィックスとして使用することが一般的です。この例では App\ を使用することで、src ディレクトリ以下をアプリケーションのメイン領域として位置づけ、その意図を名前空間に反映させています。</p>
+<h4 id="composer%E3%81%A8%E3%81%AE%E9%80%A3%E6%90%BA">Composerとの連携</h4>
+<ol>
+<li><code>composer dump-autoload</code> を実行すると、<code>vendor/autoload.php</code> にオートロードの情報が登録されます。</li>
+<li>PHPファイルの先頭などで <code>require 'vendor/autoload.php';</code> を呼び出しておけば、あとは <code>use App\Services\UserService;</code> のように宣言するだけでクラスが使えます。</li>
+</ol>
+<h3 id="%E3%81%9D%E3%81%AE%E4%BB%96%E3%81%AE%E9%87%8D%E8%A6%81%E3%81%AApsr%E6%A8%99%E6%BA%96">その他の重要なPSR標準</h3>
+<h4 id="psr-12-%E3%82%B3%E3%83%BC%E3%83%89%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%82%AC%E3%82%A4%E3%83%89">PSR-12 (コードスタイルガイド)</h4>
+<p>C#のスタイルコップに類似するガイドラインです。インデントや命名規則、ブレースの書き方などを定義しており、これに準拠することでチーム開発時のコードが統一されます。</p>
+<h4 id="psr-3-%E3%83%AD%E3%82%AE%E3%83%B3%E3%82%B0">PSR-3 (ロギング)</h4>
+<p>ロギングのインターフェイスを標準化した規格です。MonologなどのライブラリがPSR-3に準拠しているため、フレームワーク間で統一的な記法が使えます。ログレベルや実装方法が標準化されているため、異なるフレームワーク間でも一貫したロギング処理を実現できます。</p>
+<p>MEMO:</p>
+<ul>
+<li>ComposerとNuGetの比較
+<ul>
+<li>C#のNuGetに相当する仕組みがComposerです。composer.jsonの設定に従い、composer install コマンドを実行すると必要なライブラリがダウンロード・管理されます。</li>
+</ul>
+</li>
+<li>PSR-4とオートローディング
+<ul>
+<li>PHPではPSR-4規約を導入することで、ディレクトリ構造と名前空間が対応し、クラスを自動的に読み込めます。C#のプロジェクト構造と似たイメージで整理できるので、スッキリした構成を組みやすいです。</li>
+</ul>
+</li>
+<li>コード規約 (PSR-12など)
+<ul>
+<li>C#のスタイルコップと同様、PHPにも推奨されるコーディング規約があります。チーム開発時はPSR-12やPSR-3(ロギング規約)などのガイドラインを活用してコードの統一性を保ちましょう。</li>
+</ul>
+</li>
+</ul>
+<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+<p>PHPは、C#と比較して異なるパラダイムを持つ言語ですが、モダンなPHPは強力な型システムとクリーンなオブジェクト指向プログラミングをサポートしています。Webアプリケーション開発に特化した機能と、豊富なエコシステムを活用することで、セキュアで保守性の高いアプリケーションを開発することができます。</p>
+<p>MEMO:</p>
+<ul>
+<li>継続的に進化するPHP
+<ul>
+<li>PHPはバージョン7以降、型システムやパフォーマンス面で大幅な進化を遂げています。C#のように言語仕様がアップデートされ続けているため、積極的に追いかけていきましょう。</li>
+</ul>
+</li>
+<li>開発ツール
+<ul>
+<li>Visual Studioに慣れている場合、VS CodeやPhpStormなどPHP向けのIDEを使うことで補完やデバッグがしやすくなります。Xdebugという拡張を用いればブレークポイントを使ったステップ実行も可能です。</li>
+</ul>
+</li>
+<li>フレームワークの活用
+<ul>
+<li>C#でASP.NET Coreを使うように、PHPではLaravelやSymfonyといったフレームワークを利用すると、認証やルーティングといった基本機能が整備され、より生産性高く開発できます。</li>
+</ul>
+</li>
+</ul>
+<h2 id="%E5%8F%82%E8%80%83%E3%83%AA%E3%83%B3%E3%82%AF">参考リンク</h2>
+<ul>
+<li><a href="https://www.php.net/manual/ja/">PHP公式マニュアル</a></li>
+<li><a href="https://www.php-fig.org/">PHP-FIG（PHPフレームワーク相互運用グループ）</a></li>
+<li><a href="https://phptherightway.com/">PHP The Right Way</a></li>
+<li><a href="https://laravel.com/docs">Laravel公式ドキュメント</a></li>
+<li><a href="https://getcomposer.org/">Composer公式サイト</a></li>
+<li><a href="https://github.com/OWASP/CheatSheetSeries">PHP Security Checklist</a></li>
+</ul>
+<hr>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
+ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。
+https://onewedge.co.jp/</p>
+
+</body>
+</html>

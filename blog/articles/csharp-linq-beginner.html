@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>csharp-linq-beginner.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p>LINQ（Language Integrated Query）は、C#でデータベースやコレクションを効率的に操作できる強力なツールです。このシリーズでは、LINQの基本から応用までを解説していきます。今回は、セットアップ済みのプロジェクトを使って、データベースからデータを取得する基本的なLINQ構文を紹介します。</p>
+<h2 id="%E4%BA%8B%E5%89%8D%E6%BA%96%E5%82%99%E6%8E%A8%E5%A5%A8%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83">事前準備（推奨開発環境）</h2>
+<p>この記事では以下の開発ツールを使用します。あらかじめインストールしておくことをお勧めします。</p>
+<div class="details Visual Studio">
+<p>C#のプロジェクト作成とコードの編集に <strong>Visual Studio</strong> を使用します。</p>
+<h3 id="%E5%BF%85%E8%A6%81%E3%81%AA%E3%82%A8%E3%83%87%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3"><strong>必要なエディション</strong></h3>
+<ul>
+<li><strong>Visual Studio 2022 Community Edition</strong>（無料版）以上を推奨。</li>
+</ul>
+<h3 id="%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86"><strong>インストール手順</strong></h3>
+<ol>
+<li><a href="https://visualstudio.microsoft.com/ja/downloads/">Visual Studio ダウンロードページ</a> にアクセスします。</li>
+<li><strong>Community Edition</strong> を選択してインストーラーをダウンロード。</li>
+<li>インストール中に「<strong>ワークロード</strong>」の設定画面が表示されます。
+<ul>
+<li><strong>.NET デスクトップ開発</strong> を選択。</li>
+<li>必要に応じて <strong>データベースツール</strong> を含む「<strong>データストレージと処理</strong>」も選択。</li>
+</ul>
+</li>
+<li>インストールが完了したら、Visual Studio を起動します。</li>
+</ol>
+<h3 id="%E6%8E%A8%E5%A5%A8%E8%A8%AD%E5%AE%9A"><strong>推奨設定</strong></h3>
+<ul>
+<li>必要に応じて、プロジェクト設定を日本語に設定してください。</li>
+</ul>
+</div>
+<div class="details SQL Server Management Studio (SSMS">
+<p>データベースの管理とデータの確認に <strong>SQL Server Management Studio (SSMS)</strong> を使用します。</p>
+<h3 id="%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86"><strong>インストール手順</strong></h3>
+<ol>
+<li><a href="https://learn.microsoft.com/ja-jp/sql/ssms/download-sql-server-management-studio-ssms">SSMS ダウンロードページ</a> にアクセスします。</li>
+<li>最新バージョンのインストーラーをダウンロード。</li>
+<li>インストーラーを実行し、指示に従ってインストールを完了させます。</li>
+</ol>
+<h3 id="%E6%8E%A5%E7%B6%9A%E6%89%8B%E9%A0%86"><strong>接続手順</strong></h3>
+<ol>
+<li>SSMSを起動し、<strong>オブジェクトエクスプローラー</strong>で接続画面を開きます。</li>
+<li><strong>サーバー名</strong>を入力します：<code>(localdb)\MSSQLLocalDB</code></li>
+<li>認証は「Windows 認証」を選択し、<strong>接続</strong>をクリック。</li>
+<li>正常に接続できると、ローカルデータベースが表示されます。</li>
+</ol>
+</div>
+<div class="details  Git">
+<p>プロジェクトをGitHubで共有していますので、<strong>Git</strong> をインストールしておくと便利に使えます。</p>
+<h4 id="%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%89%8B%E9%A0%86"><strong>インストール手順</strong></h4>
+<ol>
+<li><a href="https://git-scm.com/">Git公式サイト</a> にアクセス。</li>
+<li>インストーラーをダウンロードし、指示に従ってインストール。</li>
+<li>インストール後、コマンドラインで以下を実行し、インストールを確認します：</li>
+</ol>
+<pre class="hljs"><code><div>git --version
+</div></code></pre>
+</div>
+<h2 id="1-%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%A6%82%E8%A6%81">1. プロジェクト概要</h2>
+<p>セットアップされたC#プロジェクトを使用します。
+このプロジェクトは、Entity Framework Core（EF Core）を使用してデータベースと接続しており、以下のような簡単なデータモデルを持っています。</p>
+<h3 id="%E3%83%87%E3%83%BC%E3%82%BF%E3%83%A2%E3%83%87%E3%83%AB"><strong>データモデル</strong></h3>
+<h4 id="author%E8%91%97%E8%80%85"><strong>Author（著者）</strong></h4>
+<table>
+<thead>
+<tr>
+<th>カラム名</th>
+<th>説明</th>
+<th>属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AuthorId</code></td>
+<td>著者ID</td>
+<td>主キー</td>
+</tr>
+<tr>
+<td><code>Name</code></td>
+<td>著者名</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="book%E6%9B%B8%E7%B1%8D"><strong>Book（書籍）</strong></h4>
+<table>
+<thead>
+<tr>
+<th>カラム名</th>
+<th>説明</th>
+<th>属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BookId</code></td>
+<td>書籍ID</td>
+<td>主キー</td>
+</tr>
+<tr>
+<td><code>Title</code></td>
+<td>書籍タイトル</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>AuthorId</code></td>
+<td>著者ID</td>
+<td>外部キー（<code>Author</code>）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-%E7%92%B0%E5%A2%83%E3%81%AE%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97">2. 環境のセットアップ</h2>
+<p>プロジェクトをクローンして実行環境を準備します。</p>
+<p><strong>リポジトリをクローン</strong></p>
+<pre class="hljs"><code><div>git <span class="hljs-built_in">clone</span> https://github.com/ktnd111/Learning-Linq
+<span class="hljs-built_in">cd</span> Learning-Linq
+</div></code></pre>
+<p><strong>パッケージを復元</strong></p>
+<pre class="hljs"><code><div>dotnet restore
+</div></code></pre>
+<p>こちらからリポジトリページ飛んでもらっても構いません。
+https://github.com/ktnd111/Learning-Linq</p>
+<p><strong>データベースの準備</strong>
+プロジェクトをビルドして実行すると、データベースが自動的に生成されます。
+動作確認 プロジェクトを実行し、データベース接続が成功していることを確認してください。</p>
+<p><strong>データ準備</strong>
+ビルドし、デバッグを開始すると自動的にデータが挿入されます。</p>
+<h2 id="3-linq%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B">3. LINQでデータを取得する</h2>
+<p>以下は、データベースから著者とその関連書籍を取得する基本的なLINQ構文です。
+下記コード（メソッド）は<code>Program.cs</code>からクラスインスタンスを生成し、実行してください。
+（クローンしたままなら実行するだけでOKです）</p>
+<p>著者と書籍の一覧を取得するコード</p>
+<pre class="hljs"><code><div>using Learning_Linq.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace Learning_Linq.Learning;
+
+public class Linq0
+{
+    public void LearningLinq0()
+    {
+        using (var context = new LibraryContext())
+        {
+            // データベースから著者とその書籍を取得
+            var authorsWithBooks = context.Authors
+                .Include(a =&gt; a.Books) // 著者に関連する書籍も取得
+                .ToList();
+
+            // 取得したデータをコンソールに表示
+            foreach (var author in authorsWithBooks)
+            {
+                Console.WriteLine($&quot;Author: {author.Name}&quot;);
+                foreach (var book in author.Books)
+                {
+                    Console.WriteLine($&quot;  Book: {book.Title}&quot;);
+                }
+            }
+        }
+    }
+}
+</div></code></pre>
+<h2 id="4-%E5%AE%9F%E8%A1%8C%E7%B5%90%E6%9E%9C">4. 実行結果</h2>
+<p>上記のコードを実行すると、以下のような結果が表示されます。</p>
+<pre class="hljs"><code><div><span class="hljs-attr">Author:</span> <span class="hljs-string">George</span> <span class="hljs-string">Orwell</span>
+  <span class="hljs-attr">Book:</span> <span class="hljs-number">1984</span>
+  <span class="hljs-attr">Book:</span> <span class="hljs-string">Animal</span> <span class="hljs-string">Farm</span>
+<span class="hljs-attr">Author:</span> <span class="hljs-string">Robert</span> <span class="hljs-string">C.</span> <span class="hljs-string">Martin</span>
+  <span class="hljs-attr">Book:</span> <span class="hljs-string">Clean</span> <span class="hljs-string">Code</span>
+<span class="hljs-attr">Author:</span> <span class="hljs-string">Andrew</span> <span class="hljs-string">Hunt</span>
+  <span class="hljs-attr">Book:</span> <span class="hljs-string">The</span> <span class="hljs-string">Pragmatic</span> <span class="hljs-string">Programmer</span>
+<span class="hljs-attr">Author:</span> <span class="hljs-string">David</span> <span class="hljs-string">Thomas</span>
+  <span class="hljs-attr">Book:</span> <span class="hljs-string">The</span> <span class="hljs-string">Pragmatic</span> <span class="hljs-string">Programmer</span>
+<span class="hljs-attr">Author:</span> <span class="hljs-string">Martin</span> <span class="hljs-string">Fowler</span>
+  <span class="hljs-attr">Book:</span> <span class="hljs-string">Refactoring</span>
+<span class="hljs-attr">Author:</span> <span class="hljs-string">Eric</span> <span class="hljs-string">Evans</span>
+  <span class="hljs-attr">Book:</span> <span class="hljs-string">Domain-Driven</span> <span class="hljs-string">Design</span>
+<span class="hljs-attr">Author:</span> <span class="hljs-string">Kent</span> <span class="hljs-string">Beck</span>
+  <span class="hljs-attr">Book: Test-Driven Development:</span> <span class="hljs-string">By</span> <span class="hljs-string">Example</span>
+<span class="hljs-attr">Author:</span> <span class="hljs-string">Don</span> <span class="hljs-string">Box</span>
+  <span class="hljs-attr">Book:</span> <span class="hljs-string">Essential</span> <span class="hljs-string">COM</span>
+<span class="hljs-attr">Author:</span> <span class="hljs-string">Jeffrey</span> <span class="hljs-string">Richter</span>
+  <span class="hljs-attr">Book:</span> <span class="hljs-string">CLR</span> <span class="hljs-string">via</span> <span class="hljs-string">C#</span>
+</div></code></pre>
+<h2 id="5-linq%E6%A7%8B%E6%96%87%E3%81%AE%E8%A7%A3%E8%AA%AC">5. LINQ構文の解説</h2>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> authorsWithBooks = context.Authors
+    .Include(a =&gt; a.Books) <span class="hljs-comment">// 著者に関連する書籍も取得</span>
+    .ToList();
+</div></code></pre>
+<p>今回使用したLINQ構文は上記のみです。
+var authorsWithBooks = context.Authors
+.Include(a =&gt; a.Books)
+.ToList();</p>
+<p>データベースから著者とその書籍を取得、Includeで著者に関連する書籍も取得します。
+（関連する書籍（Books テーブル）を結合して取得します。）</p>
+<p>クエリ結果をリストとして読み込んだものが<code>authorsWithBooks</code>です。</p>
+<h2 id="6-%E3%81%93%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%89%E3%81%A7%E5%AD%A6%E3%81%B9%E3%82%8B%E3%81%93%E3%81%A8">6. このコードで学べること</h2>
+<p>LINQを使ったデータベース操作の基本的な流れ。
+データベースのリレーション（親子関係）を活用したクエリ。</p>
+<p>LINQを使ったデータベース操作は、コードが簡潔で読みやすくなる非常に便利なスキルです。このシリーズを通じて、LINQを楽しく学んでいきましょう！😊</p>
+
+</body>
+</html>
