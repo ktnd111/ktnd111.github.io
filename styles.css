@@ -287,3 +287,16 @@ main {
         transform: translate(0);
     }
 }
+
+.external-link-note {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: 5px;
+    font-style: italic;
+}
+
+.fas.fa-external-link-alt {
+    font-size: 0.8em;
+    margin-left: 5px;
+    vertical-align: super;
+}
