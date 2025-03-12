@@ -177,9 +177,9 @@ blobClientMock
 テストで動作を差し替えたい箇所は、コンストラクタインジェクションやFactoryメソッドのモックを通じてテスト側で用意したモックを渡すように構成することが重要です。</p>
 <h2 id="%E3%82%B7%E3%82%B0%E3%83%8D%E3%83%81%E3%83%A3%E7%A2%BA%E8%AA%8D%E3%81%AEtips">シグネチャ確認のTips</h2>
 <p>Visual StudioやVS Codeでは、呼び出し箇所でF12キーを押すとそのメソッドの定義へ移動できます。Azure SDKや.NETのクラスも、F12でソースコードまたはメタデータを確認できます。</p>
-<p>例として<code>DeleteIfExists</code>を確認すると以下のように表示されます。
+<p>例として<code>DeleteIfExists</code>を確認すると以下のように表示されます。</p>
 <img src="https://storage.googleapis.com/zenn-user-upload/fa0d7becf199-20250221.png" alt="">
-「本当に引数がないメソッドなのか、デフォルト引数があるだけなのか」を把握することで、Moqのセットアップを適切に記述することができます。</p>
+<p>「本当に引数がないメソッドなのか、デフォルト引数があるだけなのか」を把握することで、Moqのセットアップを適切に記述することができます。</p>
 <h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
 <ul>
 <li>OpenReadAsync()は引数なしで呼び出せますが、実際には4つのデフォルト引数を持つメソッドです</li>
@@ -189,11 +189,13 @@ blobClientMock
 </ul>
 <p>これらのポイントを押さえることで、Azure Blob Storageのクライアント呼び出しをスムーズにモック化することができます。</p>
 <h2 id="%E5%8F%82%E8%80%83">参考</h2>
-<p>https://learn.microsoft.com/ja-jp/dotnet/api/azure.storage.blobs.specialized.blobbaseclient.openreadasync?view=azure-dotnet#azure-storage-blobs-specialized-blobbaseclient-openreadasync(azure-storage-blobs-models-blobopenreadoptions-system-threading-cancellationtoken)</p>
+<a href="https://learn.microsoft.com/ja-jp/dotnet/api/azure.storage.blobs.specialized.blobbaseclient.openreadasync?view=azure-dotnet#azure-storage-blobs-specialized-blobbaseclient-openreadasync(azure-storage-blobs-models-blobopenreadoptions-system-threading-cancellationtoken)" target="_blank">BlobBaseClient.OpenReadAsync メソッド</a>
 <hr>
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
-ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。
-https://onewedge.co.jp/</p>
+
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
+<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+
+<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
 
 </body>
 </html>

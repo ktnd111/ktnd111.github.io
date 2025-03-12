@@ -6,7 +6,8 @@
       "summary": "LINQの遅延評価と変数未代入のバグについて実体験をもとに解説します。",
       "tags": ["C#", "LINQ", "デバッグ", "テスト設計"],
       "category": "プログラミング",
-      "background": "tech"
+      "background": "tech",
+      "isCompanyPost": true
     },
     {
       "title": "ASP.NET CoreのDI完全ガイド",
@@ -15,7 +16,8 @@
       "summary": "ASP.NET CoreのDependency Injectionの基本から応用まで詳しく解説します。",
       "tags": ["C#", "ASP.NET Core", "DI", "設計パターン"],
       "category": "プログラミング",
-      "background": "web"
+      "background": "web",
+      "isCompanyPost": true
     },
     {
       "title": "ASP.NET Coreのエラーハンドリング：専用コントローラーvs既存コントローラー",
@@ -114,6 +116,7 @@
       "summary": "PowerShellを使用したファイルの一括リネーム方法と実践的な例を紹介します。",
       "tags": ["PowerShell", "効率化", "Windows"],
       "category": "生産性",
-      "background": "performance"
+      "background": "performance",
+      "isCompanyPost": false
     }
   ]
