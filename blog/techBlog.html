@@ -55,7 +55,6 @@
         .card-title a {
             color: #0366d6;
             text-decoration: none;
-            margin-top: auto;
         }
         .card-title a:hover {
             text-decoration: underline;
@@ -334,7 +333,7 @@
                             <div class="card h-100 ${bgClass}">
                                 ${article.category ? `<div class="category-badge">${article.category}</div>` : ''}
                                 <div class="card-body">
-                                    <h3 class="card-title"><a href="article.html?article=${encodeURIComponent(article.path)}">${article.title}</a></h3>
+                                    <h3 class="card-title mt-4"><a href="article.html?article=${encodeURIComponent(article.path)}">${article.title}</a></h3>
                                     <div class="article-meta">
                                         <i class="far fa-calendar-alt"></i> ${article.date}
                                     </div>
