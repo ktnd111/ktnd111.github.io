@@ -98,7 +98,7 @@
 <p>具体的には次のような問題が起きました。</p>
 <ul>
 <li>DisplayRank（表示順位）が1〜3のデータだけを取得して処理するはずが、<strong>すべてのデータが処理</strong>されてしまう</li>
-<li>E2Eテストでは「1, 2, 2, 3」といった不正なデータ順序が検出され、大きな混乱を招いた</li>
+<li>E2Eテストでは「1, 2, 2, 3」といった不正なデータ順序が検出され、不具合が発生</li>
 </ul>
 <h2 id="%E5%95%8F%E9%A1%8C%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%89">問題のコード</h2>
 <pre class="hljs"><code><div><span class="hljs-comment">// DBからEntity Frameworkでデータを取得</span>
