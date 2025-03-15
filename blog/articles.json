@@ -1,5 +1,14 @@
 [
     {
+      "title": "C#のクラス設計入門 - オブジェクト指向の基礎",
+      "path": "articles/csharp-class-concept.html",
+      "date": "2025-03-15",
+      "summary": "C#におけるクラスの概念と特徴（カプセル化、継承、多態性、抽象化）について解説し、インターフェイスと依存性注入の実践的な活用法を紹介します。",
+      "tags": ["C#", "オブジェクト指向", "設計", "インターフェイス", "★"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
       "title": "LINQの実行タイミングと変数未代入の落とし穴",
       "path": "articles/csharp-linq-undefinedmiss.html",
       "date": "2025-03-10",

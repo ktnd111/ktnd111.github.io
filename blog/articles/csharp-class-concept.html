@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>csharp-class-concept.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%E3%82%AF%E3%83%A9%E3%82%B9%E3%81%AE%E6%A6%82%E5%BF%B5">クラスの概念</h1>
+<h2 id="%E3%82%AF%E3%83%A9%E3%82%B9%E3%81%A8%E3%81%AF-%F0%9F%93%9D">クラスとは 📝</h2>
+<p>クラスは、オブジェクト指向プログラミング（OOP）の基本となる「設計図」のようなものです。データ（属性）と機能（メソッド）をひとまとめにして、実世界の物や概念を表現できます。例えば、「車」というクラスを作れば、その車の色や速度といったデータと、走る・止まるといった機能を一緒に定義できるわけです。</p>
+<h2 id="%E3%82%AF%E3%83%A9%E3%82%B9%E3%81%AE%E4%B8%BB%E8%A6%81%E3%81%AA%E7%89%B9%E5%BE%B4">クラスの主要な特徴</h2>
+<h3 id="1-%E3%82%AB%E3%83%97%E3%82%BB%E3%83%AB%E5%8C%96-%F0%9F%93%A6">1. カプセル化 📦</h3>
+<p>カプセル化とは、大切なデータを守りつつ、必要な操作だけを外に見せる仕組みです。例えば、スマートフォンのように、内部の複雑な回路は見えなくても、画面のボタンで簡単に操作できるようなものですね。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Person</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">string</span> name; <span class="hljs-comment">// 内部データは直接触れないように隠す </span>
+    
+    <span class="hljs-comment">// 外から安全にアクセスするための窓口を用意 </span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">string</span> Name
+    {
+        <span class="hljs-keyword">get</span> { <span class="hljs-keyword">return</span> name; }
+        <span class="hljs-keyword">set</span> { name = <span class="hljs-keyword">value</span>; }
+    }
+}
+</div></code></pre>
+<h3 id="2-%E7%B6%99%E6%89%BF-%F0%9F%8C%B3">2. 継承 🌳</h3>
+<p>継承は、既にあるクラスの特徴を受け継いで新しいクラスを作る方法です。親から子へ特徴が受け継がれるようなものですね。例えば「動物」クラスがあれば、その特徴を受け継いだ「犬」クラスを作って、さらに犬特有の機能を追加できます。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Animal</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">virtual</span> <span class="hljs-keyword">void</span> <span class="hljs-title">MakeSound</span>(<span class="hljs-params"></span>)</span> { } <span class="hljs-comment">// 基本の鳴き方（オーバーライド可能）👈</span>
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Dog</span> : <span class="hljs-title">Animal</span> <span class="hljs-comment">// Animalの特徴を継承 🔄</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">void</span> <span class="hljs-title">MakeSound</span>(<span class="hljs-params"></span>)</span>
+    {
+        Console.WriteLine(<span class="hljs-string">"ワンワン！"</span>); <span class="hljs-comment">// 犬特有の鳴き方を実装 🐕</span>
+    }
+}
+</div></code></pre>
+<h3 id="3-%E5%A4%9A%E6%85%8B%E6%80%A7-%F0%9F%A6%8B">3. 多態性 🦋</h3>
+<p>多態性は「形が変わる性質」というもので、同じ操作でも対象によって動作が変わる便利な機能です。例えば「話す」という同じ操作でも、人間なら「こんにちは」、猫なら「にゃー」と、それぞれの方法で反応します。</p>
+<pre class="hljs"><code><div>Animal myPet = <span class="hljs-keyword">new</span> Dog(); <span class="hljs-comment">// 動物型の変数に犬を入れる </span>
+myPet.MakeSound(); <span class="hljs-comment">// 「ワンワン！」と表示される </span>
+</div></code></pre>
+<h3 id="4-%E6%8A%BD%E8%B1%A1%E5%8C%96-%F0%9F%92%AD">4. 抽象化 💭</h3>
+<p>抽象化とは、複雑なものから必要な特徴だけを取り出すことです。例えば「乗り物」という概念では、「移動する」という共通の特徴だけに注目し、細かい違いは無視するようなものです。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IDrawable</span> <span class="hljs-comment">// 描画できるものの共通の特徴 </span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Draw</span>(<span class="hljs-params"></span>)</span>;
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Circle</span> : <span class="hljs-title">IDrawable</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Draw</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-comment">// 円を描く具体的な方法 ⭕</span>
+    }
+}
+</div></code></pre>
+<h2 id="%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%82%A4%E3%82%B9%E3%81%A8di%E4%BE%9D%E5%AD%98%E6%80%A7%E6%B3%A8%E5%85%A5%F0%9F%94%8C">インターフェイスとDI（依存性注入）🔌</h2>
+<p>インターフェイスを使うと、プログラムの部品を柔軟に組み替えられるようになります。特に「依存性注入（DI）」という仕組みと一緒に使うと、レゴブロックのように部品を簡単に付け替えられるようになります。</p>
+<h3 id="%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%82%A4%E3%82%B9%E3%81%A8di%E3%81%AE%E8%89%AF%E3%81%84%E3%81%A8%E3%81%93%E3%82%8D-%F0%9F%8C%9F">インターフェイスとDIの良いところ 🌟</h3>
+<ol>
+<li><strong>部品同士の結びつきが緩くなる</strong> 🧩<br>
+直接つながるのではなく、「約束事（インターフェイス）」を介して連携するので、お互いの変更に強くなります。</li>
+</ol>
+<pre class="hljs"><code><div><span class="hljs-comment">// ログを記録するための約束事</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">ILogger</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Log</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> message</span>)</span>;
+}
+
+<span class="hljs-comment">// コンソールに出力する実装 👇</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ConsoleLogger</span> : <span class="hljs-title">ILogger</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Log</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> message</span>)</span>
+    {
+        Console.WriteLine(<span class="hljs-string">$"ログ: <span class="hljs-subst">{message}</span>"</span>); <span class="hljs-comment">// 画面に表示 📊</span>
+    }
+}
+
+<span class="hljs-comment">// ファイルに書き込む実装 👇</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">FileLogger</span> : <span class="hljs-title">ILogger</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Log</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> message</span>)</span>
+    {
+        <span class="hljs-comment">// ファイルにログを書き込む方法 📄</span>
+    }
+}
+</div></code></pre>
+<ol start="2">
+<li><strong>テストがしやすくなる</strong> 🧪<br>
+本物の代わりに「テスト用のニセモノ」を使ってテストができます。例えば、実際のデータベースの代わりにメモリ上のデータを使うなど。</li>
+</ol>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">UserService</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ILogger _logger;
+    
+    <span class="hljs-comment">// 外から必要な部品をもらう（依存性注入） 💉</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">UserService</span>(<span class="hljs-params">ILogger logger</span>)</span>
+    {
+        _logger = logger;
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">RegisterUser</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> username</span>)</span>
+    {
+        <span class="hljs-comment">// ユーザー登録の処理</span>
+        _logger.Log(<span class="hljs-string">$"ユーザー「<span class="hljs-subst">{username}</span>」を登録しました"</span>); <span class="hljs-comment">// ログ出力 ✍️</span>
+    }
+}
+
+<span class="hljs-comment">// 使い方の例</span>
+ILogger logger = <span class="hljs-keyword">new</span> ConsoleLogger();
+UserService service = <span class="hljs-keyword">new</span> UserService(logger); <span class="hljs-comment">// 部品を注入 🔧</span>
+</div></code></pre>
+<ol start="3">
+<li><strong>部品の交換が簡単</strong> 🔄<br>
+設定を変えるだけで、異なる実装に簡単に切り替えられます。例えば、開発中は画面に表示、本番では専用ファイルに記録など。</li>
+</ol>
+<pre class="hljs"><code><div><span class="hljs-comment">// DIの仕組みを使った例（ASP.NET Core）</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">ConfigureServices</span>(<span class="hljs-params">IServiceCollection services</span>)</span>
+{
+    <span class="hljs-comment">// 開発中と本番で異なる実装を使い分ける 🛠️</span>
+    <span class="hljs-keyword">if</span> (Environment.IsDevelopment())
+        services.AddSingleton&lt;ILogger, ConsoleLogger&gt;(); <span class="hljs-comment">// 開発環境用 🔍</span>
+    <span class="hljs-keyword">else</span>
+        services.AddSingleton&lt;ILogger, FileLogger&gt;(); <span class="hljs-comment">// 本番環境用 🚀</span>
+    
+    services.AddScoped&lt;UserService&gt;();
+}
+</div></code></pre>
+<ol start="4">
+<li><strong>横断的な機能をすっきり分ける</strong> 🧹<br>
+ログ記録、キャッシュ、エラー処理など、プログラム全体で共通して必要な機能を、メインのコードから分離できます。</li>
+</ol>
+<p>DIのフレームワークを使えば、必要な部品を自動で組み合わせてくれるので、大規模なアプリケーションでも部品の管理が楽になります。これにより、コードが整理しやすく、再利用もしやすくなります。</p>
+<h2 id="%E3%82%AF%E3%83%A9%E3%82%B9%E3%81%AE%E6%A7%8B%E6%88%90%E8%A6%81%E7%B4%A0-%F0%9F%A7%B1">クラスの構成要素 🧱</h2>
+<ul>
+<li><strong>フィールド</strong> 📊: クラスが持つデータを保存する場所（例：車のクラスでの「色」や「速度」）</li>
+<li><strong>プロパティ</strong> 🔑: フィールドへの出入り口を制御する仕組み（例：データの取得・設定時のルールを決められる）</li>
+<li><strong>メソッド</strong> ⚙️: クラスができる操作や行動（例：車の「走る」「止まる」など）</li>
+<li><strong>コンストラクタ</strong> 🏗️: オブジェクトが生まれるときの初期設定をする特別なメソッド</li>
+<li><strong>イベント</strong> 📣: 何か特別なことが起きた時に知らせる仕組み（例：「燃料が少なくなった」通知）</li>
+</ul>
+<h2 id="%E3%82%AF%E3%83%A9%E3%82%B9%E3%81%A8%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AE%E9%96%A2%E4%BF%82-%F0%9F%8F%AD">クラスとオブジェクトの関係 🏭</h2>
+<p>クラスは「設計図」、オブジェクトは「実際に作られたもの（インスタンス）」と考えるとわかりやすいでしょう。一つの設計図（クラス）から、たくさんの異なる実物（オブジェクト）を作ることができます。</p>
+<pre class="hljs"><code><div>Person taro = <span class="hljs-keyword">new</span> Person(); <span class="hljs-comment">// 「Person」という設計図から「太郎さん」を作る 👨</span>
+taro.Name = <span class="hljs-string">"田中太郎"</span>;
+
+Person hanako = <span class="hljs-keyword">new</span> Person(); <span class="hljs-comment">// 同じ設計図から「花子さん」を作る 👩</span>
+hanako.Name = <span class="hljs-string">"佐藤花子"</span>;
+</div></code></pre>
+<h2 id="%E9%9D%99%E7%9A%84%E3%83%A1%E3%83%B3%E3%83%90%E3%83%BC-vs-%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%83%A1%E3%83%B3%E3%83%90%E3%83%BC-%E2%9A%A1">静的メンバー vs インスタンスメンバー ⚡</h2>
+<ul>
+<li><strong>静的メンバー</strong> 🌟: クラス全体で共有される機能やデータで、オブジェクトを作らなくても使える（例：数学のπなど、共通して使う値）</li>
+<li><strong>インスタンスメンバー</strong> 🧩: 各オブジェクト固有の機能やデータ（例：個々の車の色や現在の速度）</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Calculator</span>
+{
+    <span class="hljs-comment">// 静的メソッド - 電卓を作らなくても使える共通機能 🌐</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">Add</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> a, <span class="hljs-keyword">int</span> b</span>)</span>
+    {
+        <span class="hljs-keyword">return</span> a + b; <span class="hljs-comment">// どの電卓でも同じように計算する ✅</span>
+    }
+    
+    <span class="hljs-comment">// インスタンスメソッド - 電卓を作ってから使う機能 🔢</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">Multiply</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> a, <span class="hljs-keyword">int</span> b</span>)</span>
+    {
+        <span class="hljs-keyword">return</span> a * b; <span class="hljs-comment">// 特定の電卓で計算する ✅</span>
+    }
+}
+
+<span class="hljs-comment">// 使い方の例</span>
+<span class="hljs-keyword">int</span> sum = Calculator.Add(<span class="hljs-number">5</span>, <span class="hljs-number">3</span>); <span class="hljs-comment">// 静的メソッドは直接クラス名で呼び出せる 🌟</span>
+Calculator calc = <span class="hljs-keyword">new</span> Calculator(); <span class="hljs-comment">// インスタンスメソッドは、まずオブジェクトを作る 🛠️</span>
+<span class="hljs-keyword">int</span> product = calc.Multiply(<span class="hljs-number">5</span>, <span class="hljs-number">3</span>); <span class="hljs-comment">// そしてオブジェクトを使って呼び出す 🔢</span>
+</div></code></pre>
+<h2 id="%E3%81%BE%E3%81%A8%E3%82%81-%F0%9F%93%9D">まとめ 📝</h2>
+<p>クラスはオブジェクト指向プログラミングの基本的な考え方です。カプセル化、継承、多態性、抽象化といった特徴を使うことで、整理された、再利用しやすいプログラムが作れます。さらに、インターフェイスと依存性注入を活用すれば、部品を自由に組み替えられる柔軟なシステムが実現できます。これらの考え方は、大規模で複雑なプログラムを作る際に特に役立ちます。</p>
+<h3 id="%E5%AD%A6%E7%BF%92%E3%81%AE%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88-%F0%9F%8E%AF">学習のポイント 🎯</h3>
+<ol>
+<li>
+<p><strong>クラス設計の基本を理解する</strong> 📚<br>
+良いクラス設計は、一つのクラスに一つの責任を持たせる「単一責任の原則」に基づきます。</p>
+</li>
+<li>
+<p><strong>インターフェイスを活用する</strong> 🔄<br>
+具体的な実装に依存するのではなく、抽象に依存することでプログラムの柔軟性が高まります。</p>
+</li>
+<li>
+<p><strong>DIを習得する</strong> 💉<br>
+依存性注入はモダンな開発において必須のテクニックです。フレームワークの力を借りて効率的に実装しましょう。</p>
+</li>
+</ol>
+
+</body>
+</html>
