@@ -7,8 +7,8 @@ const USERNAME = 'ktnd111';
 async function fetchContributionData() {
     console.log('fetchContributionData: 開始');
     try {
-        // GitHubページ用の絶対パス
-        const path = '/ktnd111.github.io/data/contributions.json';
+        // 相対パスを使用してJSONファイルを取得
+        const path = '../data/contributions.json';
         console.log(`JSONファイルを取得試行: ${path}`);
         
         const response = await fetch(path);
