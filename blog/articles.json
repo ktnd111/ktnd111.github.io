@@ -1,10 +1,19 @@
 [
     {
+      "title": "GitHub Pagesサイトにコントリビューショングリッドを実装した話 🟩",
+      "path": "articles/github-pages-contributions.html",
+      "date": "2025-03-18",
+      "summary": "GitHub Pagesサイトに「草」（コントリビューショングリッド）を実装した経験と、静的サイトで動的データを扱う際の技術的課題の解決方法を紹介します。",
+      "tags": ["GitHub", "Azure", "Azure Functions", "GraphQL", "サーバーレス", "★"],
+      "category": "クラウド",
+      "background": "web"
+    },
+    {
       "title": "C#のクラス設計入門 - オブジェクト指向の基礎",
       "path": "articles/csharp-class-concept.html",
       "date": "2025-03-15",
       "summary": "C#におけるクラスの概念と特徴（カプセル化、継承、多態性、抽象化）について解説し、インターフェイスと依存性注入の実践的な活用法を紹介します。",
-      "tags": ["C#", "オブジェクト指向", "設計", "インターフェイス", "★"],
+      "tags": ["C#", "オブジェクト指向", "設計", "インターフェイス"],
       "category": "プログラミング",
       "background": "tech"
     },
