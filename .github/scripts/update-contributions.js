@@ -3,7 +3,11 @@ const fs = require('fs');
 const path = require('path');
 
 const USERNAME = 'ktnd111'; // GitHubユーザー名
-const API_URL = `https://github-contributions-api.jogruber.de/v4/${USERNAME}`;
+// オプション1: 代替APIを使用する
+const API_URL = `https://github-contributions.now.sh/api/v1/${USERNAME}`;
+// オプション2: 別のAPIを試す場合のバックアップ
+const BACKUP_API_URL = `https://skyline.github.com/${USERNAME}/2024.json`;
+
 const OUTPUT_DIR = path.join(__dirname, '../../data');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'contributions.json');
 
@@ -11,17 +15,53 @@ async function fetchContributionData() {
   try {
     console.log(`Fetching contribution data for ${USERNAME}...`);
     
-    const response = await fetch(API_URL);
+    // メインAPIを試す
+    let response = await fetch(API_URL);
     
+    // メインAPIが失敗した場合、バックアップAPIを試す
     if (!response.ok) {
-      throw new Error(`API responded with status: ${response.status}`);
+      console.log(`Primary API failed with status: ${response.status}. Trying backup API...`);
+      response = await fetch(BACKUP_API_URL);
+      
+      if (!response.ok) {
+        throw new Error(`Both APIs failed. Backup API status: ${response.status}`);
+      }
     }
     
+    // レスポンスJSONを取得
     const data = await response.json();
+    console.log('API response structure:', Object.keys(data));
+    
+    // データ構造に基づいて取得ロジックを調整
+    let contributions = [];
+    
+    // github-contributions.now.sh APIの場合
+    if (data.contributions) {
+      contributions = data.contributions;
+    } 
+    // skyline APIの場合
+    else if (data.contributions_calendar) {
+      contributions = data.contributions_calendar.map(day => ({
+        date: day.date,
+        count: day.count
+      }));
+    }
+    
+    // API応答がエラーか空の場合
+    if (!contributions || contributions.length === 0) {
+      console.log('No contribution data received from API. Generating default data...');
+      return generateDefaultData();
+    }
+    
+    console.log(`Received ${contributions.length} days of contribution data`);
     
     // 直近の140日分のデータを取得
-    const contributions = data.contributions || [];
-    const recentContributions = contributions.slice(-140);
+    // データが少ない場合は全てのデータを使用
+    const recentContributions = contributions.length > 140 
+      ? contributions.slice(-140) 
+      : contributions;
+    
+    console.log(`Using ${recentContributions.length} days of recent contribution data`);
     
     // 貢献度レベルに変換（0-4）
     const formattedData = recentContributions.map(day => {
@@ -36,7 +76,7 @@ async function fetchContributionData() {
       
       return {
         date: day.date,
-        count: day.count,
+        count: count,
         level: level
       };
     });
