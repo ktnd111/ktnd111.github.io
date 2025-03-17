@@ -164,11 +164,27 @@ async function renderContributionGrid() {
     }
 }
 
-// ページ読み込み時に実行
-if (document.readyState === 'loading') {
-    console.log('DOMContentLoadedイベントに登録します');
-    document.addEventListener('DOMContentLoaded', renderContributionGrid);
-} else {
-    console.log('DOM既に読み込み済み、直接実行します');
+// 初期化関数
+function initializeContributionGrid() {
+    console.log('コントリビューショングリッドの初期化を開始');
+    // グリッドコンテナの存在確認
+    const gridContainer = document.getElementById('contribution-grid');
+    if (!gridContainer) {
+        console.log('グリッドコンテナが見つかりません。100ms後に再試行します');
+        setTimeout(initializeContributionGrid, 100);
+        return;
+    }
+    
+    console.log('グリッドコンテナを発見、描画を開始します');
     renderContributionGrid();
 }
+
+// カスタムイベントリスナーを設定
+document.addEventListener('header-loaded', function() {
+    console.log('ヘッダー読み込みイベントを受信');
+    initializeContributionGrid();
+});
+
+// 直接実行も試みる（ヘッダーが既に存在する場合のため）
+console.log('直接初期化を試みます');
+initializeContributionGrid();
