@@ -85,8 +85,19 @@ function generateDefaultData() {
 
 // コントリビューショングリッドを描画
 async function renderContributionGrid() {
+    console.log('renderContributionGrid: 開始');
+    
     const gridContainer = document.getElementById('contribution-grid');
+    if (!gridContainer) {
+        console.error('contribution-grid要素が見つかりません');
+        return;
+    }
+    
     const tooltip = document.getElementById('tooltip');
+    if (!tooltip) {
+        console.error('tooltip要素が見つかりません');
+        // ツールチップは必須ではないので処理は続行
+    }
     
     try {
         // データを取得
@@ -115,23 +126,25 @@ async function renderContributionGrid() {
             cell.dataset.count = contribution.count;
             
             // ツールチップの表示
-            cell.addEventListener('mouseover', (e) => {
-                const date = new Date(contribution.date);
-                const formattedDate = date.toLocaleDateString('ja-JP', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
+            if (tooltip) {
+                cell.addEventListener('mouseover', (e) => {
+                    const date = new Date(contribution.date);
+                    const formattedDate = date.toLocaleDateString('ja-JP', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    
+                    tooltip.textContent = `${formattedDate}: ${contribution.count} contributions`;
+                    tooltip.style.left = `${e.pageX + 10}px`;
+                    tooltip.style.top = `${e.pageY + 10}px`;
+                    tooltip.style.display = 'block';
                 });
                 
-                tooltip.textContent = `${formattedDate}: ${contribution.count} contributions`;
-                tooltip.style.left = `${e.pageX + 10}px`;
-                tooltip.style.top = `${e.pageY + 10}px`;
-                tooltip.style.display = 'block';
-            });
-            
-            cell.addEventListener('mouseout', () => {
-                tooltip.style.display = 'none';
-            });
+                cell.addEventListener('mouseout', () => {
+                    tooltip.style.display = 'none';
+                });
+            }
             
             gridContainer.appendChild(cell);
         });
@@ -164,11 +177,26 @@ async function renderContributionGrid() {
     }
 }
 
-// ページ読み込み時に実行
-if (document.readyState === 'loading') {
-    console.log('DOMContentLoadedイベントに登録します');
-    document.addEventListener('DOMContentLoaded', renderContributionGrid);
-} else {
-    console.log('DOM既に読み込み済み、直接実行します');
-    renderContributionGrid();
+// ヘッダーコンポーネントが読み込まれた後に実行
+function initializeContributionGrid() {
+    console.log('コントリビューショングリッドの初期化を開始');
+    
+    // componentsLoadedイベントをリッスン
+    document.addEventListener('componentsLoaded', () => {
+        console.log('componentsLoadedイベントを検知、コントリビューショングリッドを描画します');
+        // 少し遅延させてDOMの更新が確実に反映された後に実行
+        setTimeout(renderContributionGrid, 100);
+    });
+    
+    // 既にcomponentsLoadedが発火済みの場合に備えて直接チェック
+    const headerComponent = document.getElementById('header-component');
+    const contributionGrid = document.getElementById('contribution-grid');
+    
+    if (headerComponent && headerComponent.innerHTML && contributionGrid) {
+        console.log('ヘッダーコンポーネントは既に読み込まれています、コントリビューショングリッドを描画します');
+        setTimeout(renderContributionGrid, 100);
+    }
 }
+
+// 初期化関数を呼び出し
+initializeContributionGrid();
