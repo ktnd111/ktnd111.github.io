@@ -25,3 +25,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.dispatchEvent(componentsLoadedEvent);
 });
 
+document.addEventListener('componentsLoaded', () => {
+    // header-component が読み込まれた後、明示的にコントリビューショングリッドを初期化
+    if (typeof renderContributionGrid === 'function') {
+        renderContributionGrid();
+    } else {
+        // github-contributions.js が読み込まれていない場合は読み込む
+        const script = document.createElement('script');
+        script.src = '/js/github-contributions.js';
+        script.onload = function() {
+            if (typeof renderContributionGrid === 'function') {
+                renderContributionGrid();
+            }
+        };
+        document.head.appendChild(script);
+    }
+});
