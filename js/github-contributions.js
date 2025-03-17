@@ -40,17 +40,18 @@ function generateDefaultData() {
     const today = new Date();
     
     for (let i = 0; i < days; i++) {
+        // インデックスを行優先から列優先に変換
+        // 例: 0→0, 1→7, 2→14, ..., 7→1, 8→8, ...
+        const col = Math.floor(i / GRID_ROWS);
+        const row = i % GRID_ROWS;
+        
         const date = new Date(today);
         date.setDate(date.getDate() - (days - 1 - i));
         
         // 日付をYYYY-MM-DD形式に変換
         const dateStr = date.toISOString().split('T')[0];
         
-        // 行と列の位置を計算
-        const row = Math.floor(i / GRID_COLUMNS);
-        const col = i % GRID_COLUMNS;
-        
-        // パターンデータ生成（Kの形）
+        // パターンデータ生成（Kの形）- 列優先の座標に調整
         let level = 0;
         let count = 0;
         
@@ -104,6 +105,9 @@ async function renderContributionGrid() {
         
         // グリッドをクリア
         gridContainer.innerHTML = '';
+        
+        // 重要: グリッドコンテナにCSSクラスを追加して正しいレイアウトを適用
+        gridContainer.classList.add('contribution-grid');
         
         // セルを生成
         contributions.forEach((contribution, index) => {
@@ -187,3 +191,4 @@ document.addEventListener('header-loaded', function() {
 
 // 直接実行も試みる（ヘッダーが既に存在する場合のため）
 console.log('直接初期化を試みます');
+initializeContributionGrid();
