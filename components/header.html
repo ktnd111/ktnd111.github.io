@@ -80,19 +80,26 @@
 
     // コントリビューションデータの取得
     async function fetchContributionData() {
+        console.log('fetchContributionData: 開始');
         try {
             // JSONファイルのパスを指定
-            const jsonPath = '/data/contributions.json';
+            const jsonPath = '../data/contributions.json';
+            console.log(`JSONファイルを取得: ${jsonPath}`);
             
             const response = await fetch(jsonPath);
+            console.log(`レスポンスステータス: ${response.status}`);
             
             if (!response.ok) {
                 throw new Error(`JSON file request failed with status: ${response.status}`);
             }
             
-            return await response.json();
+            const data = await response.json();
+            console.log('データ取得成功:', data.username, '更新日時:', data.updated_at);
+            console.log(`取得したデータ: ${data.contributions.length}日分`);
+            return data;
         } catch (error) {
             console.error('Error fetching contribution data:', error);
+            console.log('デフォルトデータに切り替えます');
             return generateDefaultData();
         }
     }
@@ -234,8 +241,10 @@
 
     // ページ読み込み時に実行
     if (document.readyState === 'loading') {
+        console.log('DOMContentLoadedイベントに登録します');
         document.addEventListener('DOMContentLoaded', renderContributionGrid);
     } else {
+        console.log('DOM既に読み込み済み、直接実行します');
         renderContributionGrid();
     }
 </script>
