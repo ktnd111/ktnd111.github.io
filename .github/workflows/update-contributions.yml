@@ -27,7 +27,7 @@ jobs:
       
       - name: Fetch contribution data
         run: |
-          node .github/script/update-contributions.js
+          node .github/scripts/update-contributions.js
       
       - name: Commit and push if changes
         run: |
