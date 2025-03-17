@@ -187,4 +187,3 @@ document.addEventListener('header-loaded', function() {
 
 // 直接実行も試みる（ヘッダーが既に存在する場合のため）
 console.log('直接初期化を試みます');
-initializeContributionGrid();
