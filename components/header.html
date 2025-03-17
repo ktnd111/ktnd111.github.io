@@ -59,67 +59,29 @@
 </header>
 
 <script>
-    // GitHub APIからktnd111のコントリビューションデータを取得
+    // ローカルのJSONファイルからコントリビューションデータを取得
     async function fetchContributionData() {
         try {
-            const username = 'ktnd111';
-            console.log('Fetching GitHub contributions for:', username);
-            
-            // 直接データを取得してみる
-            const url = `https://github-contributions-api.jogruber.de/v4/${username}`;
-            console.log('Requesting from URL:', url);
-            
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                },
-                // CORSエラーを回避するためのモード
-                mode: 'cors',
-                cache: 'no-cache'
-            });
-            
-            console.log('Response status:', response.status);
+            console.log('Fetching contribution data from local JSON file');
+            const response = await fetch('../data/contributions.json');
             
             if (!response.ok) {
-                console.warn('API response not OK:', response.status, response.statusText);
-                // エラー時はフォールバックデータを使用
-                return generateFallbackData(); 
-            }
-            
-            const contributionData = await response.json();
-            console.log('Data received, contributions count:', 
-                        contributionData.contributions ? contributionData.contributions.length : 0);
-            
-            // 最新140日分のデータを取得（20列×7行）
-            const contributions = contributionData.contributions || [];
-            
-            if (contributions.length === 0) {
-                console.warn('No contribution data found');
+                console.warn('JSON file not found or error:', response.status);
                 return generateFallbackData();
             }
             
-            const recentContributions = contributions.slice(-140);
-            console.log('Using most recent contributions:', recentContributions.length);
+            const data = await response.json();
+            console.log('Contribution data loaded, last updated:', data.updated_at);
             
-            // 貢献度レベルに変換（0-4）
-            return recentContributions.map(day => {
-                const count = day.count || 0;
-                // GitHubの貢献度を0-4のレベルに変換
-                if (count === 0) return 0;
-                if (count <= 2) return 1;
-                if (count <= 5) return 2;
-                if (count <= 10) return 3;
-                return 4;
-            });
+            // 設定されたlevelプロパティを使用
+            return data.contributions.map(day => day.level);
         } catch (error) {
-            console.error('コントリビューションデータの取得に失敗しました:', error);
-            // エラーが発生した場合はデモデータを返す
+            console.error('Error loading contribution data:', error);
             return generateFallbackData();
         }
     }
     
-    // フォールバック用のデモデータを生成（よりパターン化）
+    // フォールバック用のデモデータを生成
     function generateFallbackData() {
         console.log('Generating fallback contribution data');
         const days = 20 * 7; // グリッドのセル数
@@ -136,9 +98,9 @@
             
             // Kの形を描く
             if (col === 0 || // 縦線
-                (row === 3 && col >= 0 && col <= 10) || // 中央の横線
-                (row >= 0 && col >= 0 && row + col === 10 && col <= 10) || // 左下の斜め線
-                (row >= 0 && col >= 0 && col - row === 4 && col <= 10)) { // 右上の斜め線
+                (row === 3 && col <= 10) || // 中央の横線
+                (col <= 10 && row + col === 10) || // 左下の斜め線
+                (col <= 10 && col - row === 4)) { // 右上の斜め線
                 level = Math.floor(Math.random() * 3) + 2; // レベル2-4
             } else {
                 // その他のセルはランダムで低いレベル
@@ -153,11 +115,11 @@
     
     // コントリビューショングリッドの描画
     async function renderContributionGrid() {
-        console.log('Starting to render contribution grid');
+        console.log('Rendering contribution grid');
         const grid = document.getElementById('contribution-grid');
         
         if (!grid) {
-            console.error('Contribution grid element not found!');
+            console.error('Grid element not found');
             return;
         }
         
@@ -167,11 +129,9 @@
         try {
             // データを取得
             const data = await fetchContributionData();
-            console.log('Retrieved contribution data, length:', data.length);
             
             if (!data || data.length === 0) {
-                console.error('No data available for grid');
-                return;
+                throw new Error('No data available');
             }
             
             // セルを作成
@@ -190,9 +150,9 @@
                 grid.appendChild(cell);
             });
             
-            console.log('Grid cells created:', grid.children.length);
+            console.log('Grid rendered with', grid.children.length, 'cells');
         } catch (error) {
-            console.error('Error rendering contribution grid:', error);
+            console.error('Error in rendering:', error);
             // エラー時にはフォールバックグリッドを表示
             generateFallbackData().forEach((level) => {
                 const cell = document.createElement('div');
@@ -202,19 +162,17 @@
         }
         
         // フェードインアニメーション
-        console.log('Triggering fade-in animation');
         setTimeout(() => {
             grid.classList.add('loaded');
+            console.log('Fade-in animation triggered');
         }, 100);
     }
     
     // ページ読み込み時にグリッドを描画
-    console.log('Setting up DOMContentLoaded listener');
     document.addEventListener('DOMContentLoaded', renderContributionGrid);
     
-    // すでにDOMがロード済みの場合（遅延読み込みなど）の対策
+    // すでにDOMがロード済みの場合の対策
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        console.log('DOM already loaded, rendering immediately');
         setTimeout(renderContributionGrid, 1);
     }
 </script>
