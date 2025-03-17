@@ -52,22 +52,6 @@
     .contribution-level-2 { background-color: #40c463; }
     .contribution-level-3 { background-color: #30a14e; }
     .contribution-level-4 { background-color: #216e39; }
-    
-    .nav-links {
-        display: flex;
-        gap: 20px;
-        z-index: 10;
-    }
-    
-    .nav-link {
-        color: #ffffff;
-        text-decoration: none;
-        font-weight: 500;
-    }
-    
-    .nav-link:hover {
-        color: #9be9a8;
-    }
 </style>
 <header>
     <h1><a href="../index.html">KTND111's Personal.GITHUB.IO</a></h1>
@@ -75,20 +59,48 @@
 </header>
 
 <script>
+    // GitHub APIからktnd111のコントリビューションデータを取得
     async function fetchContributionData() {
         try {
             const username = 'ktnd111';
-            const response = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}`);
+            console.log('Fetching GitHub contributions for:', username);
+            
+            // 直接データを取得してみる
+            const url = `https://github-contributions-api.jogruber.de/v4/${username}`;
+            console.log('Requesting from URL:', url);
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                // CORSエラーを回避するためのモード
+                mode: 'cors',
+                cache: 'no-cache'
+            });
+            
+            console.log('Response status:', response.status);
             
             if (!response.ok) {
-                throw new Error('GitHub APIからデータを取得できませんでした');
+                console.warn('API response not OK:', response.status, response.statusText);
+                // エラー時はフォールバックデータを使用
+                return generateFallbackData(); 
             }
             
             const contributionData = await response.json();
+            console.log('Data received, contributions count:', 
+                        contributionData.contributions ? contributionData.contributions.length : 0);
             
             // 最新140日分のデータを取得（20列×7行）
             const contributions = contributionData.contributions || [];
+            
+            if (contributions.length === 0) {
+                console.warn('No contribution data found');
+                return generateFallbackData();
+            }
+            
             const recentContributions = contributions.slice(-140);
+            console.log('Using most recent contributions:', recentContributions.length);
             
             // 貢献度レベルに変換（0-4）
             return recentContributions.map(day => {
@@ -107,20 +119,31 @@
         }
     }
     
-    // APIが失敗した場合のフォールバックデータを生成
+    // フォールバック用のデモデータを生成（よりパターン化）
     function generateFallbackData() {
+        console.log('Generating fallback contribution data');
         const days = 20 * 7; // グリッドのセル数
         const data = [];
         
-        // 基本的なランダムデータを生成
+        // デモパターンを生成
         for (let i = 0; i < days; i++) {
-            let chance = Math.random();
+            // 行と列の位置を計算
+            const row = Math.floor(i / 20);
+            const col = i % 20;
+            
+            // 様々なパターンを作る
             let level = 0;
             
-            if (chance > 0.6) level = 1;
-            if (chance > 0.75) level = 2;
-            if (chance > 0.85) level = 3;
-            if (chance > 0.95) level = 4;
+            // Kの形を描く
+            if (col === 0 || // 縦線
+                (row === 3 && col >= 0 && col <= 10) || // 中央の横線
+                (row >= 0 && col >= 0 && row + col === 10 && col <= 10) || // 左下の斜め線
+                (row >= 0 && col >= 0 && col - row === 4 && col <= 10)) { // 右上の斜め線
+                level = Math.floor(Math.random() * 3) + 2; // レベル2-4
+            } else {
+                // その他のセルはランダムで低いレベル
+                level = Math.random() > 0.75 ? Math.floor(Math.random() * 2) + 1 : 0;
+            }
             
             data.push(level);
         }
@@ -130,36 +153,68 @@
     
     // コントリビューショングリッドの描画
     async function renderContributionGrid() {
+        console.log('Starting to render contribution grid');
         const grid = document.getElementById('contribution-grid');
+        
+        if (!grid) {
+            console.error('Contribution grid element not found!');
+            return;
+        }
         
         // グリッドをクリア
         grid.innerHTML = '';
         
-        // データを取得
-        const data = await fetchContributionData();
-        
-        // セルを作成
-        data.forEach((level, index) => {
-            const cell = document.createElement('div');
-            cell.className = `contribution-cell contribution-level-${level}`;
+        try {
+            // データを取得
+            const data = await fetchContributionData();
+            console.log('Retrieved contribution data, length:', data.length);
             
-            // 日付を計算（最新のデータが右下にくるように逆順に表示）
-            const today = new Date();
-            const pastDate = new Date(today);
-            pastDate.setDate(today.getDate() - (data.length - 1 - index));
+            if (!data || data.length === 0) {
+                console.error('No data available for grid');
+                return;
+            }
             
-            const dateStr = pastDate.toLocaleDateString();
-            cell.title = `${dateStr}: レベル ${level} の貢献`;
+            // セルを作成
+            data.forEach((level, index) => {
+                const cell = document.createElement('div');
+                cell.className = `contribution-cell contribution-level-${level}`;
+                
+                // 日付を計算（最新のデータが右下にくるように逆順に表示）
+                const today = new Date();
+                const pastDate = new Date(today);
+                pastDate.setDate(today.getDate() - (data.length - 1 - index));
+                
+                const dateStr = pastDate.toLocaleDateString();
+                cell.title = `${dateStr}: レベル ${level} の貢献`;
+                
+                grid.appendChild(cell);
+            });
             
-            grid.appendChild(cell);
-        });
+            console.log('Grid cells created:', grid.children.length);
+        } catch (error) {
+            console.error('Error rendering contribution grid:', error);
+            // エラー時にはフォールバックグリッドを表示
+            generateFallbackData().forEach((level) => {
+                const cell = document.createElement('div');
+                cell.className = `contribution-cell contribution-level-${level}`;
+                grid.appendChild(cell);
+            });
+        }
         
         // フェードインアニメーション
+        console.log('Triggering fade-in animation');
         setTimeout(() => {
             grid.classList.add('loaded');
         }, 100);
     }
     
     // ページ読み込み時にグリッドを描画
+    console.log('Setting up DOMContentLoaded listener');
     document.addEventListener('DOMContentLoaded', renderContributionGrid);
+    
+    // すでにDOMがロード済みの場合（遅延読み込みなど）の対策
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        console.log('DOM already loaded, rendering immediately');
+        setTimeout(renderContributionGrid, 1);
+    }
 </script>
