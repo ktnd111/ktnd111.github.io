@@ -30,9 +30,9 @@
         height: 100%;
         width: 50%;
         display: grid;
-        grid-template-columns: repeat(20, 1fr);  /* 20列 */
-        grid-template-rows: repeat(7, 1fr);      /* 7行 */
-        grid-auto-flow: column;                  /* 重要: 列方向に自動配置 */
+        grid-template-columns: repeat(20, 1fr);
+        grid-template-rows: repeat(7, 1fr);
+        grid-auto-flow: column; /* これだけ追加 */
         gap: 2px;
         padding: 4px;
         opacity: 0;
@@ -74,6 +74,3 @@
 </header>
 
 <script src="../js/github-contributions.js"></script>
-<script>
-    // ヘッダーの読み込みが完了したことを通知
-    document.dispatchEvent(new CustomEvent('header-loaded'));
