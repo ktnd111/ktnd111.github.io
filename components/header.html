@@ -1,5 +1,165 @@
 <!DOCTYPE html>
 <link rel="stylesheet" href="../css/common.css">
+<style>
+    header {
+        background-color: #333;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+    }
+    
+    .header-content {
+        position: relative;
+        z-index: 10;
+        color: #ffffff;
+    }
+    
+    .header-subtitle {
+        font-size: 14px;
+        color: #bbbbbb;
+        margin: 4px 0 0 0;
+    }
+    
+    .contribution-grid {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 50%;
+        display: grid;
+        grid-template-columns: repeat(20, 1fr);
+        grid-template-rows: repeat(7, 1fr);
+        gap: 2px;
+        padding: 4px;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        box-sizing: border-box;
+    }
+    
+    .contribution-grid.loaded {
+        opacity: 0.7;
+    }
+    
+    .contribution-cell {
+        border-radius: 2px;
+    }
+    
+    .contribution-level-0 { background-color: #444; }
+    .contribution-level-1 { background-color: #9be9a8; }
+    .contribution-level-2 { background-color: #40c463; }
+    .contribution-level-3 { background-color: #30a14e; }
+    .contribution-level-4 { background-color: #216e39; }
+    
+    .nav-links {
+        display: flex;
+        gap: 20px;
+        z-index: 10;
+    }
+    
+    .nav-link {
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .nav-link:hover {
+        color: #9be9a8;
+    }
+</style>
 <header>
     <h1><a href="../index.html">KTND111's Personal.GITHUB.IO</a></h1>
+    <div class="contribution-grid" id="contribution-grid"></div>
 </header>
+
+<script>
+    async function fetchContributionData() {
+        try {
+            const username = 'ktnd111';
+            const response = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}`);
+            
+            if (!response.ok) {
+                throw new Error('GitHub APIからデータを取得できませんでした');
+            }
+            
+            const contributionData = await response.json();
+            
+            // 最新140日分のデータを取得（20列×7行）
+            const contributions = contributionData.contributions || [];
+            const recentContributions = contributions.slice(-140);
+            
+            // 貢献度レベルに変換（0-4）
+            return recentContributions.map(day => {
+                const count = day.count || 0;
+                // GitHubの貢献度を0-4のレベルに変換
+                if (count === 0) return 0;
+                if (count <= 2) return 1;
+                if (count <= 5) return 2;
+                if (count <= 10) return 3;
+                return 4;
+            });
+        } catch (error) {
+            console.error('コントリビューションデータの取得に失敗しました:', error);
+            // エラーが発生した場合はデモデータを返す
+            return generateFallbackData();
+        }
+    }
+    
+    // APIが失敗した場合のフォールバックデータを生成
+    function generateFallbackData() {
+        const days = 20 * 7; // グリッドのセル数
+        const data = [];
+        
+        // 基本的なランダムデータを生成
+        for (let i = 0; i < days; i++) {
+            let chance = Math.random();
+            let level = 0;
+            
+            if (chance > 0.6) level = 1;
+            if (chance > 0.75) level = 2;
+            if (chance > 0.85) level = 3;
+            if (chance > 0.95) level = 4;
+            
+            data.push(level);
+        }
+        
+        return data;
+    }
+    
+    // コントリビューショングリッドの描画
+    async function renderContributionGrid() {
+        const grid = document.getElementById('contribution-grid');
+        
+        // グリッドをクリア
+        grid.innerHTML = '';
+        
+        // データを取得
+        const data = await fetchContributionData();
+        
+        // セルを作成
+        data.forEach((level, index) => {
+            const cell = document.createElement('div');
+            cell.className = `contribution-cell contribution-level-${level}`;
+            
+            // 日付を計算（最新のデータが右下にくるように逆順に表示）
+            const today = new Date();
+            const pastDate = new Date(today);
+            pastDate.setDate(today.getDate() - (data.length - 1 - index));
+            
+            const dateStr = pastDate.toLocaleDateString();
+            cell.title = `${dateStr}: レベル ${level} の貢献`;
+            
+            grid.appendChild(cell);
+        });
+        
+        // フェードインアニメーション
+        setTimeout(() => {
+            grid.classList.add('loaded');
+        }, 100);
+    }
+    
+    // ページ読み込み時にグリッドを描画
+    document.addEventListener('DOMContentLoaded', renderContributionGrid);
+</script>
