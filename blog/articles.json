@@ -1,5 +1,14 @@
 [
     {
+      "title": "GitHub PagesとFirebaseで実装する無料アクセスカウンター",
+      "path": "articles/firebase-counter-article.html",
+      "date": "2025-03-24",
+      "summary": "静的ウェブサイトでもFirebaseを活用することで簡単にアクセスカウンターを実装できる方法を詳しく解説します。",
+      "tags": ["Firebase", "GitHub Pages", "JavaScript", "サーバーレス", "★"],
+      "category": "クラウド",
+      "background": "web"
+    },
+    {
       "title": "GitHub Pagesサイトにコントリビューショングリッドを実装した話 🟩",
       "path": "articles/github-pages-contributions.html",
       "date": "2025-03-18",
