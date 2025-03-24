@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa" rx="10" ry="10" />
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">GitHubPages x Firebaseアクセスカウンター アーキテクチャ</text>
+  
+  <!-- GitHub Repository -->
+  <rect x="80" y="100" width="180" height="100" rx="10" ry="10" fill="#f6f8fa" stroke="#24292e" stroke-width="2" />
+  <text x="170" y="140" font-family="Arial" font-size="16" text-anchor="middle">GitHub Repository</text>
+  <text x="170" y="165" font-family="Arial" font-size="12" text-anchor="middle">アクセスカウンター</text>
+  <text x="170" y="185" font-family="Arial" font-size="12" text-anchor="middle">HTML/JSファイル</text>
+  
+  <!-- GitHub Pages -->
+  <rect x="80" y="250" width="180" height="100" rx="10" ry="10" fill="#24292e" stroke="#24292e" stroke-width="2" />
+  <text x="170" y="290" font-family="Arial" font-size="16" text-anchor="middle" fill="white">GitHub Pages</text>
+  <text x="170" y="315" font-family="Arial" font-size="12" text-anchor="middle" fill="white">静的ウェブサイト</text>
+  <text x="170" y="335" font-family="Arial" font-size="12" text-anchor="middle" fill="white">ホスティング</text>
+  
+  <!-- Firebase Firestore -->
+  <rect x="540" y="150" width="180" height="100" rx="10" ry="10" fill="#fcca3f" stroke="#f57c00" stroke-width="2" />
+  <text x="630" y="190" font-family="Arial" font-size="16" text-anchor="middle">Firebase</text>
+  <text x="630" y="215" font-family="Arial" font-size="12" text-anchor="middle">Firestore Database</text>
+  <text x="630" y="235" font-family="Arial" font-size="12" text-anchor="middle">アクセスカウント保存</text>
+  
+  <!-- Google Cloud Platform -->
+  <rect x="540" y="300" width="180" height="110" rx="10" ry="10" fill="#4285f4" stroke="#4285f4" stroke-width="2" />
+  <text x="630" y="335" font-family="Arial" font-size="16" text-anchor="middle" fill="white">Google Cloud Platform</text>
+  <text x="630" y="360" font-family="Arial" font-size="12" text-anchor="middle" fill="white">APIとサービス</text>
+  <text x="630" y="380" font-family="Arial" font-size="12" text-anchor="middle" fill="white">リファラー制限</text>
+  <text x="630" y="400" font-family="Arial" font-size="12" text-anchor="middle" fill="white">匿名認証</text>
+  
+  <!-- User - 正しく配置 -->
+  <circle cx="170" cy="420" r="30" fill="#6c757d" />
+  <text x="170" y="425" font-family="Arial" font-size="14" text-anchor="middle" fill="white">ユーザー</text>
+  
+  <!-- Arrows and Flow Lines -->
+  <!-- GitHub Repo to GitHub Pages -->
+  <path d="M170 200 L170 250" stroke="#24292e" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  <text x="190" y="225" font-family="Arial" font-size="12">デプロイ</text>
+  
+  <!-- User to GitHub Pages -->
+  <path d="M170 390 L170 350" stroke="#6c757d" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  <text x="190" y="375" font-family="Arial" font-size="12">アクセス</text>
+  
+  <!-- GitHub Pages to Firebase -->
+  <path d="M260 300 C400 300, 400 200, 540 200" stroke="#f57c00" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  <text x="370" y="280" font-family="Arial" font-size="12">JavaScript</text>
+  <text x="370" y="295" font-family="Arial" font-size="12">カウント取得/更新</text>
+  
+  <!-- Firebase to GCP -->
+  <path d="M630 250 L630 300" stroke="#4285f4" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+  <text x="650" y="275" font-family="Arial" font-size="12">セキュリティ</text>
+  <text x="650" y="290" font-family="Arial" font-size="12">ルール</text>
+  
+  <!-- Arrowhead Marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+  
+  <!-- Legend -->
+  <rect x="80" y="460" width="640" height="30" rx="5" ry="5" fill="#e9ecef" stroke="#ced4da" stroke-width="1" />
+  <text x="400" y="480" font-family="Arial" font-size="12" text-anchor="middle">
+    データフロー: ユーザー → GitHub Pages → Firebase (JWT認証) → Firestore → カウンター表示
+  </text>
+</svg>
