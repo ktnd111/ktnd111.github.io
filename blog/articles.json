@@ -1,5 +1,14 @@
 [
     {
+      "title": "早期リターン（Guard Clause）でネスト地獄を回避しよう【C#実践Tips】",
+      "path": "articles/csharp-guard-clause.html",
+      "date": "2025-03-28",
+      "summary": "読みにくいネスト地獄から脱出するために、早期リターン（Guard Clause）の考え方とコード例を紹介します。",
+      "tags": ["C#", "リファクタリング", "テクニック", "★"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
       "title": "GitHub PagesとFirebaseで実装する無料アクセスカウンター",
       "path": "articles/firebase-counter-article.html",
       "date": "2025-03-24",

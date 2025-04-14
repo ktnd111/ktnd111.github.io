@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>charp-guard-clause.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%E6%97%A9%E6%9C%9F%E3%83%AA%E3%82%BF%E3%83%BC%E3%83%B3guard-clause%E3%81%A7%E3%83%8D%E3%82%B9%E3%83%88%E5%9C%B0%E7%8D%84%E3%82%92%E5%9B%9E%E9%81%BF%E3%81%97%E3%82%88%E3%81%86c%E5%AE%9F%E8%B7%B5tips">早期リターン（Guard Clause）でネスト地獄を回避しよう【C#実践Tips】</h1>
+<p>複雑な条件分岐が重なると、気づけば <code>if</code> の入れ子が深くなって「読みにくいコード」になっていた……という経験、あると思います。</p>
+<p>そこで今回は、<strong>読みやすく・実務で即使える</strong>「早期リターン（Guard Clause）」について、Before/Afterの具体例とともに紹介します。考え方もシンプルで効果がわかりやすく、初心者〜中級者にとってもちょうどいいネタです。</p>
+<p>余談ですが「早期リターン」は英語では Guard Clause（ガード・クロース）と呼ばれています。
+より詳細に表現するなら、「無効な条件を早期に弾き出す防御壁」のような意味で、不適切な入力や条件が関数の深部まで進むのを防ぐ手法です。
+日本語では処理を「早めに終了させて戻る」という動作に着目して「早期リターン」という呼び方が定着しています。</p>
+<h2 id="before%E3%83%8D%E3%82%B9%E3%83%88%E3%81%8C%E6%B7%B1%E3%81%84%E3%82%B3%E3%83%BC%E3%83%89">Before：ネストが深いコード</h2>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">ProcessOrder</span>(<span class="hljs-params">Order order</span>)</span>
+{
+    <span class="hljs-keyword">if</span> (order != <span class="hljs-literal">null</span>)
+    {
+        <span class="hljs-keyword">if</span> (order.IsPaid)
+        {
+            <span class="hljs-keyword">if</span> (!order.IsShipped)
+            {
+                <span class="hljs-comment">// ここで出荷処理</span>
+                Ship(order);
+                <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+            }
+        }
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+}
+</div></code></pre>
+<h2 id="after%E6%97%A9%E6%9C%9F%E3%83%AA%E3%82%BF%E3%83%BC%E3%83%B3%E3%81%A7%E3%82%AC%E3%83%BC%E3%83%89">After：早期リターンでガード</h2>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">ProcessOrder</span>(<span class="hljs-params">Order order</span>)</span>
+{
+    <span class="hljs-keyword">if</span> (order <span class="hljs-keyword">is</span> <span class="hljs-literal">null</span>)           <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">if</span> (!order.IsPaid)           <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">if</span> (order.IsShipped)         <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+
+    Ship(order);
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+}
+</div></code></pre>
+<blockquote>
+<p><strong>ポイント</strong></p>
+<ul>
+<li>&quot;処理できないケース&quot; を否定形で先に弾く</li>
+<li>インデントを浅く保つことで、視線移動が上下で済むようになり、コードの読みやすさがグッと上がる</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="%E3%81%AA%E3%81%9C%E6%97%A9%E6%9C%9F%E3%83%AA%E3%82%BF%E3%83%BC%E3%83%B3">なぜ早期リターン？</h2>
+<p><code>if</code> がどんどん深くなると、<strong>どの条件で何が起きるのか</strong>を把握するのが一気に難しくなります。</p>
+<p>早期リターン（Guard Clause）は、その逆。「ダメなパターンを先に返す」ことで、正常処理の流れをスッキリさせる考え方です。</p>
+<p>実際に使ってみると、その効果はすぐに体感できると思います。</p>
+<hr>
+<h2 id="%E5%9F%BA%E6%9C%AC%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B33%E3%81%A4">基本パターン3つ</h2>
+<h3 id="1-null%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF">1. nullチェック</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (input == <span class="hljs-literal">null</span>) <span class="hljs-keyword">return</span>;
+</div></code></pre>
+<h3 id="2-%E5%BC%95%E6%95%B0%E3%83%90%E3%83%AA%E3%83%87%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3">2. 引数バリデーション</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (amount &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>;
+</div></code></pre>
+<h3 id="3-%E7%8A%B6%E6%85%8B%E3%82%AC%E3%83%BC%E3%83%89%E3%83%95%E3%83%A9%E3%82%B0%E3%82%84%E7%8A%B6%E6%85%8B%E3%81%A7%E5%87%A6%E7%90%86%E3%82%92%E6%AD%A2%E3%82%81%E3%82%8B">3. 状態ガード（フラグや状態で処理を止める）</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (!user.IsActive) <span class="hljs-keyword">return</span>;
+</div></code></pre>
+<hr>
+<h2 id="%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88%E3%81%A8%E6%B3%A8%E6%84%8F%E7%82%B9">メリットと注意点</h2>
+<h3 id="%F0%9F%91%8D-%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88">👍 メリット</h3>
+<ul>
+<li>可読性が高く、処理の意図が明確</li>
+<li>テストケースが書きやすい（早期終了パターンが増える）</li>
+<li>差分レビューがラク（深いインデントがないと、変更箇所が見やすい）</li>
+</ul>
+<h3 id="%E2%9A%A0%EF%B8%8F-%E6%B3%A8%E6%84%8F%E7%82%B9">⚠️ 注意点</h3>
+<ul>
+<li><code>return</code> が増えすぎると「処理の流れ」が見えにくくなることも</li>
+<li>複雑になってきたら、小さなメソッドに分けるのも選択肢のひとつです</li>
+</ul>
+<hr>
+<h2 id="%E5%AE%9F%E5%8B%99tips%E3%82%88%E3%82%8A%E3%81%86%E3%81%BE%E3%81%8F%E4%BD%BF%E3%81%86%E3%81%9F%E3%82%81%E3%81%AB">実務Tips：よりうまく使うために</h2>
+<h3 id="%E5%A4%B1%E6%95%97%E6%99%82%E3%81%AF%E3%83%AD%E3%82%B0%E3%82%92%E5%87%BA%E3%81%99">失敗時はログを出す</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (!order.IsValid)
+{
+    logger.LogWarning(<span class="hljs-string">"注文が無効です"</span>);
+    <span class="hljs-keyword">return</span>;
+}
+</div></code></pre>
+<h3 id="return-%E3%81%A8-throw-%E3%81%AE%E4%BD%BF%E3%81%84%E5%88%86%E3%81%91">return と throw の使い分け</h3>
+<ul>
+<li><strong>recoverable（復帰できる）</strong> → <code>return</code></li>
+<li><strong>critical（致命的な異常）</strong> → <code>throw</code></li>
+</ul>
+<p>このあたりは、業務アプリの要件や開発方針に合わせて調整するとよいです。</p>
+<hr>
+<h2 id="%E3%81%BE%E3%81%A8%E3%82%81%E5%88%A4%E6%96%AD%E5%9F%BA%E6%BA%96%E3%82%92%E6%8C%81%E3%81%A3%E3%81%A6%E3%81%8A%E3%81%8F%E3%81%A8%E6%A5%BD%E3%81%AB%E3%81%AA%E3%82%8B">まとめ：判断基準を持っておくと楽になる</h2>
+<ul>
+<li><input type="checkbox" id="checkbox0"><label for="checkbox0">インデントが2段以上になっていないか？</label></li>
+<li><input type="checkbox" id="checkbox1"><label for="checkbox1">「この条件、先に抜けられない？」と考えてみる</label></li>
+<li><input type="checkbox" id="checkbox2"><label for="checkbox2">処理の本道（正常系）をシンプルに書けているか？</label></li>
+</ul>
+<p>早期リターンは、ちょっとした書き方の工夫でコードの見通しが良くなるテクニックです。
+「これ、ちょっとネスト深いな」と感じたときは、ぜひ思い出して使ってみてください。</p>
+<hr>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
+<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+
+<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
+
+</body>
+</html>
+</body>
+</html>
