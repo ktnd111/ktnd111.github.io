@@ -1,5 +1,32 @@
 [
     {
+      "title": "インデックス／レンジ演算子（^, ..）でスマートに配列操作",
+      "path": "articles/csharp-index-range-operator-guide.html",
+      "date": "2025-04-24",
+      "summary": "C# 8.0から導入されたインデックス演算子（^）とレンジ演算子（..）の基本から応用までを解説し、配列操作をより簡潔に書く方法を紹介します。",
+      "tags": ["C#", "配列", "テクニック", "★"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "C#「null 合体演算子」で null チェック＋代入を 1 行に",
+      "path": "articles/csharp-null-operator.html",
+      "date": "2025-04-22",
+      "summary": "C#のnull合体演算子（??と??=）の基本的な使い方と実践的な活用例を解説し、よりクリーンなコードを書く方法を紹介します。",
+      "tags": ["C#", "null", "テクニック"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
+      "title": "C#での名前付きタプル：シンプルで可読性の高いデータ構造",
+      "path": "articles/csharp-named-taples.html",
+      "date": "2025-04-20",
+      "summary": "C# 7.0から導入された名前付きタプルの基本から活用方法まで解説し、コードの可読性とメンテナンス性を向上させる方法を紹介します。",
+      "tags": ["C#", "タプル", "設計"],
+      "category": "プログラミング",
+      "background": "tech"
+    },
+    {
       "title": "早期リターン（Guard Clause）でネスト地獄を回避しよう",
       "path": "articles/csharp-guard-clause.html",
       "date": "2025-04-13",

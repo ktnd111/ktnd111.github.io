@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>csharp-named-taples.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="c%E3%81%A7%E3%81%AE%E5%90%8D%E5%89%8D%E4%BB%98%E3%81%8D%E3%82%BF%E3%83%97%E3%83%AB%E3%82%B7%E3%83%B3%E3%83%97%E3%83%AB%E3%81%A7%E5%8F%AF%E8%AA%AD%E6%80%A7%E3%81%AE%E9%AB%98%E3%81%84%E3%83%87%E3%83%BC%E3%82%BF%E6%A7%8B%E9%80%A0">C#での名前付きタプル：シンプルで可読性の高いデータ構造</h1>
+<p>C# 7.0 以降では、タプル（Tuple）が言語仕様として強化されより直感的に使える構文が導入されました。特に「名前付きタプル」は、コードの可読性を飛躍的に向上させる機能の一つです。</p>
+<blockquote>
+<p>参考：Microsoft Learn「<a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-tuples">Tuples (C# Guide)</a>」</p>
+</blockquote>
+<p>この記事では、名前付きタプルの基本的な使い方と、そのメリットや具体的な活用シーンをご紹介します。</p>
+<h2 id="%F0%9F%94%B0-%E5%90%8D%E5%89%8D%E4%BB%98%E3%81%8D%E3%82%BF%E3%83%97%E3%83%AB%E3%81%A8%E3%81%AF">🔰 名前付きタプルとは？</h2>
+<p>タプルとは、複数の値を1つの値のようにまとめて扱える構造です。名前付きタプルでは、それぞれの要素に名前を付けられるため、読みやすく扱いやすいコードになります</p>
+<h3 id="%E2%9C%85-%E4%BE%8B%E5%90%8D%E5%89%8D%E4%BB%98%E3%81%8D%E3%82%BF%E3%83%97%E3%83%AB%E3%81%AE%E5%AE%9A%E7%BE%A9%E3%81%A8%E4%BD%BF%E7%94%A8">✅ 例：名前付きタプルの定義と使用</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> person = (Name: <span class="hljs-string">"Taro"</span>, Age: <span class="hljs-number">30</span>);
+
+Console.WriteLine(<span class="hljs-string">$"名前: <span class="hljs-subst">{person.Name}</span>, 年齢: <span class="hljs-subst">{person.Age}</span>"</span>);
+</div></code></pre>
+<p>このように書くことで、配列や匿名型に頼らず簡単に複数の値を返すことができます。</p>
+<h2 id="%F0%9F%86%9A-%E5%90%8D%E5%89%8D%E3%81%AA%E3%81%97%E3%82%BF%E3%83%97%E3%83%AB%E3%81%A8%E3%81%AE%E9%81%95%E3%81%84">🆚 名前なしタプルとの違い</h2>
+<p>名前付きタプルを使わない場合</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> person = (<span class="hljs-string">"Taro"</span>, <span class="hljs-number">30</span>);
+
+Console.WriteLine(<span class="hljs-string">$"名前: <span class="hljs-subst">{person.Item1}</span>, 年齢: <span class="hljs-subst">{person.Item2}</span>"</span>);
+</div></code></pre>
+<p><code>Item1</code>, <code>Item2</code> のようなアクセスは、何の値かが一目で分かりづらく保守性にも劣ります。一時的に使っちゃう場面はあるかもしれませんが、デバッグでも名前はつけておけばより分かりやすいです。</p>
+<h2 id="%F0%9F%93%A6-%E9%96%A2%E6%95%B0%E3%81%AE%E6%88%BB%E3%82%8A%E5%80%A4%E3%81%A8%E3%81%97%E3%81%A6%E4%BD%BF%E3%81%86">📦 関数の戻り値として使う</h2>
+<p>名前付きタプルはメソッドの戻り値としても活用できます。</p>
+<pre class="hljs"><code><div>(<span class="hljs-keyword">string</span> FirstName, <span class="hljs-keyword">string</span> LastName) GetName()
+{
+    <span class="hljs-keyword">return</span> (FirstName: <span class="hljs-string">"Taro"</span>, LastName: <span class="hljs-string">"Yamada"</span>);
+}
+
+<span class="hljs-keyword">var</span> name = GetName();
+Console.WriteLine(<span class="hljs-string">$"<span class="hljs-subst">{name.FirstName}</span> <span class="hljs-subst">{name.LastName}</span>"</span>);
+</div></code></pre>
+<p>複数の値を返したいときに、専用のクラスや構造体を用意する手間が省けます。でもまぁ、メソッドはひとつだけ返して欲しい気もします（SRP）。タプルで返すのはクラスにするほどでもないけど複数のセットで返したい場合・・・のような、ちょっとイレギュラーな対応の場合には使うかもしれません。</p>
+<h2 id="%F0%9F%8E%AF-%E3%81%BE%E3%81%A8%E3%82%81">🎯 まとめ</h2>
+<p>名前付きタプルは、以下のようなシーンで特に有効です：</p>
+<ul>
+<li>メソッドで複数の値を返したいとき</li>
+<li>一時的なデータをわかりやすく保持したいとき</li>
+<li>保守性・可読性を高めたいとき</li>
+</ul>
+<p>シンプルで軽量なデータ構造として名前付きタプルをぜひ積極的に活用してみてください！</p>
+<h3 id="%F0%9F%92%A1-%E8%A3%9C%E8%B6%B3%E3%82%AF%E3%83%A9%E3%82%B9%E3%81%A8%E3%82%BF%E3%83%97%E3%83%AB%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E4%BD%BF%E3%81%86%E3%81%B9%E3%81%8D%E3%81%8B">💡 補足：クラスとタプル、どちらを使うべきか？</h3>
+<p>名前付きタプルはシンプルで使いやすい反面、汎用性や拡張性には限界があります。複数の箇所で同じ戻り値構造を使う場合や、戻り値にメソッドやプロパティを持たせたい場合は、専用のクラスを定義した方が保守性が高くなることもあります。なお、メソッドを持たない「データ専用クラス（DTOやモデルクラス）」として定義しておけば、あとからロジックやバリデーションを追加する余地も残せます。</p>
+<p>迷ったときは「この戻り値、将来的に育ちそうか？」という視点で考えてみると良いんじゃないでしょうか。</p>
+
+</body>
+</html>
