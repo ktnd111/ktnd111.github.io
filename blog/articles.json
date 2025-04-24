@@ -13,7 +13,7 @@
       "path": "articles/csharp-null-operator.html",
       "date": "2025-04-22",
       "summary": "C#のnull合体演算子（??と??=）の基本的な使い方と実践的な活用例を解説し、よりクリーンなコードを書く方法を紹介します。",
-      "tags": ["C#", "null", "テクニック"],
+      "tags": ["C#", "null", "テクニック", "★"],
       "category": "プログラミング",
       "background": "tech"
     },
@@ -22,7 +22,7 @@
       "path": "articles/csharp-named-taples.html",
       "date": "2025-04-20",
       "summary": "C# 7.0から導入された名前付きタプルの基本から活用方法まで解説し、コードの可読性とメンテナンス性を向上させる方法を紹介します。",
-      "tags": ["C#", "タプル", "設計"],
+      "tags": ["C#", "タプル", "設計", "★"],
       "category": "プログラミング",
       "background": "tech"
     },
