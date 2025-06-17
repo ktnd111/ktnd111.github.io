@@ -6,9 +6,9 @@ const { JSDOM } = require('jsdom');
 const hljs = require('highlight.js');
 
 // 設定
-const MD_DIR = path.join(__dirname, '../articles/md');
-const HTML_DIR = path.join(__dirname, '../articles');
-const ARTICLES_JSON = path.join(__dirname, '../articles.json');
+const MD_DIR = path.join(__dirname, '..', 'articles', 'md');
+const HTML_DIR = path.join(__dirname, '..', 'articles', 'html');
+const ARTICLES_JSON = path.join(__dirname, '..', 'articles.json');
 
 // カスタムブロックの処理
 const customBlocks = {
@@ -70,15 +70,15 @@ function convertMarkdownToHtml(mdContent, filePath) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${data.title}</title>
-  <link rel="stylesheet" href="../css/github-markdown.css">
-  <link rel="stylesheet" href="../css/highlight.css">
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../../css/github-markdown.css">
+  <link rel="stylesheet" href="../../css/highlight.css">
+  <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
   <article class="markdown-body">
     ${html}
   </article>
-  <script src="../js/highlight.min.js"></script>
+  <script src="../../js/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
 </body>
 </html>`;
@@ -118,6 +118,11 @@ function updateArticlesJson(metadata, htmlPath) {
 
 // メイン処理
 function processMarkdownFiles() {
+  if (!fs.existsSync(MD_DIR)) {
+    console.error(`Markdown directory not found: ${MD_DIR}`);
+    return;
+  }
+
   const mdFiles = fs.readdirSync(MD_DIR).filter(file => file.endsWith('.md'));
 
   mdFiles.forEach(mdFile => {
@@ -129,7 +134,7 @@ function processMarkdownFiles() {
     const { html, metadata } = convertMarkdownToHtml(mdContent, htmlPath);
 
     fs.writeFileSync(htmlPath, html);
-    updateArticlesJson(metadata, `articles/${htmlFile}`);
+    updateArticlesJson(metadata, `articles/html/${htmlFile}`);
   });
 }
 
