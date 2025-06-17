@@ -3,11 +3,19 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # または master
+      - main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -28,7 +36,8 @@ jobs:
           node scripts/convert_md_to_html.js
 
       - name: Deploy
+        id: deployment
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: blog/articles/html  # デプロイするディレクトリ
-          branch: gh-pages  # デプロイ先のブランチ 
+          branch: main  # mainブランチにデプロイ 
