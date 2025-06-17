@@ -1,6 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: false
----
-コマンド実行時は&&でパイプすると動かないので分割すること
