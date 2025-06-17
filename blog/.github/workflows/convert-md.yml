@@ -31,12 +31,26 @@ jobs:
       - name: Convert Markdown to HTML
         run: |
           cd blog
-          npm run convert
+          npm run build
           
       - name: Commit changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add blog/articles/*.html blog/articles.json
+          git add blog/articles/*.html blog/articles.json blog/.nojekyll
           git commit -m "Update HTML files and articles.json" || exit 0
-          git push 
+          git push
+
+  deploy:
+    needs: convert
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
+          force_orphan: true 
