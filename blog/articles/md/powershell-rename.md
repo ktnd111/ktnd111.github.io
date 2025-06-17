@@ -53,9 +53,9 @@ Get-ChildItem -Filter "01-*.jpg" | ForEach-Object {
   `00-01.jpg` → `01-01-01-01.jpg`
 
 ![](https://storage.googleapis.com/zenn-user-upload/20a1fd901fb9-20250109.png)
-:::message
+```message
 実行にはpowershellのウインドウから直接ファイルを指定、もしくはps1ファイル右クリックから実行できます。
-:::
+```
 
 ## 応用編
 

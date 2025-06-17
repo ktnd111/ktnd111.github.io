@@ -1,200 +1,92 @@
 [
-    {
-      "title": "インデックス／レンジ演算子（^, ..）でスマートに配列操作",
-      "path": "articles/csharp-index-range-operator-guide.html",
-      "date": "2025-04-24",
-      "summary": "C# 8.0から導入されたインデックス演算子（^）とレンジ演算子（..）の基本から応用までを解説し、配列操作をより簡潔に書く方法を紹介します。",
-      "tags": ["C#", "配列", "テクニック", "★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "C#「null 合体演算子」で null チェック＋代入を 1 行に",
-      "path": "articles/csharp-null-operator.html",
-      "date": "2025-04-22",
-      "summary": "C#のnull合体演算子（??と??=）の基本的な使い方と実践的な活用例を解説し、よりクリーンなコードを書く方法を紹介します。",
-      "tags": ["C#", "null", "テクニック", "★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "C#での名前付きタプル：シンプルで可読性の高いデータ構造",
-      "path": "articles/csharp-named-taples.html",
-      "date": "2025-04-20",
-      "summary": "C# 7.0から導入された名前付きタプルの基本から活用方法まで解説し、コードの可読性とメンテナンス性を向上させる方法を紹介します。",
-      "tags": ["C#", "タプル", "設計", "★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "早期リターン（Guard Clause）でネスト地獄を回避しよう",
-      "path": "articles/csharp-guard-clause.html",
-      "date": "2025-04-13",
-      "summary": "読みにくいネスト地獄から脱出するために、早期リターン（Guard Clause）の考え方とコード例を紹介します。",
-      "tags": ["C#", "リファクタリング", "テクニック", "★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "GitHub PagesとFirebaseで実装する無料アクセスカウンター",
-      "path": "articles/firebase-counter-article.html",
-      "date": "2025-03-24",
-      "summary": "静的ウェブサイトでもFirebaseを活用することで簡単にアクセスカウンターを実装できる方法を詳しく解説します。",
-      "tags": ["Firebase", "GitHub Pages", "JavaScript", "サーバーレス", "★"],
-      "category": "クラウド",
-      "background": "web"
-    },
-    {
-      "title": "GitHub Pagesサイトにコントリビューショングリッドを実装した話 🟩",
-      "path": "articles/github-pages-contributions.html",
-      "date": "2025-03-18",
-      "summary": "GitHub Pagesサイトに「草」（コントリビューショングリッド）を実装した経験と、静的サイトで動的データを扱う際の技術的課題の解決方法を紹介します。",
-      "tags": ["GitHub", "Azure", "Azure Functions", "GraphQL", "サーバーレス", "★"],
-      "category": "クラウド",
-      "background": "web"
-    },
-    {
-      "title": "C#のクラス設計入門 - オブジェクト指向の基礎",
-      "path": "articles/csharp-class-concept.html",
-      "date": "2025-03-15",
-      "summary": "C#におけるクラスの概念と特徴（カプセル化、継承、多態性、抽象化）について解説し、インターフェイスと依存性注入の実践的な活用法を紹介します。",
-      "tags": ["C#", "オブジェクト指向", "設計", "インターフェイス"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "LINQの実行タイミングと変数未代入の落とし穴",
-      "path": "articles/csharp-linq-undefinedmiss.html",
-      "date": "2025-03-10",
-      "summary": "LINQの遅延評価と変数未代入のバグについて実体験をもとに解説します。",
-      "tags": ["C#", "LINQ", "デバッグ", "設計","★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-        "title": "Azure DevOps Pipelinesの落とし穴と解決策",
-        "path": "articles/devops-pipelines-pit.html",
-        "date": "2025-03-05",
-        "summary": "Azure DevOps Pipelinesを使い始める際に直面する課題と、セルフホストエージェントのセットアップ方法を解説します。",
-        "tags": ["Azure", "CI/CD","★"],
-        "category": "DevOps",
-        "background": "web"
-      },
-      {
-        "title": "ASP.NET CoreでシンプルなQRコードジェネレーターを作る",
-        "path": "articles/csharp-aspnet-qrcode-generator.html",
-        "date": "2025-03-01",
-        "summary": "ASP.NET Core Razorページを使って、テキストからQRコードを生成・ダウンロードできるウェブアプリケーションの実装方法を解説します。",
-        "tags": ["C#", "ASP.NET Core", "Razor Pages","★"],
-        "category": "プログラミング",
-        "background": "web"
-      },
-    {
-      "title": "ASP.NET CoreのDI完全ガイド",
-      "path": "articles/csharp-aspnet-dependency-injection.html",
-      "date": "2025-02-20",
-      "summary": "ASP.NET CoreのDependency Injectionの基本から応用まで詳しく解説します。",
-      "tags": ["C#", "ASP.NET Core", "設計"],
-      "category": "プログラミング",
-      "background": "web"
-    },
-    {
-      "title": "ASP.NET Coreのエラーハンドリング：専用コントローラーvs既存コントローラー",
-      "path": "articles/csharp-aspnet-error-handle.html",
-      "date": "2025-01-17",
-      "summary": "ASP.NET Coreアプリケーションにおけるエラーハンドリングの実装方法を比較検討します。",
-      "tags": ["C#", "ASP.NET Core"],
-      "category": "プログラミング",
-      "background": "web"
-    },
-    {
-      "title": "C# AWS ALB⇔Lambda Mock Test Tool ローカル環境下でデバッグする",
-      "path": "articles/csharp-aws-lambda-mocktesttool.html",
-      "date": "2025-01-28",
-      "summary": "AWS Lambdaを使ったサーバーレスアプリケーションをローカル環境でテストする方法を解説します。",
-      "tags": ["AWS", "C#", "サーバーレス","★"],
-      "category": "クラウド",
-      "background": "web"
-    },
-    {
-      "title": "C# 12で進化したコレクション操作の基本と応用",
-      "path": "articles/csharp-cs12-collections.html",
-      "date": "2025-02-03",
-      "summary": "C# 12で追加された新しいコレクション操作機能の使い方を基本から応用まで解説します。",
-      "tags": ["C#", "コレクション","★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "C#におけるEnum Flags属性の実践ガイド",
-      "path": "articles/csharp-enum-flags-guide.html",
-      "date": "2025-01-15",
-      "summary": "C#でEnum Flags属性を使ったビットフラグの実装方法と活用例を紹介します。",
-      "tags": ["C#","テクニック","★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "C# LINQ入門 - データ操作の基本構文",
-      "path": "articles/csharp-linq-basic-sentense.html",
-      "date": "2025-01-16",
-      "summary": "C#のLINQを使ったデータ操作の基本的な構文と使い方を初心者向けに解説します。",
-      "tags": ["C#", "LINQ"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "C# LINQ入門 データベースからデータを取得する基本構文",
-      "path": "articles/csharp-linq-beginner.html",
-      "date": "2025-01-09",
-      "summary": "C#のLINQを使ってデータベースからデータを取得する基本的な方法を解説します。",
-      "tags": ["C#", "LINQ"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "[Moq & xUnit] BlobClient.OpenReadAsyncをモック化する方法",
-      "path": "articles/csharp-moq-xunit-openreadasync.html",
-      "date": "2025-02-21",
-      "summary": "C#のテストフレームワークを使用してAzure Storage Blobsクライアントのモック化方法を紹介します。",
-      "tags": ["C#", "xUnit", "Moq", "テスト", "Azure","★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "デスクトップアプリからWebアプリへ：開発パラダイムの転換と理解",
-      "path": "articles/csharp-paradigm-shift.html",
-      "date": "2025-02-10",
-      "summary": "デスクトップアプリケーション開発とWebアプリケーション開発の違いと移行における考え方を解説します。",
-      "tags": ["C#", "Web開発", "アーキテクチャ"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "C#プログラマーのためのPHP入門ガイド",
-      "path": "articles/csharp-php-guide.html",
-      "date": "2025-02-13",
-      "summary": "C#プログラマーがPHPを学ぶ際に知っておくべき違いと基本的な概念を解説します。",
-      "tags": ["PHP", "C#","★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "C# switch式の実践例",
-      "path": "articles/csharp-switch-expression.html",
-      "date": "2025-01-14",
-      "summary": "C# 8.0から導入されたswitch式の基本的な使い方と実践的な応用例を紹介します。",
-      "tags": ["C#", "テクニック","★"],
-      "category": "プログラミング",
-      "background": "tech"
-    },
-    {
-      "title": "PowerShellでファイルを一括リネームする",
-      "path": "articles/powershell-rename.html",
-      "date": "2025-01-09",
-      "summary": "PowerShellを使用したファイルの一括リネーム方法と実践的な例を紹介します。",
-      "tags": ["PowerShell", "効率化", "Windows","★"],
-      "category": "生産性",
-      "background": "performance"
-    }
-  ]
+  {
+    "path": "articles/csharp-index-range-operator-guide.html"
+  },
+  {
+    "path": "articles/csharp-null-operator.html"
+  },
+  {
+    "path": "articles/csharp-named-taples.html"
+  },
+  {
+    "path": "articles/csharp-guard-clause.html"
+  },
+  {
+    "path": "articles/firebase-counter-article.html"
+  },
+  {
+    "path": "articles/github-pages-contributions.html"
+  },
+  {
+    "path": "articles/csharp-class-concept.html"
+  },
+  {
+    "title": "LINQの実行タイミングと変数未代入の落とし穴",
+    "path": "articles/csharp-linq-undefinedmiss.html",
+    "date": "2025-03-10T00:00:00.000Z",
+    "tags": [
+      "C#",
+      "LINQ",
+      "デバッグ",
+      "テスト設計"
+    ],
+    "category": "プログラミング",
+    "background": "tech"
+  },
+  {
+    "title": "Azure DevOps Pipelinesの無料枠を使うときの落とし穴と解決策",
+    "path": "articles/devops-pipelines-pit.html"
+  },
+  {
+    "title": "[C# ASP.NET Core]QRコードジェネレーターを作成する",
+    "path": "articles/csharp-aspnet-qrcode-generator.html"
+  },
+  {
+    "title": "ASP.NET CoreのDI（Dependency Injection）入門",
+    "path": "articles/csharp-aspnet-dependency-injection.html"
+  },
+  {
+    "title": "ASP.NET Coreのエラーハンドリング：専用コントローラーvs既存コントローラー",
+    "path": "articles/csharp-aspnet-error-handle.html"
+  },
+  {
+    "title": "C# AWS ALB⇔Lambda Mock Test Tool ローカル環境下でデバッグする",
+    "path": "articles/csharp-aws-lambda-mocktesttool.html"
+  },
+  {
+    "title": "C# 12で進化したコレクション操作の基本と応用",
+    "path": "articles/csharp-cs12-collections.html"
+  },
+  {
+    "title": "C#におけるEnum Flags属性の実践ガイド",
+    "path": "articles/csharp-enum-flags-guide.html"
+  },
+  {
+    "title": "C# LINQ入門 - データ操作の基本構文",
+    "path": "articles/csharp-linq-basic-sentense.html"
+  },
+  {
+    "title": "C# LINQ入門 データベースからデータを取得する基本構文",
+    "path": "articles/csharp-linq-beginner.html"
+  },
+  {
+    "title": "[Moq & xUnit] BlobClient.OpenReadAsyncをモック化する方法",
+    "path": "articles/csharp-moq-xunit-openreadasync.html"
+  },
+  {
+    "title": "デスクトップアプリからWebアプリへ：開発パラダイムの転換と理解",
+    "path": "articles/csharp-paradigm-shift.html"
+  },
+  {
+    "title": "C#プログラマーのためのPHP入門ガイド",
+    "path": "articles/csharp-php-guide.html"
+  },
+  {
+    "title": "C# switch式の実践例",
+    "path": "articles/csharp-switch-expression.html"
+  },
+  {
+    "title": "PowerShellでファイルを一括リネームする",
+    "path": "articles/powershell-rename.html"
+  }
+]

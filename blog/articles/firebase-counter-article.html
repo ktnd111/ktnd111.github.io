@@ -1,99 +1,19 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>firebase-counter-article.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>undefined</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<p>「このサイト、どれくらいの人が見てくれているんだろう？」と思ったことはありませんか？最近はGoogleアナリティクスなど高機能な解析ツールがありますが、昔ながらのシンプルなアクセスカウンターにも独自の魅力があります。</p>
-<p>Firebase の勉強がてら、GitHub Pagesで運用している静的サイトにアクセスカウンターを実装してみました。サーバーサイドの処理なしでこれができるのは意外と面白いものです。この記事では、その実装方法を初心者にもわかりやすく解説します。</p>
-<h2 id="%E7%9B%AE%E6%AC%A1">目次</h2>
+  <article class="markdown-body">
+    <h1>GitHub PagesとFirebaseで実装する無料アクセスカウンター完全ガイド</h1>
+<p>静的ウェブサイトでアクセスカウンターを実装したいと思ったことはありませんか？従来はサーバーサイドの処理が必要でしたが、Firebaseを活用すればGitHub Pagesのような完全に静的なサイトでも簡単にアクセスカウンターを実装できます。本記事ではその実装方法を詳しく解説します。</p>
+<h2>目次</h2>
 <ol>
 <li><a href="#%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E6%A6%82%E8%A6%81">アーキテクチャ概要</a></li>
 <li><a href="#firebase%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89">Firebase環境構築</a></li>
@@ -104,17 +24,17 @@
 <li><a href="#%E7%99%BA%E5%B1%95%E7%9A%84%E3%81%AA%E3%83%88%E3%83%94%E3%83%83%E3%82%AF">発展的なトピック</a></li>
 <li><a href="#%E3%81%BE%E3%81%A8%E3%82%81">まとめ</a></li>
 </ol>
-<h2 id="%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E6%A6%82%E8%A6%81">アーキテクチャ概要</h2>
+<h2>アーキテクチャ概要</h2>
 <ol>
 <li>ユーザーがGitHub Pagesホストのウェブサイトにアクセス</li>
 <li>ページのJavaScriptがFirebaseに接続</li>
 <li>Firestoreのカウンターデータを取得・更新</li>
 <li>更新されたカウンターをページに表示</li>
 </ol>
-<p><img src="../../images/article/counter-architecture-diagram.svg" alt="アーキテクチャ図"></p>
+<p><img src="../../../images/article/counter-architecture-diagram.svg" alt="アーキテクチャ図"></p>
 <p>このアーキテクチャの最大の特徴は、サーバーサイドの実装が一切不要なことです。すべての処理はクライアントサイドのJavaScriptとFirebaseによって行われます。</p>
-<h2 id="firebase%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89">Firebase環境構築</h2>
-<h3 id="1-firebase%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AE%E4%BD%9C%E6%88%90">1. Firebaseプロジェクトの作成</h3>
+<h2>Firebase環境構築</h2>
+<h3>1. Firebaseプロジェクトの作成</h3>
 <ol>
 <li><a href="https://console.firebase.google.com/">Firebase Console</a>にアクセス</li>
 <li>「プロジェクトを追加」をクリック</li>
@@ -122,7 +42,7 @@
 <li>Google アナリティクスの設定（任意）</li>
 <li>「プロジェクトを作成」をクリック</li>
 </ol>
-<h3 id="2-firebase%E3%82%A2%E3%83%97%E3%83%AA%E3%81%AE%E7%99%BB%E9%8C%B2">2. Firebaseアプリの登録</h3>
+<h3>2. Firebaseアプリの登録</h3>
 <ol>
 <li>プロジェクトのダッシュボードで「&lt;/&gt;」（Webアプリ）をクリック</li>
 <li>アプリのニックネームを入力（例：<code>github-pages-counter</code>）</li>
@@ -132,9 +52,9 @@
 </ol>
 <p>この時点で表示されるFirebase設定情報（apiKey, authDomain, projectId等）をメモしておきましょう。
 まとめてコピペしておくと便利です。</p>
-<h2 id="firestore-database%E3%81%AE%E8%A8%AD%E5%AE%9A">Firestore Databaseの設定</h2>
+<h2>Firestore Databaseの設定</h2>
 <p>次にカウンターデータを保存するFirestore Databaseを設定します。</p>
-<h3 id="1-firestore%E3%81%AE%E6%9C%89%E5%8A%B9%E5%8C%96">1. Firestoreの有効化</h3>
+<h3>1. Firestoreの有効化</h3>
 <ol>
 <li>Firebase Consoleの左側メニューから「Firestore Database」を選択</li>
 <li>「データベースの作成」をクリック</li>
@@ -142,7 +62,7 @@
 <li>リージョンを選択（例：<code>asia-northeast1</code>（東京））</li>
 <li>「有効にする」をクリック</li>
 </ol>
-<h3 id="2-%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E5%88%9D%E6%9C%9F%E5%8C%96">2. カウンターデータの初期化</h3>
+<h3>2. カウンターデータの初期化</h3>
 <ol>
 <li>「コレクションを開始」をクリック</li>
 <li>コレクションID「counters」を入力</li>
@@ -150,33 +70,33 @@
 <li>フィールドに「count」（数値型）を追加し、値を「0」に設定</li>
 <li>「保存」をクリック</li>
 </ol>
-<h2 id="%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E3%83%AB%E3%83%BC%E3%83%AB%E3%81%AE%E5%AE%9F%E8%A3%85">セキュリティルールの実装</h2>
+<h2>セキュリティルールの実装</h2>
 <p>Firebaseのセキュリティは非常に重要です。適切なルールを設定して不正なアクセスやデータ操作を防ぎましょう。</p>
-<h3 id="1-firestore%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E3%83%AB%E3%83%BC%E3%83%AB">1. Firestoreセキュリティルール</h3>
+<h3>1. Firestoreセキュリティルール</h3>
 <p>Firestoreのセキュリティルールは以下のように設定します。</p>
 <ul>
 <li>誰でも読み取りは可能</li>
 <li>カウンターの更新は「count」フィールドのみ許可</li>
 <li>カウンターは必ず1ずつ増加するように制限</li>
 </ul>
-<pre class="hljs"><code><div>rules_version = <span class="hljs-string">'2'</span>;
+<pre><code class="language-javascript">rules_version = &#39;2&#39;;
 service cloud.firestore {
   match /databases/{database}/documents {
     match /counters/visitors {
-      allow read: <span class="hljs-keyword">if</span> <span class="hljs-literal">true</span>;
-      allow update: <span class="hljs-keyword">if</span> request.resource.data.keys().hasOnly([<span class="hljs-string">"count"</span>]) &amp;&amp;
+      allow read: if true;
+      allow update: if request.resource.data.keys().hasOnly([&quot;count&quot;]) &amp;&amp;
                      resource.data.count is number &amp;&amp;
                      request.resource.data.count is number &amp;&amp;
-                     request.resource.data.count == resource.data.count + <span class="hljs-number">1</span>;
-      allow create: <span class="hljs-keyword">if</span> request.resource.data.keys().hasOnly([<span class="hljs-string">"count"</span>]) &amp;&amp;
+                     request.resource.data.count == resource.data.count + 1;
+      allow create: if request.resource.data.keys().hasOnly([&quot;count&quot;]) &amp;&amp;
                      request.resource.data.count is number &amp;&amp;
-                     request.resource.data.count == <span class="hljs-number">1</span>;
+                     request.resource.data.count == 1;
     }
   }
 }
-</div></code></pre>
+</code></pre>
 <p>Firebase Consoleの「Firestore Database」→「ルール」タブからこのルールを設定し、「公開」をクリックします。</p>
-<h3 id="2-api%E5%88%B6%E9%99%90%E3%81%AE%E8%A8%AD%E5%AE%9A">2. API制限の設定</h3>
+<h3>2. API制限の設定</h3>
 <p>Firebase APIキーはHTMLに埋め込まれるため、誰でも見ることができます。そのため、不正使用を防ぐためにAPIキーの使用制限を設定します。</p>
 <ol>
 <li><a href="https://console.cloud.google.com/">Google Cloud Platform Console</a>にアクセス</li>
@@ -187,108 +107,108 @@ service cloud.firestore {
 <li>「保存」をクリック</li>
 </ol>
 <p>この設定により、指定したドメインからのリクエストのみAPIキーが使用可能になります。</p>
-<h2 id="html%E3%81%A8javascript%E3%81%AE%E5%AE%9F%E8%A3%85">HTMLとJavaScriptの実装</h2>
+<h2>HTMLとJavaScriptの実装</h2>
 <p>HTMLとJavaScriptを実装します。
 コード量は少なめですのでHTML内に記述しても良いかなと思います。お好みでどうぞ。</p>
-<h3 id="1-html%E3%81%AE%E5%9F%BA%E6%9C%AC%E6%A7%8B%E9%80%A0">1. HTMLの基本構造</h3>
-<pre class="hljs"><code><div><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">"ja"</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"UTF-8"</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"viewport"</span> <span class="hljs-attr">content</span>=<span class="hljs-string">"width=device-width, initial-scale=1.0"</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>アクセスカウンター<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="css">
-    <span class="hljs-selector-class">.counter</span> {
-      <span class="hljs-attribute">font-family</span>: monospace;
-      <span class="hljs-attribute">font-size</span>: <span class="hljs-number">24px</span>;
-      <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#f5f5f5</span>;
-      <span class="hljs-attribute">padding</span>: <span class="hljs-number">8px</span> <span class="hljs-number">16px</span>;
-      <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">4px</span>;
-      <span class="hljs-attribute">display</span>: inline-block;
+<h3>1. HTMLの基本構造</h3>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ja&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;アクセスカウンター&lt;/title&gt;
+  &lt;style&gt;
+    .counter {
+      font-family: monospace;
+      font-size: 24px;
+      background-color: #f5f5f5;
+      padding: 8px 16px;
+      border-radius: 4px;
+      display: inline-block;
     }
-  </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"container"</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>アクセスカウンター<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"counter"</span>&gt;</span>読み込み中...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>このページの総訪問者数<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;h1&gt;アクセスカウンター&lt;/h1&gt;
+        &lt;div id=&quot;counter&quot;&gt;読み込み中...&lt;/div&gt;
+        &lt;p&gt;このページの総訪問者数&lt;/p&gt;
+    &lt;/div&gt;
   
-  <span class="hljs-comment">&lt;!-- Firebase SDK --&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+  &lt;!-- Firebase SDK --&gt;
+  &lt;script src=&quot;https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js&quot;&gt;&lt;/script&gt;
   
-  <span class="hljs-comment">&lt;!-- アクセスカウンタースクリプト --&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"counter.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
-</div></code></pre>
-<h3 id="2-javascript%E3%81%AE%E5%AE%9F%E8%A3%85-counterjs">2. JavaScriptの実装 (counter.js)</h3>
-<pre class="hljs"><code><div><span class="hljs-comment">// Firebase設定</span>
-<span class="hljs-keyword">const</span> firebaseConfig = {
-  <span class="hljs-attr">apiKey</span>: <span class="hljs-string">"YOUR_API_KEY"</span>,
-  <span class="hljs-attr">authDomain</span>: <span class="hljs-string">"YOUR_PROJECT_ID.firebaseapp.com"</span>,
-  <span class="hljs-attr">projectId</span>: <span class="hljs-string">"YOUR_PROJECT_ID"</span>,
-  <span class="hljs-attr">storageBucket</span>: <span class="hljs-string">"YOUR_PROJECT_ID.appspot.com"</span>,
-  <span class="hljs-attr">messagingSenderId</span>: <span class="hljs-string">"YOUR_MESSAGING_SENDER_ID"</span>,
-  <span class="hljs-attr">appId</span>: <span class="hljs-string">"YOUR_APP_ID"</span>
+  &lt;!-- アクセスカウンタースクリプト --&gt;
+  &lt;script src=&quot;counter.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h3>2. JavaScriptの実装 (counter.js)</h3>
+<pre><code class="language-javascript">// Firebase設定
+const firebaseConfig = {
+  apiKey: &quot;YOUR_API_KEY&quot;,
+  authDomain: &quot;YOUR_PROJECT_ID.firebaseapp.com&quot;,
+  projectId: &quot;YOUR_PROJECT_ID&quot;,
+  storageBucket: &quot;YOUR_PROJECT_ID.appspot.com&quot;,
+  messagingSenderId: &quot;YOUR_MESSAGING_SENDER_ID&quot;,
+  appId: &quot;YOUR_APP_ID&quot;
 };
 
-<span class="hljs-comment">// Firebase初期化</span>
+// Firebase初期化
 firebase.initializeApp(firebaseConfig);
-<span class="hljs-keyword">const</span> db = firebase.firestore();
-<span class="hljs-keyword">const</span> counterRef = db.collection(<span class="hljs-string">'counters'</span>).doc(<span class="hljs-string">'visitors'</span>);
+const db = firebase.firestore();
+const counterRef = db.collection(&#39;counters&#39;).doc(&#39;visitors&#39;);
 
-<span class="hljs-comment">// DOM要素の参照</span>
-<span class="hljs-keyword">const</span> counterElement = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'visitor-count'</span>);
+// DOM要素の参照
+const counterElement = document.getElementById(&#39;visitor-count&#39;);
 
-<span class="hljs-comment">// 初回訪問かどうかのチェック（セッションストレージを使用）</span>
-<span class="hljs-keyword">const</span> sessionKey = <span class="hljs-string">'visited'</span>;
-<span class="hljs-keyword">const</span> hasVisited = sessionStorage.getItem(sessionKey);
+// 初回訪問かどうかのチェック（セッションストレージを使用）
+const sessionKey = &#39;visited&#39;;
+const hasVisited = sessionStorage.getItem(sessionKey);
 
-<span class="hljs-comment">// カウンター処理</span>
-<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">handleCounter</span>(<span class="hljs-params"></span>) </span>{
-  <span class="hljs-keyword">try</span> {
-    <span class="hljs-comment">// カウンターを表示</span>
-    <span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> counterRef.get();
-    <span class="hljs-keyword">if</span> (doc.exists) {
+// カウンター処理
+async function handleCounter() {
+  try {
+    // カウンターを表示
+    const doc = await counterRef.get();
+    if (doc.exists) {
       counterElement.textContent = doc.data().count.toLocaleString();
-    } <span class="hljs-keyword">else</span> {
-      <span class="hljs-comment">// ドキュメントが存在しない場合は作成</span>
-      <span class="hljs-keyword">await</span> counterRef.set({ <span class="hljs-attr">count</span>: <span class="hljs-number">1</span> });
-      counterElement.textContent = <span class="hljs-string">'1'</span>;
+    } else {
+      // ドキュメントが存在しない場合は作成
+      await counterRef.set({ count: 1 });
+      counterElement.textContent = &#39;1&#39;;
     }
     
-    <span class="hljs-comment">// 初回訪問の場合はカウンターを増加</span>
-    <span class="hljs-keyword">if</span> (!hasVisited) {
-      <span class="hljs-comment">// トランザクションを使用して安全に更新</span>
-      <span class="hljs-keyword">await</span> db.runTransaction(<span class="hljs-keyword">async</span> (transaction) =&gt; {
-        <span class="hljs-keyword">const</span> docRef = <span class="hljs-keyword">await</span> transaction.get(counterRef);
-        <span class="hljs-keyword">if</span> (!docRef.exists) {
-          transaction.set(counterRef, { <span class="hljs-attr">count</span>: <span class="hljs-number">1</span> });
-        } <span class="hljs-keyword">else</span> {
-          <span class="hljs-keyword">const</span> newCount = docRef.data().count + <span class="hljs-number">1</span>;
-          transaction.update(counterRef, { <span class="hljs-attr">count</span>: newCount });
+    // 初回訪問の場合はカウンターを増加
+    if (!hasVisited) {
+      // トランザクションを使用して安全に更新
+      await db.runTransaction(async (transaction) =&gt; {
+        const docRef = await transaction.get(counterRef);
+        if (!docRef.exists) {
+          transaction.set(counterRef, { count: 1 });
+        } else {
+          const newCount = docRef.data().count + 1;
+          transaction.update(counterRef, { count: newCount });
         }
       });
       
-      <span class="hljs-comment">// 訪問済みとしてマーク</span>
-      sessionStorage.setItem(sessionKey, <span class="hljs-string">'true'</span>);
+      // 訪問済みとしてマーク
+      sessionStorage.setItem(sessionKey, &#39;true&#39;);
       
-      <span class="hljs-comment">// 更新後のカウントを再取得して表示</span>
-      <span class="hljs-keyword">const</span> updatedDoc = <span class="hljs-keyword">await</span> counterRef.get();
+      // 更新後のカウントを再取得して表示
+      const updatedDoc = await counterRef.get();
       counterElement.textContent = updatedDoc.data().count.toLocaleString();
     }
-  } <span class="hljs-keyword">catch</span> (error) {
-    <span class="hljs-built_in">console</span>.error(<span class="hljs-string">'カウンター処理エラー:'</span>, error);
-    counterElement.textContent = <span class="hljs-string">'Error'</span>;
+  } catch (error) {
+    console.error(&#39;カウンター処理エラー:&#39;, error);
+    counterElement.textContent = &#39;Error&#39;;
   }
 }
 
-<span class="hljs-comment">// カウンター処理を実行</span>
+// カウンター処理を実行
 handleCounter();
-</div></code></pre>
+</code></pre>
 <p>上記のJavaScriptコードでは以下の処理を行っています。</p>
 <ol>
 <li>Firebaseを初期化</li>
@@ -297,22 +217,22 @@ handleCounter();
 <li>エラーハンドリング</li>
 </ol>
 <p>必ず<code>firebaseConfig</code>の値は、Firebase Consoleで取得した実際の値に置き換えてください。</p>
-<h2 id="%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E3%81%A8%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D">デプロイと動作確認</h2>
+<h2>デプロイと動作確認</h2>
 <p>実装したファイルをGitHubリポジトリにプッシュして、GitHub Pagesでデプロイします。</p>
-<h3 id="1-github%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AE%E4%BD%9C%E6%88%90">1. GitHubリポジトリの作成</h3>
+<h3>1. GitHubリポジトリの作成</h3>
 <ol>
 <li><a href="https://github.com/">GitHub</a>にログイン</li>
 <li>「New repository」をクリック</li>
 <li>リポジトリ名を入力（例：<code>access-counter-demo</code>）</li>
 <li>「Create repository」をクリック</li>
 </ol>
-<h3 id="2-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E3%82%A2%E3%83%83%E3%83%97%E3%83%AD%E3%83%BC%E3%83%89">2. ファイルのアップロード</h3>
+<h3>2. ファイルのアップロード</h3>
 <ol>
 <li>リポジトリページで「Add file」→「Upload files」をクリック</li>
 <li>作成したHTMLとJavaScriptファイルをアップロード</li>
 <li>「Commit changes」をクリック</li>
 </ol>
-<h3 id="3-github-pages%E3%81%AE%E6%9C%89%E5%8A%B9%E5%8C%96">3. GitHub Pagesの有効化</h3>
+<h3>3. GitHub Pagesの有効化</h3>
 <ol>
 <li>リポジトリの「Settings」をクリック</li>
 <li>左側メニューから「Pages」を選択</li>
@@ -320,11 +240,11 @@ handleCounter();
 <li>「Save」をクリック</li>
 </ol>
 <p>しばらく待つと、GitHub Pagesのサイトが有効になります（例：<code>https://username.github.io/access-counter-demo/</code>）</p>
-<h3 id="4-%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D">4. 動作確認</h3>
+<h3>4. 動作確認</h3>
 <p>サイトにアクセスして、カウンターが表示され、更新されることを確認します。異なるブラウザやデバイスからアクセスして、カウンターが増加することを確認しましょう。</p>
-<p><img src="../../images/article/counter-test.png" alt="動作確認の図"></p>
-<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
-<p>Firebase Firestoreを使用することで、サーバーサイドの実装なしに、完全に静的なGitHub Pagesサイトにアクセスカウンター機能を簡単に追加できます。</p>
+<p><img src="../../../images/article/counter-test.png" alt="動作確認の図"></p>
+<h2>まとめ</h2>
+<p>Firebase Firestoreを使用することで、サーバーサイドの実装なしに、完全に静的なGitHub Pagesサイトにアクセスカウンター機能を簡単に追加できます。このアプローチの主なメリットは：</p>
 <ol>
 <li><strong>サーバーレス</strong>: サーバー管理が不要</li>
 <li><strong>低コスト</strong>: Firebaseの無料枠内で運用可能（1日あたり50,000回の読み取りと20,000回の書き込み、1GBのストレージまで無料）</li>
@@ -335,10 +255,9 @@ handleCounter();
 <p>適切なセキュリティルールの設定と、API制限の設定を忘れないようにしましょう。これらの対策により、API情報が公開されていても、悪用される可能性を最小限に抑えることができます。</p>
 <p>なお、本実装ではセッションストレージを使用して重複カウントを防止していますが、これはブラウザのセッションごとに計測される点に注意してください。つまり、ユーザーがブラウザを閉じて再度開くと、新たな訪問としてカウントされます。より厳密なユーザー識別が必要な場合は、LocalStorageやCookieを使用した実装に変更することも検討しましょう。</p>
 <p>以上の手順に従えば、誰でも簡単に自分のウェブサイトにアクセスカウンターを実装できます。ぜひトライしてみてください！</p>
-<hr>
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
-<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
 
-<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>

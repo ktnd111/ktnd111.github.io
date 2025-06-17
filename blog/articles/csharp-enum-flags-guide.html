@@ -1,377 +1,288 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>csharp-enum-flags-guide.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C#におけるEnum Flags属性の実践ガイド</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<p>C#のEnumに<code>[Flags]</code>属性を付けると、通常の列挙型よりも柔軟に使えるビットフラグとして扱えるようになります。この記事では、初心者向けの基本的な説明から実務での活用例まで、段階的に解説していきます。</p>
-<h2 id="flags%E5%B1%9E%E6%80%A7%E3%81%AE%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5">[Flags]属性の基本概念</h2>
-<h3 id="%E3%83%93%E3%83%83%E3%83%88%E3%83%95%E3%83%A9%E3%82%B0%E3%81%A8%E3%81%AF">ビットフラグとは？</h3>
+  <article class="markdown-body">
+    <p>C#のEnumに<code>[Flags]</code>属性を付けると、通常の列挙型よりも柔軟に使えるビットフラグとして扱えるようになります。この記事では、初心者向けの基本的な説明から実務での活用例まで、段階的に解説していきます。</p>
+<h2>[Flags]属性の基本概念</h2>
+<h3>ビットフラグとは？</h3>
 <p><code>[Flags]</code>属性は、列挙型の値を複数組み合わせて使用できるようにする機能です。各値はビットごとに意味を持ち、2のべき乗の値を使用することで、ビット単位の操作が可能になります。</p>
-<pre class="hljs"><code><div>[<span class="hljs-meta">Flags</span>]
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> Permissions
+<pre><code class="language-csharp">[Flags]
+public enum Permissions
 {
-    None    = <span class="hljs-number">0</span>,      <span class="hljs-comment">// 0000</span>
-    Read    = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">0</span>, <span class="hljs-comment">// 0001</span>
-    Write   = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">1</span>, <span class="hljs-comment">// 0010</span>
-    Execute = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">2</span>, <span class="hljs-comment">// 0100</span>
-    Delete  = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">3</span>  <span class="hljs-comment">// 1000</span>
+    None    = 0,      // 0000
+    Read    = 1 &lt;&lt; 0, // 0001
+    Write   = 1 &lt;&lt; 1, // 0010
+    Execute = 1 &lt;&lt; 2, // 0100
+    Delete  = 1 &lt;&lt; 3  // 1000
 }
-</div></code></pre>
-<h3 id="%E3%81%AA%E3%81%9C-1--n-%E3%82%92%E4%BD%BF%E3%81%86%E3%81%AE%E3%81%8B">なぜ <code>1 &lt;&lt; n</code> を使うのか？</h3>
+</code></pre>
+<h3>なぜ <code>1 &lt;&lt; n</code> を使うのか？</h3>
 <p>ビットシフト演算子 <code>1 &lt;&lt; n</code> を使用する理由：</p>
 <ol>
 <li><strong>ビット位置の明確化</strong>: 各値がどのビット位置に対応しているかが一目で分かります</li>
 <li><strong>計算ミスの防止</strong>: 値を直接記述する場合と比べて、新しい値の追加時の計算ミスを防げます</li>
 <li><strong>保守性の向上</strong>: コードの意図が明確になり、後からの修正が容易になります</li>
 </ol>
-<pre class="hljs"><code><div><span class="hljs-comment">// 直接値を使用する場合（計算が必要）</span>
-[<span class="hljs-meta">Flags</span>]
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> Options
+<pre><code class="language-csharp">// 直接値を使用する場合（計算が必要）
+[Flags]
+public enum Options
 {
-    None    = <span class="hljs-number">0</span>,
-    First   = <span class="hljs-number">1</span>,    <span class="hljs-comment">// 2^0</span>
-    Second  = <span class="hljs-number">2</span>,    <span class="hljs-comment">// 2^1</span>
-    Third   = <span class="hljs-number">4</span>,    <span class="hljs-comment">// 2^2</span>
-    Fourth  = <span class="hljs-number">8</span>,    <span class="hljs-comment">// 2^3</span>
-    Fifth   = <span class="hljs-number">16</span>    <span class="hljs-comment">// 計算が必要</span>
+    None    = 0,
+    First   = 1,    // 2^0
+    Second  = 2,    // 2^1
+    Third   = 4,    // 2^2
+    Fourth  = 8,    // 2^3
+    Fifth   = 16    // 計算が必要
 }
 
-<span class="hljs-comment">// ビットシフトを使用する場合（直感的）</span>
-[<span class="hljs-meta">Flags</span>]
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> BetterOptions
+// ビットシフトを使用する場合（直感的）
+[Flags]
+public enum BetterOptions
 {
-    None    = <span class="hljs-number">0</span>,
-    First   = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">0</span>,
-    Second  = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">1</span>,
-    Third   = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">2</span>,
-    Fourth  = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">3</span>,
-    Fifth   = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">4</span>  <span class="hljs-comment">// 追加が簡単！</span>
+    None    = 0,
+    First   = 1 &lt;&lt; 0,
+    Second  = 1 &lt;&lt; 1,
+    Third   = 1 &lt;&lt; 2,
+    Fourth  = 1 &lt;&lt; 3,
+    Fifth   = 1 &lt;&lt; 4  // 追加が簡単！
 }
-</div></code></pre>
-<h3 id="%E3%83%93%E3%83%83%E3%83%88%E6%BC%94%E7%AE%97%E5%AD%90%E3%81%AE%E5%9F%BA%E6%9C%AC">ビット演算子の基本</h3>
+</code></pre>
+<h3>ビット演算子の基本</h3>
 <p>Flags属性を使用する際に重要なビット演算子の説明：</p>
 <ol>
-<li>
-<p><strong>OR演算子 (<code>|</code>)</strong>: フラグの追加</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// 読み取りと書き込み権限を組み合わせる</span>
-<span class="hljs-keyword">var</span> flags = Permissions.Read | Permissions.Write;
-</div></code></pre>
+<li><p><strong>OR演算子 (<code>|</code>)</strong>: フラグの追加</p>
+<pre><code class="language-csharp">// 読み取りと書き込み権限を組み合わせる
+var flags = Permissions.Read | Permissions.Write;
+</code></pre>
 </li>
-<li>
-<p><strong>複合代入演算子 (<code>|=</code>)</strong>: 既存のフラグに新しいフラグを追加</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// 既存の読み取り権限に書き込み権限を追加</span>
+<li><p><strong>複合代入演算子 (<code>|=</code>)</strong>: 既存のフラグに新しいフラグを追加</p>
+<pre><code class="language-csharp">// 既存の読み取り権限に書き込み権限を追加
 Permissions flags = Permissions.Read;
 flags |= Permissions.Write; 
-</div></code></pre>
+</code></pre>
 </li>
-<li>
-<p><strong>AND演算子 (<code>&amp;</code>)</strong>: フラグのチェック</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">if</span> ((flags &amp; Permissions.Read) == Permissions.Read)
+<li><p><strong>AND演算子 (<code>&amp;</code>)</strong>: フラグのチェック</p>
+<pre><code class="language-csharp">if ((flags &amp; Permissions.Read) == Permissions.Read)
 {
-    Console.WriteLine(<span class="hljs-string">"読み取り権限があります"</span>);
+    Console.WriteLine(&quot;読み取り権限があります&quot;);
 }
-</div></code></pre>
+</code></pre>
 </li>
-<li>
-<p><strong>NOT演算子 (<code>~</code>) と複合AND代入 (<code>&amp;=</code>)</strong>: フラグの削除</p>
-<pre class="hljs"><code><div>flags &amp;= ~Permissions.Write; <span class="hljs-comment">// 書き込み権限を削除</span>
-</div></code></pre>
+<li><p><strong>NOT演算子 (<code>~</code>) と複合AND代入 (<code>&amp;=</code>)</strong>: フラグの削除</p>
+<pre><code class="language-csharp">flags &amp;= ~Permissions.Write; // 書き込み権限を削除
+</code></pre>
 </li>
-<li>
-<p><strong>XOR演算子 (<code>^</code>)</strong>: フラグの切り替え</p>
-<pre class="hljs"><code><div>flags ^= Permissions.Read; <span class="hljs-comment">// 読み取り権限をトグル（あれば削除、なければ追加）</span>
-</div></code></pre>
+<li><p><strong>XOR演算子 (<code>^</code>)</strong>: フラグの切り替え</p>
+<pre><code class="language-csharp">flags ^= Permissions.Read; // 読み取り権限をトグル（あれば削除、なければ追加）
+</code></pre>
 </li>
 </ol>
 <p>これらの演算子を組み合わせることで、フラグの追加、削除、チェックなどの操作が可能になります。特に <code>|=</code> は「既存の状態を保持しながら新しいフラグを追加する」という意味で、Flags属性付きEnumでよく使用されます。</p>
-<h2 id="%E5%9F%BA%E6%9C%AC%E7%9A%84%E3%81%AA%E4%BD%BF%E7%94%A8%E4%BE%8B">基本的な使用例</h2>
-<h3 id="1-%E3%82%B2%E3%83%BC%E3%83%A0%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%A9%E3%82%AF%E3%82%BF%E3%83%BC%E7%8A%B6%E6%85%8B%E7%AE%A1%E7%90%86">1. ゲームのキャラクター状態管理</h3>
+<h2>基本的な使用例</h2>
+<h3>1. ゲームのキャラクター状態管理</h3>
 <p>ゲーム開発でよく使用される例として、キャラクターの状態管理があります。
 （理想としてはバフ・デバフで分けるべきですが、サンプルということで。）</p>
-<pre class="hljs"><code><div>[<span class="hljs-meta">Flags</span>]
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> CharacterState
+<pre><code class="language-csharp">[Flags]
+public enum CharacterState
 {
-    None     = <span class="hljs-number">0</span>,
-    Poisoned = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">0</span>, <span class="hljs-comment">// 毒状態</span>
-    Stunned  = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">1</span>, <span class="hljs-comment">// 気絶状態</span>
-    Shielded = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">2</span>, <span class="hljs-comment">// 防御状態</span>
-    Powered  = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">3</span>  <span class="hljs-comment">// パワーアップ状態</span>
+    None     = 0,
+    Poisoned = 1 &lt;&lt; 0, // 毒状態
+    Stunned  = 1 &lt;&lt; 1, // 気絶状態
+    Shielded = 1 &lt;&lt; 2, // 防御状態
+    Powered  = 1 &lt;&lt; 3  // パワーアップ状態
 }
 
-<span class="hljs-comment">// 使用例</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Character</span>
+// 使用例
+public class Character
 {
-    <span class="hljs-keyword">private</span> CharacterState _state;
+    private CharacterState _state;
     
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">ApplyStatus</span>(<span class="hljs-params">CharacterState state</span>)</span>
+    public void ApplyStatus(CharacterState state)
     {
-        _state |= state; <span class="hljs-comment">// 状態を追加</span>
+        _state |= state; // 状態を追加
     }
     
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">RemoveStatus</span>(<span class="hljs-params">CharacterState state</span>)</span>
+    public void RemoveStatus(CharacterState state)
     {
-        _state &amp;= ~state; <span class="hljs-comment">// 状態を解除</span>
+        _state &amp;= ~state; // 状態を解除
     }
     
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">HasStatus</span>(<span class="hljs-params">CharacterState state</span>)</span>
+    public bool HasStatus(CharacterState state)
     {
-        <span class="hljs-keyword">return</span> (_state &amp; state) == state;
+        return (_state &amp; state) == state;
     }
 }
 
-<span class="hljs-comment">// 実際の使用</span>
-<span class="hljs-keyword">var</span> hero = <span class="hljs-keyword">new</span> Character();
+// 実際の使用
+var hero = new Character();
 hero.ApplyStatus(CharacterState.Shielded | CharacterState.Powered);
-<span class="hljs-keyword">if</span> (hero.HasStatus(CharacterState.Shielded))
+if (hero.HasStatus(CharacterState.Shielded))
 {
-    Console.WriteLine(<span class="hljs-string">"防御状態です！"</span>);
+    Console.WriteLine(&quot;防御状態です！&quot;);
 }
-</div></code></pre>
-<h3 id="2-ui%E3%81%AE%E7%8A%B6%E6%85%8B%E7%AE%A1%E7%90%86">2. UIの状態管理</h3>
+</code></pre>
+<h3>2. UIの状態管理</h3>
 <p>ユーザーインターフェースの状態を管理する例</p>
-<pre class="hljs"><code><div>[<span class="hljs-meta">Flags</span>]
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> ControlState
+<pre><code class="language-csharp">[Flags]
+public enum ControlState
 {
-    None     = <span class="hljs-number">0</span>,
-    Visible  = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">0</span>,
-    Enabled  = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">1</span>,
-    Focused  = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">2</span>,
-    Selected = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">3</span>,
+    None     = 0,
+    Visible  = 1 &lt;&lt; 0,
+    Enabled  = 1 &lt;&lt; 1,
+    Focused  = 1 &lt;&lt; 2,
+    Selected = 1 &lt;&lt; 3,
     
-    <span class="hljs-comment">// よく使用される組み合わせ</span>
+    // よく使用される組み合わせ
     Normal = Visible | Enabled,
     Active = Normal | Focused,
     Highlighted = Normal | Selected
 }
 
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">UIControl</span>
+public class UIControl
 {
-    <span class="hljs-keyword">private</span> ControlState _state = ControlState.Normal;
+    private ControlState _state = ControlState.Normal;
     
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">UpdateState</span>(<span class="hljs-params">ControlState newState</span>)</span>
+    public void UpdateState(ControlState newState)
     {
-        <span class="hljs-keyword">var</span> changes = _state ^ newState; <span class="hljs-comment">// 変更されたフラグを特定</span>
-        <span class="hljs-keyword">if</span> (changes != <span class="hljs-number">0</span>)
+        var changes = _state ^ newState; // 変更されたフラグを特定
+        if (changes != 0)
         {
             _state = newState;
             OnStateChanged(changes);
         }
     }
 }
-</div></code></pre>
-<h2 id="%E5%AE%9F%E5%8B%99%E3%81%A7%E3%81%AE%E6%B4%BB%E7%94%A8%E3%82%B7%E3%83%BC%E3%83%B3">実務での活用シーン</h2>
-<h3 id="1-%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%A8%E3%81%AE%E9%80%A3%E6%90%BA">1. データベースとの連携</h3>
+</code></pre>
+<h2>実務での活用シーン</h2>
+<h3>1. データベースとの連携</h3>
 <p>権限管理をデータベースで扱う例</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// データベースへの保存</span>
+<pre><code class="language-csharp">// データベースへの保存
 Permissions adminPerms = Permissions.Read | Permissions.Write | Permissions.Execute;
-<span class="hljs-keyword">int</span> dbValue = (<span class="hljs-keyword">int</span>)adminPerms; <span class="hljs-comment">// 7を保存</span>
+int dbValue = (int)adminPerms; // 7を保存
 
-<span class="hljs-comment">// データベースからの読み込み</span>
-<span class="hljs-keyword">int</span> storedValue = <span class="hljs-number">7</span>; <span class="hljs-comment">// DBから取得</span>
+// データベースからの読み込み
+int storedValue = 7; // DBから取得
 Permissions loadedPerms = (Permissions)storedValue;
-<span class="hljs-keyword">if</span> (loadedPerms.HasFlag(Permissions.Write))
+if (loadedPerms.HasFlag(Permissions.Write))
 {
-    Console.WriteLine(<span class="hljs-string">"書き込み権限があります"</span>);
+    Console.WriteLine(&quot;書き込み権限があります&quot;);
 }
-</div></code></pre>
-<h3 id="2-%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E6%9D%A1%E4%BB%B6%E3%81%AE%E7%AE%A1%E7%90%86">2. フィルタ条件の管理</h3>
+</code></pre>
+<h3>2. フィルタ条件の管理</h3>
 <p>検索条件やフィルタを管理する例：</p>
-<pre class="hljs"><code><div>[<span class="hljs-meta">Flags</span>]
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> SearchFilters
+<pre><code class="language-csharp">[Flags]
+public enum SearchFilters
 {
-    None       = <span class="hljs-number">0</span>,
-    ByDate     = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">0</span>,
-    ByCategory = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">1</span>,
-    ByStatus   = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">2</span>,
-    ByAuthor   = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">3</span>
+    None       = 0,
+    ByDate     = 1 &lt;&lt; 0,
+    ByCategory = 1 &lt;&lt; 1,
+    ByStatus   = 1 &lt;&lt; 2,
+    ByAuthor   = 1 &lt;&lt; 3
 }
 
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">DocumentSearch</span>
+public class DocumentSearch
 {
-    <span class="hljs-function"><span class="hljs-keyword">public</span> IEnumerable&lt;Document&gt; <span class="hljs-title">Search</span>(<span class="hljs-params">SearchFilters filters</span>)</span>
+    public IEnumerable&lt;Document&gt; Search(SearchFilters filters)
     {
-        <span class="hljs-keyword">var</span> query = GetBaseQuery();
+        var query = GetBaseQuery();
         
-        <span class="hljs-keyword">if</span> (filters.HasFlag(SearchFilters.ByDate))
+        if (filters.HasFlag(SearchFilters.ByDate))
             query = query.OrderByDate();
             
-        <span class="hljs-keyword">if</span> (filters.HasFlag(SearchFilters.ByCategory))
+        if (filters.HasFlag(SearchFilters.ByCategory))
             query = query.FilterByCategory();
             
-        <span class="hljs-keyword">return</span> query.Execute();
+        return query.Execute();
     }
 }
-</div></code></pre>
-<h2 id="%E3%83%87%E3%83%90%E3%83%83%E3%82%B0%E3%81%A8%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0">デバッグとトラブルシューティング</h2>
-<h3 id="1-%E6%84%8F%E5%9B%B3%E3%81%97%E3%81%AA%E3%81%84%E5%80%A4%E3%81%AE%E7%B5%84%E3%81%BF%E5%90%88%E3%82%8F%E3%81%9B">1. 意図しない値の組み合わせ</h3>
-<pre class="hljs"><code><div>[<span class="hljs-meta">Flags</span>]
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> PlayerStatus
+</code></pre>
+<h2>デバッグとトラブルシューティング</h2>
+<h3>1. 意図しない値の組み合わせ</h3>
+<pre><code class="language-csharp">[Flags]
+public enum PlayerStatus
 {
-    None    = <span class="hljs-number">0</span>,
-    Alive   = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">0</span>,
-    Dead    = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">1</span>,    <span class="hljs-comment">// AliveとDeadは同時に成立しない</span>
-    Playing = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">2</span>
+    None    = 0,
+    Alive   = 1 &lt;&lt; 0,
+    Dead    = 1 &lt;&lt; 1,    // AliveとDeadは同時に成立しない
+    Playing = 1 &lt;&lt; 2
 }
 
-<span class="hljs-comment">// 検証用ヘルパーメソッド</span>
-<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">IsValidStatus</span>(<span class="hljs-params">PlayerStatus status</span>)</span>
+// 検証用ヘルパーメソッド
+public bool IsValidStatus(PlayerStatus status)
 {
-    <span class="hljs-keyword">return</span> status != (PlayerStatus.Alive | PlayerStatus.Dead);
+    return status != (PlayerStatus.Alive | PlayerStatus.Dead);
 }
-</div></code></pre>
-<h3 id="2-%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E6%9C%80%E9%81%A9%E5%8C%96">2. パフォーマンス最適化</h3>
+</code></pre>
+<h3>2. パフォーマンス最適化</h3>
 <p>大量の処理を行う場合の最適化例：</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// 標準的な方法（より直観的）</span>
-<span class="hljs-keyword">if</span> (permissions.HasFlag(Permissions.Read)) 
+<pre><code class="language-csharp">// 標準的な方法（より直観的）
+if (permissions.HasFlag(Permissions.Read)) 
 {
-    <span class="hljs-comment">// 処理</span>
+    // 処理
 }
 
-<span class="hljs-comment">// パフォーマンスを重視した方法</span>
-<span class="hljs-keyword">if</span> ((permissions &amp; Permissions.Read) == Permissions.Read) 
+// パフォーマンスを重視した方法
+if ((permissions &amp; Permissions.Read) == Permissions.Read) 
 {
-    <span class="hljs-comment">// 処理</span>
+    // 処理
 }
-</div></code></pre>
-<h2 id="%E3%83%A6%E3%83%8B%E3%83%83%E3%83%88%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%AE%E6%B4%BB%E7%94%A8">ユニットテストでの活用</h2>
+</code></pre>
+<h2>ユニットテストでの活用</h2>
 <p>Flags Enumのテスト例：</p>
-<pre class="hljs"><code><div>[<span class="hljs-meta">Test</span>]
-<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">TestCharacterState</span>(<span class="hljs-params"></span>)</span>
+<pre><code class="language-csharp">[Test]
+public void TestCharacterState()
 {
-    <span class="hljs-keyword">var</span> character = <span class="hljs-keyword">new</span> Character();
+    var character = new Character();
     
-    <span class="hljs-comment">// 状態の追加テスト</span>
+    // 状態の追加テスト
     character.ApplyStatus(CharacterState.Poisoned | CharacterState.Shielded);
     Assert.That(character.HasStatus(CharacterState.Poisoned), Is.True);
     Assert.That(character.HasStatus(CharacterState.Shielded), Is.True);
     Assert.That(character.HasStatus(CharacterState.Stunned), Is.False);
     
-    <span class="hljs-comment">// 状態の解除テスト</span>
+    // 状態の解除テスト
     character.RemoveStatus(CharacterState.Poisoned);
     Assert.That(character.HasStatus(CharacterState.Poisoned), Is.False);
     Assert.That(character.HasStatus(CharacterState.Shielded), Is.True);
 }
-</div></code></pre>
-<h2 id="%E6%B3%A8%E6%84%8F%E7%82%B9%E3%81%A8%E3%83%99%E3%82%B9%E3%83%88%E3%83%97%E3%83%A9%E3%82%AF%E3%83%86%E3%82%A3%E3%82%B9">注意点とベストプラクティス</h2>
+</code></pre>
+<h2>注意点とベストプラクティス</h2>
 <ol>
-<li>
-<p><strong>値は2のべき乗を使用する</strong></p>
+<li><p><strong>値は2のべき乗を使用する</strong></p>
 <ul>
 <li>各フラグが独立したビットを使用するようにする</li>
 <li><code>1 &lt;&lt; n</code> の形式を使用すると分かりやすい</li>
 </ul>
 </li>
-<li>
-<p><strong>Noneは必ず0にする</strong></p>
+<li><p><strong>Noneは必ず0にする</strong></p>
 <ul>
 <li>初期状態や「選択なし」を明確に表現する</li>
 <li>データベースなどでの初期値との整合性を保つ</li>
 </ul>
 </li>
-<li>
-<p><strong>意味のある組み合わせのみを許可する</strong></p>
+<li><p><strong>意味のある組み合わせのみを許可する</strong></p>
 <ul>
 <li>矛盾する状態の組み合わせを防ぐ</li>
 <li>検証ロジックを実装する</li>
 </ul>
 </li>
-<li>
-<p><strong>拡張性を考慮する</strong></p>
+<li><p><strong>拡張性を考慮する</strong></p>
 <ul>
 <li>将来の追加を見据えて十分なビット数を確保する</li>
 <li>意味のある名前と適切なコメントを付ける</li>
 </ul>
 </li>
 </ol>
-<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+<h2>まとめ</h2>
 <p><code>[Flags]</code>属性は、以下のような場面で特に効果を発揮します：</p>
 <ul>
 <li>複数の状態を同時に管理する必要がある場合</li>
@@ -379,13 +290,15 @@ Permissions loadedPerms = (Permissions)storedValue;
 <li>パフォーマンスを重視する処理での状態管理</li>
 </ul>
 <p>適切に使用することで、コードの可読性向上、メモリ使用量の削減、処理の最適化が実現できます。</p>
-<h2 id="%E5%8F%82%E8%80%83">参考</h2>
-<p>https://learn.microsoft.com/ja-jp/dotnet/api/system.flagsattribute?view=net-9.0</p>
+<h2>参考</h2>
+<p><a href="https://learn.microsoft.com/ja-jp/dotnet/api/system.flagsattribute?view=net-9.0">https://learn.microsoft.com/ja-jp/dotnet/api/system.flagsattribute?view=net-9.0</a></p>
 <hr>
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
-<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
+ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+<p><a href="https://onewedge.co.jp/">https://onewedge.co.jp/</a></p>
 
-<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
-
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>

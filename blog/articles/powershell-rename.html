@@ -1,118 +1,34 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>powershell-rename.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PowerShellでファイルを一括リネームする</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<p>Windowsで大量のファイルをリネームするなら、手作業よりもPowerShellを使ったほうがずっとスマート！ 簡単なスクリプトで一括リネームができるので、初心者でもすぐに始められます。 本記事では、基本的なサンプルから応用テクニックまでをわかりやすく紹介します。</p>
-<h2 id="powershell%E3%81%AE%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C">PowerShellの基本操作</h2>
-<h3 id="%E5%BF%85%E8%A6%81%E3%81%AA%E6%BA%96%E5%82%99">必要な準備</h3>
+  <article class="markdown-body">
+    <p>Windowsで大量のファイルをリネームするなら、手作業よりもPowerShellを使ったほうがずっとスマート！ 簡単なスクリプトで一括リネームができるので、初心者でもすぐに始められます。 本記事では、基本的なサンプルから応用テクニックまでをわかりやすく紹介します。</p>
+<h2>PowerShellの基本操作</h2>
+<h3>必要な準備</h3>
 <ol>
-<li>
-<p><strong>PowerShellの起動</strong><br>
-スタートメニューで「PowerShell」と検索し、起動します。</p>
+<li><p><strong>PowerShellの起動</strong><br>スタートメニューで「PowerShell」と検索し、起動します。</p>
 </li>
-<li>
-<p><strong>スクリプト実行ポリシーの設定（必要に応じて）</strong><br>
-スクリプトを実行する前に、以下のコマンドで一時的にポリシーを変更します（管理者権限が必要です）。
+<li><p><strong>スクリプト実行ポリシーの設定（必要に応じて）</strong><br>スクリプトを実行する前に、以下のコマンドで一時的にポリシーを変更します（管理者権限が必要です）。
 システム設定の変更につきご使用の際は注意してください。</p>
 </li>
 </ol>
-<pre class="hljs"><code><div>   <span class="hljs-built_in">Set-ExecutionPolicy</span> <span class="hljs-literal">-Scope</span> <span class="hljs-keyword">Process</span> <span class="hljs-literal">-ExecutionPolicy</span> Bypass
-</div></code></pre>
-<h2 id="%E5%9F%BA%E6%9C%AC%E4%BE%8B-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%90%8D%E3%81%AE%E3%83%97%E3%83%AC%E3%83%95%E3%82%A3%E3%83%83%E3%82%AF%E3%82%B9%E3%82%92%E5%A4%89%E6%9B%B4">基本例: ファイル名のプレフィックスを変更</h2>
+<pre><code class="language-powershell">   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+</code></pre>
+<h2>基本例: ファイル名のプレフィックスを変更</h2>
 <p>以下のスクリプトは、特定のファイルに新しいプレフィックスを追加する例です。
 サンプルとして以下のようなフォルダとリネーム対象を用意しました。ひとつずつ手で修正していくと時間がかかる上にミスを誘発しやすいため、スクリプトでざっと修正してしまいたいです。</p>
 <p><code>01-**.jpg</code>の連番ファイルをすべて<code>01-01-01-**.jpg</code>に変更します。</p>
 <p><img src="https://storage.googleapis.com/zenn-user-upload/f0eb12e038cf-20250109.png" alt=""></p>
-<pre class="hljs"><code><div># 新しいプレフィックス
+<pre><code class="language-powershell:PowerShell_Sample.ps1"># 新しいプレフィックス
 $prefix = &quot;01-01-01-&quot;
 
 # 対象フォルダ
@@ -126,21 +42,22 @@ Get-ChildItem -Filter &quot;01-*.jpg&quot; | ForEach-Object {
     $newName = $prefix + $_.Name.Substring(3)
     Rename-Item $_.FullName $newName
 }
-</div></code></pre>
+</code></pre>
 <ul>
-<li><strong>変更例</strong>:<br>
-<code>00-01.jpg</code> → <code>01-01-01-01.jpg</code></li>
+<li><strong>変更例</strong>:<br><code>00-01.jpg</code> → <code>01-01-01-01.jpg</code></li>
 </ul>
 <p><img src="https://storage.googleapis.com/zenn-user-upload/20a1fd901fb9-20250109.png" alt=""></p>
+
 <div class="message">
-<p>実行にはpowershellのウインドウから直接ファイルを指定、もしくはps1ファイル右クリックから実行できます。</p>
-</div>
-<h2 id="%E5%BF%9C%E7%94%A8%E7%B7%A8">応用編</h2>
-<h3 id="%E5%BF%9C%E7%94%A8%E4%BE%8B1-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%90%8D%E3%81%AB%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%B9%E3%82%BF%E3%83%B3%E3%83%97%E3%82%92%E8%BF%BD%E5%8A%A0">応用例1: ファイル名にタイムスタンプを追加</h3>
+  <div class="message-title">メッセージ</div>
+  <p>実行にはpowershellのウインドウから直接ファイルを指定、もしくはps1ファイル右クリックから実行できます。</p>
+
+</div><h2>応用編</h2>
+<h3>応用例1: ファイル名にタイムスタンプを追加</h3>
 <p>タイムスタンプを付与することで、ファイルの管理が容易になります。
 下記コードでは既にタイムスタンプの形式をチェックし、付与されているファイルは無視して実行します。
 タイムスタンプの存在チェックにはフォーマット指定を行っているため、実行には注意してください。</p>
-<pre class="hljs"><code><div>$timestamp = Get-Date -Format &quot;yyyyMMdd-HHmmss&quot;
+<pre><code class="language-powershell:Add_Timestamp.ps1">$timestamp = Get-Date -Format &quot;yyyyMMdd-HHmmss&quot;
 $folderPath = &quot;C:\Users\YourFolder&quot;
 
 Set-Location -Path $folderPath
@@ -149,48 +66,45 @@ Get-ChildItem | ForEach-Object {
     $fileNameWithoutExtension = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
     $extension = $_.Extension
 
-    if ($fileNameWithoutExtension -notmatch '^\d{8}-\d{6}_') {
+    if ($fileNameWithoutExtension -notmatch &#39;^\d{8}-\d{6}_&#39;) {
         $newName = &quot;{0}_{1}{2}&quot; -f $timestamp, $fileNameWithoutExtension, $extension
         Rename-Item -Path $_.FullName -NewName $newName
     }
 }
-</div></code></pre>
+</code></pre>
 <ul>
-<li><strong>変更例</strong>:<br>
-<code>image.jpg</code> → <code>20241227-153000_image.jpg</code></li>
+<li><strong>変更例</strong>:<br><code>image.jpg</code> → <code>20241227-153000_image.jpg</code></li>
 </ul>
 <hr>
-<h3 id="%E5%BF%9C%E7%94%A8%E4%BE%8B2-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E6%8B%A1%E5%BC%B5%E5%AD%90%E3%82%92%E4%B8%80%E6%8B%AC%E5%A4%89%E6%9B%B4">応用例2: ファイル拡張子を一括変更</h3>
+<h3>応用例2: ファイル拡張子を一括変更</h3>
 <p>すべてのファイルの拡張子を <code>.jpg</code>から<code>.png</code> に変更する方法です。</p>
-<pre class="hljs"><code><div>$folderPath = &quot;C:\Users\YourFolder&quot;
+<pre><code class="language-powershell:Change_Extention.ps1">$folderPath = &quot;C:\Users\YourFolder&quot;
 
 Set-Location -Path $folderPath
 Get-ChildItem -Filter &quot;*.jpg&quot; | ForEach-Object {
     $newName = [System.IO.Path]::ChangeExtension($_.Name, &quot;.png&quot;)
     Rename-Item $_.FullName $newName
 }
-</div></code></pre>
+</code></pre>
 <ul>
-<li><strong>変更例</strong>:<br>
-<code>picture.jpg</code> → <code>picture.png</code>
+<li><strong>変更例</strong>:<br><code>picture.jpg</code> → <code>picture.png</code>
 （この変更はあくまでサンプルです。互換性等注意してください。）</li>
 </ul>
-<h3 id="%E5%BF%9C%E7%94%A8%E4%BE%8B3-%E7%89%B9%E5%AE%9A%E3%81%AE%E3%82%AD%E3%83%BC%E3%83%AF%E3%83%BC%E3%83%89%E3%82%92%E5%90%AB%E3%82%80%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%A0%E3%81%91%E3%82%92%E3%83%AA%E3%83%8D%E3%83%BC%E3%83%A0">応用例3: 特定のキーワードを含むファイルだけをリネーム</h3>
+<h3>応用例3: 特定のキーワードを含むファイルだけをリネーム</h3>
 <p>条件を指定してファイル名を変更します。</p>
-<pre class="hljs"><code><div>$folderPath = &quot;C:\Users\YourFolder&quot;
+<pre><code class="language-powershell:Rename_TargetWord.ps1">$folderPath = &quot;C:\Users\YourFolder&quot;
 
 Set-Location -Path $folderPath
 Get-ChildItem -Filter &quot;*.jpg&quot; | Where-Object { $_.Name -like &quot;*target*&quot; } | ForEach-Object {
     $newName = $_.Name.Replace(&quot;target&quot;, &quot;processed&quot;)
     Rename-Item $_.FullName $newName
 }
-</div></code></pre>
+</code></pre>
 <ul>
-<li><strong>変更例</strong>:<br>
-<code>target-image.jpg</code> → <code>processed-image.jpg</code></li>
+<li><strong>変更例</strong>:<br><code>target-image.jpg</code> → <code>processed-image.jpg</code></li>
 </ul>
-<h2 id="%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89">コマンド</h2>
-<h3 id="%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%9F%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89">使用したコマンド</h3>
+<h2>コマンド</h2>
+<h3>使用したコマンド</h3>
 <table>
 <thead>
 <tr>
@@ -199,8 +113,7 @@ Get-ChildItem -Filter &quot;*.jpg&quot; | Where-Object { $_.Name -like &quot;*ta
 <th>例</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>Set-Location</td>
 <td>現在の作業ディレクトリを指定したパスに変更する</td>
 <td>Set-Location -Path &quot;C:\path\to\dir&quot;</td>
@@ -235,8 +148,7 @@ Get-ChildItem -Filter &quot;*.jpg&quot; | Where-Object { $_.Name -like &quot;*ta
 <td>指定した正規表現に一致しないかを確認する</td>
 <td>if ($value -notmatch &quot;pattern&quot;) { ... }</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <table>
 <thead>
 <tr>
@@ -245,8 +157,7 @@ Get-ChildItem -Filter &quot;*.jpg&quot; | Where-Object { $_.Name -like &quot;*ta
 <th>例</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>[System.IO.Path]::<br>GetFileNameWithoutExtension</td>
 <td>ファイル名から拡張子を除いた部分を取得する</td>
 <td>[System.IO.Path]::<br>GetFileNameWithoutExtension(&quot;file.txt&quot;)</td>
@@ -256,9 +167,8 @@ Get-ChildItem -Filter &quot;*.jpg&quot; | Where-Object { $_.Name -like &quot;*ta
 <td>ファイルの拡張子を変更する</td>
 <td>[System.IO.Path]::<br>ChangeExtension(&quot;file.txt&quot;, &quot;.jpg&quot;)</td>
 </tr>
-</tbody>
-</table>
-<h3 id="%E6%A8%99%E6%BA%96%E7%9A%84%E3%81%AA%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89">標準的なコマンド</h3>
+</tbody></table>
+<h3>標準的なコマンド</h3>
 <table>
 <thead>
 <tr>
@@ -267,8 +177,7 @@ Get-ChildItem -Filter &quot;*.jpg&quot; | Where-Object { $_.Name -like &quot;*ta
 <th>例</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>ls</td>
 <td>ディレクトリ内のファイルやフォルダを一覧表示</td>
 <td>ls -l</td>
@@ -301,7 +210,7 @@ Get-ChildItem -Filter &quot;*.jpg&quot; | Where-Object { $_.Name -like &quot;*ta
 <tr>
 <td>echo</td>
 <td>指定したテキストを出力</td>
-<td>echo 'Hello, World!'</td>
+<td>echo &#39;Hello, World!&#39;</td>
 </tr>
 <tr>
 <td>cat</td>
@@ -313,14 +222,15 @@ Get-ChildItem -Filter &quot;*.jpg&quot; | Where-Object { $_.Name -like &quot;*ta
 <td>空のファイルを作成</td>
 <td>touch newfile.txt</td>
 </tr>
-</tbody>
-</table>
-<h2 id="%E3%81%95%E3%81%84%E3%81%94%E3%81%AB">さいごに</h2>
+</tbody></table>
+<h2>さいごに</h2>
 <p>PowerShellを使うことで、煩雑なファイルリネーム作業を効率的に自動化できます。この記事で紹介した方法を参考に、ぜひ日常業務や趣味の管理に活用してみてください！ 😊</p>
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
-<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
+ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+<p><a href="https://onewedge.co.jp/">https://onewedge.co.jp/</a></p>
 
-<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
-
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>

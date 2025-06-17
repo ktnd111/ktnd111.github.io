@@ -12,7 +12,7 @@ published_at: "2025-01-09 23:57"
 LINQ（Language Integrated Query）は、C#でデータベースやコレクションを効率的に操作できる強力なツールです。このシリーズでは、LINQの基本から応用までを解説していきます。今回は、セットアップ済みのプロジェクトを使って、データベースからデータを取得する基本的なLINQ構文を紹介します。
 ## 事前準備（推奨開発環境）
 この記事では以下の開発ツールを使用します。あらかじめインストールしておくことをお勧めします。
-:::details Visual Studio
+```details Visual Studio
 C#のプロジェクト作成とコードの編集に **Visual Studio** を使用します。
 
 ### **必要なエディション**
@@ -28,9 +28,9 @@ C#のプロジェクト作成とコードの編集に **Visual Studio** を使�
 
 ### **推奨設定**
 - 必要に応じて、プロジェクト設定を日本語に設定してください。
-:::
+```
 
-:::details SQL Server Management Studio (SSMS
+```details SQL Server Management Studio (SSMS
 データベースの管理とデータの確認に **SQL Server Management Studio (SSMS)** を使用します。
 
 ### **インストール手順**
@@ -43,9 +43,9 @@ C#のプロジェクト作成とコードの編集に **Visual Studio** を使�
 2. **サーバー名**を入力します：`(localdb)\MSSQLLocalDB`
 3. 認証は「Windows 認証」を選択し、**接続**をクリック。
 4. 正常に接続できると、ローカルデータベースが表示されます。
-:::
+```
 
-:::details  Git
+```details  Git
 プロジェクトをGitHubで共有していますので、**Git** をインストールしておくと便利に使えます。
 
 #### **インストール手順**
@@ -55,7 +55,7 @@ C#のプロジェクト作成とコードの編集に **Visual Studio** を使�
 ```bash
 git --version
 ```
-:::
+```
 ## 1. プロジェクト概要
 セットアップされたC#プロジェクトを使用します。
 このプロジェクトは、Entity Framework Core（EF Core）を使用してデータベースと接続しており、以下のような簡単なデータモデルを持っています。

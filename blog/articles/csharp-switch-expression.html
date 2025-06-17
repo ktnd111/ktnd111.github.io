@@ -1,271 +1,187 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>csharp-switch-expression.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C# switch式の実践例</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<p>この記事では<code>if</code>や<code>switch</code>による複雑になりがちな条件文をスッキリさせ、処理を書きやすく・読みやすいコードにするための要素<strong>switch式</strong>を紹介します。</p>
+  <article class="markdown-body">
+    <p>この記事では<code>if</code>や<code>switch</code>による複雑になりがちな条件文をスッキリさせ、処理を書きやすく・読みやすいコードにするための要素<strong>switch式</strong>を紹介します。</p>
 <p>switch式は、冗長になりがちなif文や従来のswitch文を置き換え、コードを簡潔かつ明快に記述するための手段です。また、パターンマッチングと組み合わせることで、条件分岐を柔軟に表現でき、読みやすさやメンテナンス性が向上します。</p>
 <p>C# 8.0で導入されたswitch式（switch expression）は、従来のswitch文をより簡潔かつ表現力豊かにした新しい構文です。本記事では、Switch式の基本的な使い方から実践的な応用までを解説します。</p>
-<h2 id="%E5%BE%93%E6%9D%A5%E3%81%AEswitch%E6%96%87%E3%81%AE%E8%AA%B2%E9%A1%8C">従来のswitch文の課題</h2>
+<h2>従来のswitch文の課題</h2>
 <p>従来のswitch文では、以下のようなコードを書く必要がありました。</p>
-<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">string</span> <span class="hljs-title">GetDayType</span>(<span class="hljs-params">DayOfWeek day</span>)</span>
+<pre><code class="language-csharp">string GetDayType(DayOfWeek day)
 {
-    <span class="hljs-keyword">switch</span> (day)
+    switch (day)
     {
-        <span class="hljs-keyword">case</span> DayOfWeek.Saturday:
-        <span class="hljs-keyword">case</span> DayOfWeek.Sunday:
-            <span class="hljs-keyword">return</span> <span class="hljs-string">"Weekend"</span>;
-        <span class="hljs-keyword">default</span>:
-            <span class="hljs-keyword">return</span> <span class="hljs-string">"Weekday"</span>;
+        case DayOfWeek.Saturday:
+        case DayOfWeek.Sunday:
+            return &quot;Weekend&quot;;
+        default:
+            return &quot;Weekday&quot;;
     }
 }
-</div></code></pre>
+</code></pre>
 <p>このぐらいの量なら読みやすいですが、caseが多いパターン場合は繰り返しが多く、冗長になりがちです。</p>
-<h2 id="switch%E5%BC%8F%E3%81%AE%E5%9F%BA%E6%9C%AC%E6%A7%8B%E6%96%87">switch式の基本構文</h2>
+<h2>switch式の基本構文</h2>
 <p>switch式を使うと、同じ処理をもっと簡潔に記述できます。</p>
-<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">string</span> <span class="hljs-title">GetDayType</span>(<span class="hljs-params">DayOfWeek day</span>)</span> =&gt;
-    day <span class="hljs-keyword">switch</span>
+<pre><code class="language-csharp">string GetDayType(DayOfWeek day) =&gt;
+    day switch
     {
-        DayOfWeek.Saturday or DayOfWeek.Sunday =&gt; <span class="hljs-string">"Weekend"</span>,
-        _ =&gt; <span class="hljs-string">"Weekday"</span>
+        DayOfWeek.Saturday or DayOfWeek.Sunday =&gt; &quot;Weekend&quot;,
+        _ =&gt; &quot;Weekday&quot;
     };
-</div></code></pre>
-<pre class="hljs"><code><div>Console.WriteLine(GetDayType(DayOfWeek.Saturday)); <span class="hljs-comment">// 出力: Weekend</span>
-Console.WriteLine(GetDayType(DayOfWeek.Monday));   <span class="hljs-comment">// 出力: Weekday</span>
-</div></code></pre>
-<h3 id="%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88">ポイント</h3>
+</code></pre>
+<pre><code class="language-csharp">Console.WriteLine(GetDayType(DayOfWeek.Saturday)); // 出力: Weekend
+Console.WriteLine(GetDayType(DayOfWeek.Monday));   // 出力: Weekday
+</code></pre>
+<h3>ポイント</h3>
 <p>switchキーワードの後に式を書きます。</p>
 <p><strong>=&gt;（ラムダ演算子）の右側に戻り値を指定します。
 デフォルトケースは_で記述します。</strong></p>
-<h2 id="%E5%AE%9F%E8%B7%B5%E4%BE%8B">実践例</h2>
-<h3 id="%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0%E3%81%A8%E3%81%AE%E7%B5%84%E3%81%BF%E5%90%88%E3%82%8F%E3%81%9B">パターンマッチングとの組み合わせ</h3>
+<h2>実践例</h2>
+<h3>パターンマッチングとの組み合わせ</h3>
 <p>Switch式は、パターンマッチングと組み合わせて使用可能です。たとえば、以下のコードはオブジェクトの型に応じた処理を行います。</p>
-<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">string</span> <span class="hljs-title">DescribeObject</span>(<span class="hljs-params"><span class="hljs-keyword">object</span> obj</span>)</span> =&gt;
-    obj <span class="hljs-keyword">switch</span>
+<pre><code class="language-csharp">string DescribeObject(object obj) =&gt;
+    obj switch
     {
-        <span class="hljs-keyword">int</span> i =&gt; <span class="hljs-string">$"整数: <span class="hljs-subst">{i}</span>"</span>,
-        <span class="hljs-keyword">string</span> s =&gt; <span class="hljs-string">$"文字列: <span class="hljs-subst">{s}</span>"</span>,
-        <span class="hljs-literal">null</span> =&gt; <span class="hljs-string">"値はnull"</span>,
-        _ =&gt; <span class="hljs-string">"その他"</span>
+        int i =&gt; $&quot;整数: {i}&quot;,
+        string s =&gt; $&quot;文字列: {s}&quot;,
+        null =&gt; &quot;値はnull&quot;,
+        _ =&gt; &quot;その他&quot;
     };
-</div></code></pre>
-<pre class="hljs"><code><div>Console.WriteLine(DescribeObject(<span class="hljs-number">42</span>));         <span class="hljs-comment">// 出力: 整数: 42</span>
-Console.WriteLine(DescribeObject(<span class="hljs-string">"hello"</span>));  <span class="hljs-comment">// 出力: 文字列: hello</span>
-Console.WriteLine(DescribeObject(<span class="hljs-literal">null</span>));      <span class="hljs-comment">// 出力: 値はnull</span>
-Console.WriteLine(DescribeObject(<span class="hljs-number">3.14</span>));      <span class="hljs-comment">// 出力: その他</span>
-</div></code></pre>
-<h3 id="%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0%E3%81%AE%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB">パターンマッチングのサンプル</h3>
+</code></pre>
+<pre><code class="language-csharp">Console.WriteLine(DescribeObject(42));         // 出力: 整数: 42
+Console.WriteLine(DescribeObject(&quot;hello&quot;));  // 出力: 文字列: hello
+Console.WriteLine(DescribeObject(null));      // 出力: 値はnull
+Console.WriteLine(DescribeObject(3.14));      // 出力: その他
+</code></pre>
+<h3>パターンマッチングのサンプル</h3>
 <ol>
-<li>
-<p>数値範囲によるパターンマッチング</p>
+<li><p>数値範囲によるパターンマッチング</p>
 <ul>
 <li>点数から成績への変換</li>
 <li>90点以上はA、80点以上はB、というように直感的な範囲判定</li>
 <li>基本的なタプルパターン</li>
 </ul>
 </li>
-<li>
-<p>気温と季節の組み合わせによる状態判定</p>
+<li><p>気温と季節の組み合わせによる状態判定</p>
 <ul>
 <li>シンプルな2要素の組み合わせ</li>
 <li>型によるパターンマッチング</li>
 </ul>
 </li>
-<li>
-<p>図形の種類による面積計算</p>
+<li><p>図形の種類による面積計算</p>
 <ul>
 <li>継承関係を活用した基本的な型パターン</li>
 </ul>
 </li>
 </ol>
 <p>上記は以下のように実装できます。</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">using</span> System;
+<pre><code class="language-csharp">using System;
 
-<span class="hljs-keyword">class</span> <span class="hljs-title">Program</span>
+class Program
 {
-    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"></span>)</span>
+    static void Main()
     {
-        <span class="hljs-comment">// 基本的な数値範囲の例</span>
-        Console.WriteLine(<span class="hljs-string">"=== Score Grade Example ==="</span>);
-        <span class="hljs-keyword">int</span>[] scores = { <span class="hljs-number">95</span>, <span class="hljs-number">85</span>, <span class="hljs-number">75</span>, <span class="hljs-number">65</span>, <span class="hljs-number">55</span> };
-        <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> score <span class="hljs-keyword">in</span> scores)
+        // 基本的な数値範囲の例
+        Console.WriteLine(&quot;=== Score Grade Example ===&quot;);
+        int[] scores = { 95, 85, 75, 65, 55 };
+        foreach (var score in scores)
         {
-            <span class="hljs-keyword">var</span> grade = GetGrade(score);
-            Console.WriteLine(<span class="hljs-string">$"Score <span class="hljs-subst">{score}</span> =&gt; Grade <span class="hljs-subst">{grade}</span>"</span>);
+            var grade = GetGrade(score);
+            Console.WriteLine($&quot;Score {score} =&gt; Grade {grade}&quot;);
         }
 
-        <span class="hljs-comment">// シンプルなタプルパターンの例</span>
-        Console.WriteLine(<span class="hljs-string">"\n=== Temperature Check Example ==="</span>);
-        CheckTemperature(<span class="hljs-number">35</span>, <span class="hljs-string">"Summer"</span>);
-        CheckTemperature(<span class="hljs-number">35</span>, <span class="hljs-string">"Winter"</span>);
-        CheckTemperature(<span class="hljs-number">15</span>, <span class="hljs-string">"Winter"</span>);
-        CheckTemperature(<span class="hljs-number">15</span>, <span class="hljs-string">"Summer"</span>);
+        // シンプルなタプルパターンの例
+        Console.WriteLine(&quot;\n=== Temperature Check Example ===&quot;);
+        CheckTemperature(35, &quot;Summer&quot;);
+        CheckTemperature(35, &quot;Winter&quot;);
+        CheckTemperature(15, &quot;Winter&quot;);
+        CheckTemperature(15, &quot;Summer&quot;);
 
-        <span class="hljs-comment">// 基本的な型パターンの例</span>
-        Console.WriteLine(<span class="hljs-string">"\n=== Shape Area Example ==="</span>);
-        Shape[] shapes = { <span class="hljs-keyword">new</span> Circle(<span class="hljs-number">5</span>), <span class="hljs-keyword">new</span> Rectangle(<span class="hljs-number">4</span>, <span class="hljs-number">6</span>), <span class="hljs-keyword">new</span> Square(<span class="hljs-number">4</span>) };
-        <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> shape <span class="hljs-keyword">in</span> shapes)
+        // 基本的な型パターンの例
+        Console.WriteLine(&quot;\n=== Shape Area Example ===&quot;);
+        Shape[] shapes = { new Circle(5), new Rectangle(4, 6), new Square(4) };
+        foreach (var shape in shapes)
         {
-            <span class="hljs-keyword">var</span> area = CalculateArea(shape);
-            Console.WriteLine(<span class="hljs-string">$"<span class="hljs-subst">{shape.GetType().Name}</span> Area: <span class="hljs-subst">{area}</span>"</span>);
+            var area = CalculateArea(shape);
+            Console.WriteLine($&quot;{shape.GetType().Name} Area: {area}&quot;);
         }
     }
 
-    <span class="hljs-comment">// シンプルな数値範囲パターン（成績判定）</span>
-    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">string</span> <span class="hljs-title">GetGrade</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> score</span>)</span> =&gt; score <span class="hljs-keyword">switch</span>
+    // シンプルな数値範囲パターン（成績判定）
+    static string GetGrade(int score) =&gt; score switch
     {
-        &gt;= <span class="hljs-number">90</span> =&gt; <span class="hljs-string">"A"</span>,
-        &gt;= <span class="hljs-number">80</span> =&gt; <span class="hljs-string">"B"</span>,
-        &gt;= <span class="hljs-number">70</span> =&gt; <span class="hljs-string">"C"</span>,
-        &gt;= <span class="hljs-number">60</span> =&gt; <span class="hljs-string">"D"</span>,
-        _ =&gt; <span class="hljs-string">"F"</span>
+        &gt;= 90 =&gt; &quot;A&quot;,
+        &gt;= 80 =&gt; &quot;B&quot;,
+        &gt;= 70 =&gt; &quot;C&quot;,
+        &gt;= 60 =&gt; &quot;D&quot;,
+        _ =&gt; &quot;F&quot;
     };
 
-    <span class="hljs-comment">// シンプルなタプルパターン（気温判定）</span>
-    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">CheckTemperature</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> temp, <span class="hljs-keyword">string</span> season</span>)</span>
+    // シンプルなタプルパターン（気温判定）
+    static void CheckTemperature(int temp, string season)
     {
-        <span class="hljs-keyword">var</span> status = (temp, season) <span class="hljs-keyword">switch</span>
+        var status = (temp, season) switch
         {
-            ( &gt;= <span class="hljs-number">30</span>, <span class="hljs-string">"Summer"</span>) =&gt; <span class="hljs-string">"通常の暑い日"</span>,
-            ( &gt;= <span class="hljs-number">30</span>, <span class="hljs-string">"Winter"</span>) =&gt; <span class="hljs-string">"異常な暖かさ"</span>,
-            ( &lt;= <span class="hljs-number">20</span>, <span class="hljs-string">"Winter"</span>) =&gt; <span class="hljs-string">"通常の寒い日"</span>,
-            ( &lt;= <span class="hljs-number">20</span>, <span class="hljs-string">"Summer"</span>) =&gt; <span class="hljs-string">"異常な寒さ"</span>,
-            _ =&gt; <span class="hljs-string">"普通の気温"</span>
+            ( &gt;= 30, &quot;Summer&quot;) =&gt; &quot;通常の暑い日&quot;,
+            ( &gt;= 30, &quot;Winter&quot;) =&gt; &quot;異常な暖かさ&quot;,
+            ( &lt;= 20, &quot;Winter&quot;) =&gt; &quot;通常の寒い日&quot;,
+            ( &lt;= 20, &quot;Summer&quot;) =&gt; &quot;異常な寒さ&quot;,
+            _ =&gt; &quot;普通の気温&quot;
         };
-        Console.WriteLine(<span class="hljs-string">$"Temperature: <span class="hljs-subst">{temp}</span>°C, Season: <span class="hljs-subst">{season}</span> =&gt; <span class="hljs-subst">{status}</span>"</span>);
+        Console.WriteLine($&quot;Temperature: {temp}°C, Season: {season} =&gt; {status}&quot;);
     }
 
-    <span class="hljs-comment">// 基本的な型パターン（面積計算）</span>
-    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span> <span class="hljs-title">CalculateArea</span>(<span class="hljs-params">Shape shape</span>)</span> =&gt; shape <span class="hljs-keyword">switch</span>
+    // 基本的な型パターン（面積計算）
+    static double CalculateArea(Shape shape) =&gt; shape switch
     {
         Circle c =&gt; Math.PI * c.Radius * c.Radius,
         Rectangle r =&gt; r.Width * r.Height,
         Square s =&gt; s.Side * s.Side,
-        _ =&gt; <span class="hljs-number">0</span>
+        _ =&gt; 0
     };
 }
 
-<span class="hljs-comment">// 図形の基底クラス</span>
-<span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Shape</span> { }
+// 図形の基底クラス
+abstract class Shape { }
 
-<span class="hljs-comment">// 円クラス</span>
-<span class="hljs-keyword">class</span> <span class="hljs-title">Circle</span> : <span class="hljs-title">Shape</span>
+// 円クラス
+class Circle : Shape
 {
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">double</span> Radius { <span class="hljs-keyword">get</span>; }
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Circle</span>(<span class="hljs-params"><span class="hljs-keyword">double</span> radius</span>)</span> =&gt; Radius = radius;
+    public double Radius { get; }
+    public Circle(double radius) =&gt; Radius = radius;
 }
 
-<span class="hljs-comment">// 長方形クラス</span>
-<span class="hljs-keyword">class</span> <span class="hljs-title">Rectangle</span> : <span class="hljs-title">Shape</span>
+// 長方形クラス
+class Rectangle : Shape
 {
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">double</span> Width { <span class="hljs-keyword">get</span>; }
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">double</span> Height { <span class="hljs-keyword">get</span>; }
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Rectangle</span>(<span class="hljs-params"><span class="hljs-keyword">double</span> width, <span class="hljs-keyword">double</span> height</span>)</span>
+    public double Width { get; }
+    public double Height { get; }
+    public Rectangle(double width, double height)
     {
         Width = width;
         Height = height;
     }
 }
 
-<span class="hljs-comment">// 正方形クラス</span>
-<span class="hljs-keyword">class</span> <span class="hljs-title">Square</span> : <span class="hljs-title">Shape</span>
+// 正方形クラス
+class Square : Shape
 {
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">double</span> Side { <span class="hljs-keyword">get</span>; }
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Square</span>(<span class="hljs-params"><span class="hljs-keyword">double</span> side</span>)</span> =&gt; Side = side;
+    public double Side { get; }
+    public Square(double side) =&gt; Side = side;
 }
-
-</div></code></pre>
+</code></pre>
 <p><code>CheckGrade</code>,<code>CheckTemperature</code>,<code>CalculateArea</code>それぞれのメソッド内でswitch式を使用しています。
 従来のswitchやif分でもボリュームはそれほど大きくなりませんが、追加や仕様変更などでマシマシになっていくとメンテナンスが難しくなっていきます。読みやすさ、書きやすさ、修正しやすさが整うのがswitch式の良い点だと思っています。（もちろんケースバイケースです）</p>
-<h2 id="switch%E5%BC%8F%E3%82%92%E4%BD%BF%E3%81%86%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88">switch式を使うメリット</h2>
+<h2>switch式を使うメリット</h2>
 <p>switch式を使うことで得られる主なメリットは次の通りです。</p>
 <ul>
 <li>コードの簡潔化: 冗長な記述を削減できます。</li>
@@ -273,44 +189,47 @@ Console.WriteLine(DescribeObject(<span class="hljs-number">3.14</span>));      <
 <li>読みやすさ: 条件ごとの処理がひと目でわかりやすくなります。</li>
 <li>修正しすさ： コード量を抑えられるため修正しやすくなります。</li>
 </ul>
-<h2 id="switch%E5%BC%8F%EF%BC%8B%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0enum%E3%81%AE%E6%B4%BB%E7%94%A8">switch式＋カスタムEnumの活用</h2>
+<h2>switch式＋カスタムEnumの活用</h2>
 <p>以下はカスタムenumとswitch式を組み合わせた例です。</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">enum</span> TrafficLight
+<pre><code class="language-csharp">enum TrafficLight
 {
     Red,
     Yellow,
     Green
 }
 
-<span class="hljs-function"><span class="hljs-keyword">string</span> <span class="hljs-title">GetAction</span>(<span class="hljs-params">TrafficLight light</span>)</span> =&gt;
-    light <span class="hljs-keyword">switch</span>
+string GetAction(TrafficLight light) =&gt;
+    light switch
     {
-        TrafficLight.Red =&gt; <span class="hljs-string">"Stop"</span>,
-        TrafficLight.Yellow =&gt; <span class="hljs-string">"Caution"</span>,
-        TrafficLight.Green =&gt; <span class="hljs-string">"Go"</span>,
-        _ =&gt; <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentOutOfRangeException(<span class="hljs-keyword">nameof</span>(light), light, <span class="hljs-literal">null</span>)
+        TrafficLight.Red =&gt; &quot;Stop&quot;,
+        TrafficLight.Yellow =&gt; &quot;Caution&quot;,
+        TrafficLight.Green =&gt; &quot;Go&quot;,
+        _ =&gt; throw new ArgumentOutOfRangeException(nameof(light), light, null)
     };
-</div></code></pre>
-<pre class="hljs"><code><div>Console.WriteLine(GetAction(TrafficLight.Red));    <span class="hljs-comment">// 出力: Stop</span>
-Console.WriteLine(GetAction(TrafficLight.Yellow)); <span class="hljs-comment">// 出力: Caution</span>
-Console.WriteLine(GetAction(TrafficLight.Green));  <span class="hljs-comment">// 出力: Go</span>
-</div></code></pre>
-<h3 id="%E6%B3%A8%E6%84%8F%E7%82%B9">注意点</h3>
+</code></pre>
+<pre><code class="language-csharp">Console.WriteLine(GetAction(TrafficLight.Red));    // 出力: Stop
+Console.WriteLine(GetAction(TrafficLight.Yellow)); // 出力: Caution
+Console.WriteLine(GetAction(TrafficLight.Green));  // 出力: Go
+</code></pre>
+<h3>注意点</h3>
+
 <div class="message">
-<p>網羅性の確認: switch式では、全てのケースを網羅するか、_でデフォルトケースを記述する必要があります。</p>
-</div>
-<div class="message alert">
-<p>例外処理: 想定外の値を扱う場合は、明示的に例外をスローするコードを書きましょう。</p>
-</div>
-<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+  <div class="message-title">メッセージ</div>
+  <p>網羅性の確認: switch式では、全てのケースを網羅するか、_でデフォルトケースを記述する必要があります。</p>
+
+</div><pre><code class="language-message">例外処理: 想定外の値を扱う場合は、明示的に例外をスローするコードを書きましょう。
+</code></pre>
+<h2>まとめ</h2>
 <p>C# 8.0のswitch式は、従来のswitch文をより簡潔に記述できる非常に便利な機能です。特に、パターンマッチングと組み合わせることで、複雑な条件分岐をシンプルに表現できます。今後のプロジェクトでぜひ活用してみてください！</p>
-<h2 id="%E3%83%AA%E3%83%95%E3%82%A1%E3%83%AC%E3%83%B3%E3%82%B9">リファレンス</h2>
-<p>https://learn.microsoft.com/ja-jp/dotnet/csharp/language-reference/proposals/csharp-8.0/patterns#switch-expression</p>
+<h2>リファレンス</h2>
+<p><a href="https://learn.microsoft.com/ja-jp/dotnet/csharp/language-reference/proposals/csharp-8.0/patterns#switch-expression">https://learn.microsoft.com/ja-jp/dotnet/csharp/language-reference/proposals/csharp-8.0/patterns#switch-expression</a></p>
 <hr>
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
-<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
+ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+<p><a href="https://onewedge.co.jp/">https://onewedge.co.jp/</a></p>
 
-<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
-
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>

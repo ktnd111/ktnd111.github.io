@@ -1,201 +1,120 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>csharp-aws-lambda-mocktesttool.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C# AWS ALB⇔Lambda Mock Test Tool ローカル環境下でデバッグする</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<p>AWSでサーバーレスアプリケーションを構築する際、Application Load Balancer（ALB）を使用してLambda関数にリクエストを送ることができます。
+  <article class="markdown-body">
+    <p>AWSでサーバーレスアプリケーションを構築する際、Application Load Balancer（ALB）を使用してLambda関数にリクエストを送ることができます。
 FT
 応答経路はだいたいの場合Api Gatewayを選択することがほとんどですが、ALBとの連携も可能です。この記事ではALBとLambdaの応答をMock Test Toolでローカル環境下にてデバッグする方法を解説します。</p>
-<h2 id="%E5%AE%9F%E8%A1%8C%E7%92%B0%E5%A2%83">実行環境</h2>
+<h2>実行環境</h2>
 <ul>
 <li>VisualStudio 2022</li>
 <li>拡張機能：AWS Toolkit with Amazon Q</li>
 </ul>
-<h3 id="%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BDaws-toolkit-with-amazon-q">拡張機能：AWS Toolkit with Amazon Q</h3>
+<h3>拡張機能：AWS Toolkit with Amazon Q</h3>
 <p><img src="https://storage.googleapis.com/zenn-user-upload/46d924a5d046-20250127.png" alt="">
 インストールするだけでOKです。</p>
-<h3 id="%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%96%B0%E8%A6%8F%E4%BD%9C%E6%88%90">プロジェクト新規作成</h3>
+<h3>プロジェクト新規作成</h3>
 <p>AmazonQをインストールした後、新規プロジェクトを作成します。
 <img src="https://storage.googleapis.com/zenn-user-upload/9adf59f74f5d-20250127.png" alt=""></p>
 <p>新規プロジェクト名入力後のブループリント選択では「ALB」でフィルタリングするとすぐ見つけられます。
 <img src="https://storage.googleapis.com/zenn-user-upload/98e6579bd5ec-20250127.png" alt=""></p>
-<h2 id="%E5%AE%9F%E8%A3%85%E3%82%B3%E3%83%BC%E3%83%89">実装コード</h2>
+<h2>実装コード</h2>
 <p>下記リポジトリを使用します。
-https://github.com/ktnd111/AWSLambda1</p>
-<h3 id="lambda%E9%96%A2%E6%95%B0%E3%81%AE%E5%AE%9F%E8%A3%85%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB">Lambda関数の実装サンプル</h3>
+<a href="https://github.com/ktnd111/AWSLambda1">https://github.com/ktnd111/AWSLambda1</a></p>
+<h3>Lambda関数の実装サンプル</h3>
 <p>リクエストを処理するLambda関数を実装します：</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">using</span> Amazon.Lambda.Core;
-<span class="hljs-keyword">using</span> Amazon.Lambda.ApplicationLoadBalancerEvents;
+<pre><code class="language-csharp">using Amazon.Lambda.Core;
+using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
-<span class="hljs-comment">// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.</span>
-[<span class="hljs-meta">assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))</span>]
+// Assembly attribute to enable the Lambda function&#39;s JSON input to be converted into a .NET class.
+[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
-<span class="hljs-keyword">namespace</span> <span class="hljs-title">AWSLambda1</span>;
+namespace AWSLambda1;
 
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Function</span>
+public class Function
 {
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> Application Load Balancerからのリクエストを処理するLambda関数</span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name="request"&gt;</span>ALBからのリクエスト情報<span class="hljs-doctag">&lt;/param&gt;</span></span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name="context"&gt;</span>Lambda実行コンテキスト<span class="hljs-doctag">&lt;/param&gt;</span></span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>ALBに返すレスポンス<span class="hljs-doctag">&lt;/returns&gt;</span></span>
-    <span class="hljs-function"><span class="hljs-keyword">public</span> ApplicationLoadBalancerResponse <span class="hljs-title">FunctionHandler</span>(<span class="hljs-params">ApplicationLoadBalancerRequest request, ILambdaContext context</span>)</span>
+    /// &lt;summary&gt;
+    /// Application Load Balancerからのリクエストを処理するLambda関数
+    /// &lt;/summary&gt;
+    /// &lt;param name=&quot;request&quot;&gt;ALBからのリクエスト情報&lt;/param&gt;
+    /// &lt;param name=&quot;context&quot;&gt;Lambda実行コンテキスト&lt;/param&gt;
+    /// &lt;returns&gt;ALBに返すレスポンス&lt;/returns&gt;
+    public ApplicationLoadBalancerResponse FunctionHandler(ApplicationLoadBalancerRequest request, ILambdaContext context)
     {
-        <span class="hljs-comment">// Lambdaのログストリームに情報を出力</span>
-        context.Logger.LogInformation(<span class="hljs-string">$"Processing request: <span class="hljs-subst">{request.Body}</span>"</span>);
+        // Lambdaのログストリームに情報を出力
+        context.Logger.LogInformation($&quot;Processing request: {request.Body}&quot;);
 
-        <span class="hljs-keyword">try</span>
+        try
         {
-            <span class="hljs-comment">// リクエストのパスとメソッドに基づいて処理を分岐</span>
-            <span class="hljs-keyword">var</span> response = request.HttpMethod.ToUpper() <span class="hljs-keyword">switch</span>
+            // リクエストのパスとメソッドに基づいて処理を分岐
+            var response = request.HttpMethod.ToUpper() switch
             {
-                <span class="hljs-string">"GET"</span> =&gt; HandleGetRequest(request),
-                <span class="hljs-string">"POST"</span> =&gt; HandlePostRequest(request),
-                _ =&gt; CreateResponse(<span class="hljs-number">405</span>, <span class="hljs-string">"Method not allowed"</span>)
+                &quot;GET&quot; =&gt; HandleGetRequest(request),
+                &quot;POST&quot; =&gt; HandlePostRequest(request),
+                _ =&gt; CreateResponse(405, &quot;Method not allowed&quot;)
             };
 
-            <span class="hljs-keyword">return</span> response;
+            return response;
         }
-        <span class="hljs-keyword">catch</span> (Exception ex)
+        catch (Exception ex)
         {
-            <span class="hljs-comment">// エラーが発生した場合は500エラーを返す</span>
-            context.Logger.LogError(<span class="hljs-string">$"Error processing request: <span class="hljs-subst">{ex.Message}</span>"</span>);
-            <span class="hljs-keyword">return</span> CreateResponse(<span class="hljs-number">500</span>, <span class="hljs-string">$"Internal server error: <span class="hljs-subst">{ex.Message}</span>"</span>);
+            // エラーが発生した場合は500エラーを返す
+            context.Logger.LogError($&quot;Error processing request: {ex.Message}&quot;);
+            return CreateResponse(500, $&quot;Internal server error: {ex.Message}&quot;);
         }
     }
 
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> GETリクエストの処理</span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span>
-    <span class="hljs-function"><span class="hljs-keyword">private</span> ApplicationLoadBalancerResponse <span class="hljs-title">HandleGetRequest</span>(<span class="hljs-params">ApplicationLoadBalancerRequest request</span>)</span>
+    /// &lt;summary&gt;
+    /// GETリクエストの処理
+    /// &lt;/summary&gt;
+    private ApplicationLoadBalancerResponse HandleGetRequest(ApplicationLoadBalancerRequest request)
     {
-        <span class="hljs-comment">// パスに基づいて処理を分岐</span>
-        <span class="hljs-keyword">return</span> request.Path <span class="hljs-keyword">switch</span>
+        // パスに基づいて処理を分岐
+        return request.Path switch
         {
-            <span class="hljs-string">"/"</span> =&gt; CreateResponse(<span class="hljs-number">200</span>, <span class="hljs-string">"Welcome to ALB Lambda Demo"</span>),
-            <span class="hljs-string">"/health"</span> =&gt; CreateResponse(<span class="hljs-number">200</span>, <span class="hljs-string">"Healthy"</span>),
-            _ =&gt; CreateResponse(<span class="hljs-number">404</span>, <span class="hljs-string">"Not found"</span>)
+            &quot;/&quot; =&gt; CreateResponse(200, &quot;Welcome to ALB Lambda Demo&quot;),
+            &quot;/health&quot; =&gt; CreateResponse(200, &quot;Healthy&quot;),
+            _ =&gt; CreateResponse(404, &quot;Not found&quot;)
         };
     }
 
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> POSTリクエストの処理</span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span>
-    <span class="hljs-function"><span class="hljs-keyword">private</span> ApplicationLoadBalancerResponse <span class="hljs-title">HandlePostRequest</span>(<span class="hljs-params">ApplicationLoadBalancerRequest request</span>)</span>
+    /// &lt;summary&gt;
+    /// POSTリクエストの処理
+    /// &lt;/summary&gt;
+    private ApplicationLoadBalancerResponse HandlePostRequest(ApplicationLoadBalancerRequest request)
     {
-        <span class="hljs-comment">// リクエストボディをそのまま返すエコーサービス</span>
-        <span class="hljs-keyword">return</span> CreateResponse(<span class="hljs-number">200</span>, <span class="hljs-string">$"Received POST data: <span class="hljs-subst">{request.Body}</span>"</span>);
+        // リクエストボディをそのまま返すエコーサービス
+        return CreateResponse(200, $&quot;Received POST data: {request.Body}&quot;);
     }
 
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> ALBレスポンスを生成するヘルパーメソッド</span>
-    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span>
-    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> ApplicationLoadBalancerResponse <span class="hljs-title">CreateResponse</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> statusCode, <span class="hljs-keyword">string</span> body</span>)</span>
+    /// &lt;summary&gt;
+    /// ALBレスポンスを生成するヘルパーメソッド
+    /// &lt;/summary&gt;
+    private static ApplicationLoadBalancerResponse CreateResponse(int statusCode, string body)
     {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> ApplicationLoadBalancerResponse
+        return new ApplicationLoadBalancerResponse
         {
             StatusCode = statusCode,
-            Headers = <span class="hljs-keyword">new</span> Dictionary&lt;<span class="hljs-keyword">string</span>, <span class="hljs-keyword">string</span>&gt;
+            Headers = new Dictionary&lt;string, string&gt;
             {
-                { <span class="hljs-string">"Content-Type"</span>, <span class="hljs-string">"application/json"</span> }
+                { &quot;Content-Type&quot;, &quot;application/json&quot; }
             },
             Body = body,
-            IsBase64Encoded = <span class="hljs-literal">false</span>
+            IsBase64Encoded = false
         };
     }
 }
-
-</div></code></pre>
-<h3 id="%E3%81%96%E3%81%A3%E3%81%8F%E3%82%8A%E3%82%B3%E3%83%BC%E3%83%89%E8%AA%AC%E6%98%8E">ざっくりコード説明</h3>
+</code></pre>
+<h3>ざっくりコード説明</h3>
 <p>上から順にざっくりと説明します。</p>
 <ol>
 <li>リクエストのボディをインフォメーションレベルでロギングします。</li>
@@ -205,16 +124,16 @@ https://github.com/ktnd111/AWSLambda1</p>
 <li>レスポンスを作成するメソッド。返りの型は<code>ApplicationLoadBalancerResponse</code>で、最低限の要素を返しています。</li>
 </ol>
 <p><code>FunctionHandler</code>の引数にはALBからのリクエストが格納されています。<code>QueryStringParameters</code>や<code>Path</code>などrequest内にはALBが取り扱う情報があります。一方で<code>context</code>にはLambdaの情報が格納されています。</p>
-<p>https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/csharp-context.html
-https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/load-balancer-request-tracing.html</p>
-<h2 id="mock-test-tool%E3%81%A7%E3%81%AE%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D">Mock Test Toolでの動作確認</h2>
-<h3 id="mock-lambda-test-tool%E8%B5%B7%E5%8B%95">Mock Lambda Test Tool起動</h3>
+<p><a href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/csharp-context.html">https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/csharp-context.html</a>
+<a href="https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/load-balancer-request-tracing.html">https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/load-balancer-request-tracing.html</a></p>
+<h2>Mock Test Toolでの動作確認</h2>
+<h3>Mock Lambda Test Tool起動</h3>
 <p>VisualStudioおなじみのデバッグ開始ボタンから起動します。正常にビルドできた場合、ブラウザが立ち上がります。
 <img src="https://storage.googleapis.com/zenn-user-upload/c65c0f328026-20250127.png" alt=""></p>
 <p>今回はリポジトリ同梱のコード（下記と同じ内容）を使用します。プリセットからALBリクエストを選んでもOKです。</p>
 <p>実行するにはFunction Inputフィールドにデータを挿入し、Execute Functionボタンで実行します。</p>
-<h3 id="get%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%81%AE%E3%83%86%E3%82%B9%E3%83%88">GETリクエストのテスト</h3>
-<pre class="hljs"><code><div>{
+<h3>GETリクエストのテスト</h3>
+<pre><code class="language-json:request(get).json">{
   &quot;requestContext&quot;: {
     &quot;elb&quot;: {
       &quot;targetGroupArn&quot;: &quot;arn:aws:elasticloadbalancing:ap-northeast-1:123456789012:targetgroup/lambda-test/abcdef123456&quot;
@@ -236,9 +155,9 @@ https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/load-b
   &quot;body&quot;: &quot;&quot;,
   &quot;isBase64Encoded&quot;: false
 }
-</div></code></pre>
-<h3 id="post%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%81%AE%E3%83%86%E3%82%B9%E3%83%88">POSTリクエストのテスト</h3>
-<pre class="hljs"><code><div>{
+</code></pre>
+<h3>POSTリクエストのテスト</h3>
+<pre><code class="language-json:request(post).json">{
   &quot;requestContext&quot;: {
     &quot;elb&quot;: {
       &quot;targetGroupArn&quot;: &quot;arn:aws:elasticloadbalancing:ap-northeast-1:123456789012:targetgroup/lambda-test/abcdef123456&quot;
@@ -259,51 +178,53 @@ https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/load-b
   &quot;body&quot;: &quot;{\&quot;message\&quot;: \&quot;Hello from ALB!\&quot;, \&quot;timestamp\&quot;: \&quot;2024-01-20T10:00:00Z\&quot;}&quot;,
   &quot;isBase64Encoded&quot;: false
 }
-</div></code></pre>
-<h3 id="%E6%9C%9F%E5%BE%85%E3%81%95%E3%82%8C%E3%82%8B%E7%B5%90%E6%9E%9C">期待される結果</h3>
+</code></pre>
+<h3>期待される結果</h3>
 <ol>
 <li>GETリクエスト（/health）の場合：</li>
 </ol>
-<pre class="hljs"><code><div>{
-    <span class="hljs-attr">"StatusCode"</span>: <span class="hljs-number">200</span>,
-    <span class="hljs-attr">"Headers"</span>: {
-        <span class="hljs-attr">"Content-Type"</span>: <span class="hljs-string">"application/json"</span>
+<pre><code class="language-json">{
+    &quot;StatusCode&quot;: 200,
+    &quot;Headers&quot;: {
+        &quot;Content-Type&quot;: &quot;application/json&quot;
     },
-    <span class="hljs-attr">"Body"</span>: <span class="hljs-string">"Healthy"</span>,
-    <span class="hljs-attr">"IsBase64Encoded"</span>: <span class="hljs-literal">false</span>
+    &quot;Body&quot;: &quot;Healthy&quot;,
+    &quot;IsBase64Encoded&quot;: false
 }
-</div></code></pre>
+</code></pre>
 <p>Mock Test Tool上ではログも確認できます。
 <img src="https://storage.googleapis.com/zenn-user-upload/7c6bb00f25b0-20250128.png" alt=""></p>
 <ol start="2">
 <li>POSTリクエストの場合：</li>
 </ol>
-<pre class="hljs"><code><div>{
-    <span class="hljs-attr">"StatusCode"</span>: <span class="hljs-number">200</span>,
-    <span class="hljs-attr">"Headers"</span>: {
-        <span class="hljs-attr">"Content-Type"</span>: <span class="hljs-string">"application/json"</span>
+<pre><code class="language-json">{
+    &quot;StatusCode&quot;: 200,
+    &quot;Headers&quot;: {
+        &quot;Content-Type&quot;: &quot;application/json&quot;
     },
-    <span class="hljs-attr">"Body"</span>: <span class="hljs-string">"Received POST data: {\"message\": \"Hello from ALB!\", \"timestamp\": \"2024-01-20T10:00:00Z\"}"</span>,
-    <span class="hljs-attr">"IsBase64Encoded"</span>: <span class="hljs-literal">false</span>
+    &quot;Body&quot;: &quot;Received POST data: {\&quot;message\&quot;: \&quot;Hello from ALB!\&quot;, \&quot;timestamp\&quot;: \&quot;2024-01-20T10:00:00Z\&quot;}&quot;,
+    &quot;IsBase64Encoded&quot;: false
 }
-</div></code></pre>
+</code></pre>
 <p><img src="https://storage.googleapis.com/zenn-user-upload/fd254930f5fa-20250128.png" alt=""></p>
-<h3 id="%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88json%E3%82%92%E4%BF%9D%E5%AD%98%E3%81%99%E3%82%8B">リクエストJSONを保存する</h3>
+<h3>リクエストJSONを保存する</h3>
 <p><img src="https://storage.googleapis.com/zenn-user-upload/68d392b83ace-20250128.png" alt=""></p>
 <p>実行ボタンの右側「Save Request」ボタンを押下して保存すると下記のようなパスにリクエストを保存できます。</p>
-<pre class="hljs"><code><div>プロジェクトの場所\.lambda-test-tool\SavedRequests
-</div></code></pre>
+<pre><code>プロジェクトの場所\.lambda-test-tool\SavedRequests
+</code></pre>
 <p>ファイルで保存されますのでgitに入れておくのもありだと思います。</p>
-<h3 id="%E4%BF%9D%E5%AD%98%E3%81%97%E3%81%9F%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88json%E3%82%92%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%99">保存したリクエストJSONを呼び出す</h3>
+<h3>保存したリクエストJSONを呼び出す</h3>
 <p><img src="https://storage.googleapis.com/zenn-user-upload/73a40eff2982-20250128.png" alt=""></p>
 <p>前項で保存したリクエストJSONはプルダウンメニューから選択できます。</p>
-<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+<h2>まとめ</h2>
 <p>AWS Lambda Test Toolを使用することで、実際のALB環境がなくても、ローカルでLambda関数の動作を確認できます。Mock Test Toolでは普段のデバッグとほぼ同じような使用感でデバッグでき、VisualStudioを普段から使っている方なら馴染みやすい便利なツールだと思います。今回紹介したMock Test Toolの機能はほんの一部に過ぎませんが、API開発やLambdaの実装には欠かせないツールです。ぜひ試してみてください！</p>
 <hr>
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
-<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
+ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。
+<a href="https://onewedge.co.jp/">https://onewedge.co.jp/</a></p>
 
-<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
-
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>

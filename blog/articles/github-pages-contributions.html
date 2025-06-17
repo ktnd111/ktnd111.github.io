@@ -1,115 +1,32 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>pages-getContributions.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>undefined</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-
-<h2 id="%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB-%F0%9F%91%8B">はじめに 👋</h2>
+  <article class="markdown-body">
+    <h1>GitHub Pagesサイトにコントリビューショングリッドを実装した話 🟩</h1>
+<h2>はじめに 👋</h2>
 <p>今回は私のGitHub Pagesサイトにコントリビューショングリッド（あの緑色のブロックマップ、通称「草」）を実装した経験を共有したいと思います。このプロジェクトでは、静的サイトの制約の中で動的なデータを扱うという挑戦に直面し、様々な技術的課題を乗り越えました。<strong>「制約の中での創造性」</strong> をテーマにして実装プロセスを振り返ります。</p>
-<h2 id="%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AE%E7%9B%AE%E6%A8%99-%F0%9F%8E%AF">プロジェクトの目標 🎯</h2>
+<h2>プロジェクトの目標 🎯</h2>
 <ul>
 <li><strong>学習モチベーションの向上</strong> 📈: GitHub Pagesがあるので、自分のコントリビューション活動を可視化することで学習への意欲を高めたい</li>
 <li><strong>常時表示の利便性</strong> 👁️: ヘッダーに実装することで、サイト内のどのページからでも活動記録を確認できるようにしたい</li>
 <li><strong>視覚的な彩り</strong> 🎨: ダークカラーのヘッダー背景(#333)に緑色のコントリビューショングリッドを加えることで、サイトに視覚的な魅力を追加したい</li>
 </ul>
 <p>結果として、140日分のコントリビューション履歴をヘッダーに表示することができ、殺風景なサイトに少し色がつきました。</p>
-<p>ご覧の通り、ヘッダーに草が生えました。</p>
-<center><img src="../../images/article/pages-contr.jpg"></center>
-<hr>
-<h2 id="%E5%AE%9F%E8%A3%85%E3%82%A2%E3%83%97%E3%83%AD%E3%83%BC%E3%83%81%E3%81%AE%E6%A4%9C%E8%A8%8E%E3%81%A8%E8%AA%B2%E9%A1%8C-%F0%9F%A4%94">実装アプローチの検討と課題 🤔</h2>
-<h3 id="%E5%88%9D%E6%9C%9F%E3%82%A2%E3%83%97%E3%83%AD%E3%83%BC%E3%83%81%E3%81%A8%E3%81%9D%E3%81%AE%E9%99%90%E7%95%8C-%E2%9A%A0%EF%B8%8F">初期アプローチとその限界 ⚠️</h3>
+<h2>実装アプローチの検討と課題 🤔</h2>
+<h3>初期アプローチとその限界 ⚠️</h3>
 <p>まず最初に試したのは「GitHub APIを直接使ってコントリビューションデータを取得する方法」でした。しかし、この方法では2020年頃の古いデータしか取得できないという問題に直面し、結局狙ったものにはなりませんでした。</p>
 <p>調査を進めた結果、GitHub GraphQL APIを使えば最新のコントリビューションデータが取得できることがわかりましたが、このAPIを使用するにはPersonal Access Token (PAT)が必要です。</p>
-<p>あまりフロントエンドに明るくない当方ですが、 <strong>静的サイト上に機密情報を埋め込むことはセキュリティ上まずい</strong> ということは分かります。（Firebase等の公開前提のものは除く）なんとか静的サイトに実装する方法として考えたところ・・・</p>
-<h3 id="%E8%A7%A3%E6%B1%BA%E7%AD%96%E3%81%AE%E6%A8%A1%E7%B4%A2-%F0%9F%92%A1">解決策の模索 💡</h3>
+<p>あまりフロントエンドに明るくない当方ですが、 <strong>静的サイト上にPATのような機密情報を埋め込むことはセキュリティ上かなりまずい</strong> ということは分かります。なんとか静的サイトに実装する方法として考えたところ・・・</p>
+<h3>解決策の模索 💡</h3>
 <ol>
 <li><strong>Azure Functions活用</strong> ☁️: 既存のF1プラン（無料枠）のAzure環境を使ってバックエンドサービスを構築</li>
 <li><strong>GitHub Actions活用</strong> 🤖: GitHub Actions内でAPI呼び出しを行い、結果をリポジトリに保存</li>
@@ -119,10 +36,10 @@
 <li><strong>GetGithubContributions</strong> 📊: HTTPトリガーでGraphQL APIを呼び出すエンドポイント</li>
 <li><strong>UpdateGitHubContributions</strong> ⏰: タイマートリガーで定期的にデータを更新し、リポジトリにコミット</li>
 </ul>
-<h2 id="%E6%8A%80%E8%A1%93%E7%9A%84%E3%81%AA%E5%AE%9F%E8%A3%85%E3%81%A8%E8%8B%A6%E5%8A%B4%E3%81%97%E3%81%9F%E7%82%B9-%F0%9F%9B%A0%EF%B8%8F">技術的な実装と苦労した点 🛠️</h2>
-<h3 id="graphql%E5%88%9D%E4%BD%93%E9%A8%93%E3%81%AE%E8%8B%A6%E5%8A%B4-%F0%9F%93%9D">GraphQL初体験の苦労 📝</h3>
+<h2>技術的な実装と苦労した点 🛠️</h2>
+<h3>GraphQL初体験の苦労 📝</h3>
 <p>GitHub GraphQL APIは初で、クエリの書き方やデータ構造に戸惑いつつも少しずつ実装していきました。</p>
-<pre class="hljs"><code><div># GitHub GraphQLクエリ例
+<pre><code class="language-graphql"># GitHub GraphQLクエリ例
 query {
   user(login: &quot;ktnd111&quot;) {
     contributionsCollection {
@@ -138,32 +55,32 @@ query {
     }
   }
 }
-</div></code></pre>
-<h3 id="api%E7%B5%8C%E7%94%B1%E3%81%AEgit%E3%82%B3%E3%83%9F%E3%83%83%E3%83%88-%F0%9F%94%84">API経由のGitコミット 🔄</h3>
+</code></pre>
+<h3>API経由のGitコミット 🔄</h3>
 <p>もう一つの挑戦は、API経由でGitリポジトリにコミットする方法を実装することでした。通常のFunctionの実装とは異なり、GitHub APIを使ってプログラム的にリポジトリを更新する仕組みを作る必要がありました。</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// Azure FunctionからGitHubリポジトリにファイルをコミットする例</span>
-<span class="hljs-keyword">var</span> client = <span class="hljs-keyword">new</span> GitHubClient(<span class="hljs-keyword">new</span> ProductHeaderValue(<span class="hljs-string">"UpdateContributions"</span>));
-client.Credentials = <span class="hljs-keyword">new</span> Credentials(_config[<span class="hljs-string">"GitHubToken"</span>]);
+<pre><code class="language-csharp">// Azure FunctionからGitHubリポジトリにファイルをコミットする例
+var client = new GitHubClient(new ProductHeaderValue(&quot;UpdateContributions&quot;));
+client.Credentials = new Credentials(_config[&quot;GitHubToken&quot;]);
 
-<span class="hljs-comment">// リポジトリ情報</span>
-<span class="hljs-keyword">var</span> owner = <span class="hljs-string">"ktnd111"</span>;
-<span class="hljs-keyword">var</span> repo = <span class="hljs-string">"ktnd111.github.io"</span>;
-<span class="hljs-keyword">var</span> path = <span class="hljs-string">"data/contributions.json"</span>;
+// リポジトリ情報
+var owner = &quot;ktnd111&quot;;
+var repo = &quot;ktnd111.github.io&quot;;
+var path = &quot;data/contributions.json&quot;;
 
-<span class="hljs-comment">// 現在のファイル情報を取得（SHA値が必要）</span>
-<span class="hljs-keyword">var</span> existingFile = <span class="hljs-keyword">await</span> client.Repository.Content.GetAllContents(owner, repo, path);
-<span class="hljs-keyword">var</span> sha = existingFile.FirstOrDefault()?.Sha;
+// 現在のファイル情報を取得（SHA値が必要）
+var existingFile = await client.Repository.Content.GetAllContents(owner, repo, path);
+var sha = existingFile.FirstOrDefault()?.Sha;
 
-<span class="hljs-comment">// ファイルを更新</span>
-<span class="hljs-keyword">var</span> updateRequest = <span class="hljs-keyword">new</span> UpdateFileRequest(
-    message: <span class="hljs-string">"Update contributions data"</span>,
+// ファイルを更新
+var updateRequest = new UpdateFileRequest(
+    message: &quot;Update contributions data&quot;,
     content: Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonContent)),
     sha: sha
 );
 
-<span class="hljs-keyword">await</span> client.Repository.Content.UpdateFile(owner, repo, path, updateRequest);
-</div></code></pre>
-<h3 id="%E3%83%87%E3%83%BC%E3%82%BF%E3%83%95%E3%83%AD%E3%83%BC%E3%81%AE%E6%9C%80%E9%81%A9%E5%8C%96-%E2%9A%A1">データフローの最適化 ⚡</h3>
+await client.Repository.Content.UpdateFile(owner, repo, path, updateRequest);
+</code></pre>
+<h3>データフローの最適化 ⚡</h3>
 <p>コスト効率と性能を考慮し、次のようなデータフローを設計しました。</p>
 <ol>
 <li>Azure Functionsで定期的にGraphQL APIからデータを取得 🔄</li>
@@ -172,33 +89,33 @@ client.Credentials = <span class="hljs-keyword">new</span> Credentials(_config[<
 </ol>
 <p>この方法により、ページ表示ごとにFunctionを実行することなく、常に最新のデータを表示できるようになりました。</p>
 <p>表示ごとにAPIを叩いてしまうとF1プランとはいえ課金されてしまうため、1日1回のAPIコールになるよう意識して設計しました。（お試しで作成したBLOBなんかは放置してても1日10円ぐらいかかってますし、なるべくコストをかけずに。）</p>
-<h3 id="%E3%82%B3%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%8D%E3%83%B3%E3%83%88%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF%E3%81%AE%E9%9D%9E%E5%90%8C%E6%9C%9F%E5%95%8F%E9%A1%8C-%E2%8F%B3">コンポーネント読み込みの非同期問題 ⏳</h3>
+<h3>コンポーネント読み込みの非同期問題 ⏳</h3>
 <p>実装過程で最も苦労したのは、ヘッダーをコンポーネントとして動的に読み込む際に発生した問題でした。サイトでは<code>loadComponent</code>メソッドを使ってヘッダーを読み込んでいましたが、このメソッドがヘッダー内のJavaScriptを自動的に実行してくれないことに気づきました。</p>
 <p>解決策として、コンポーネント読み込み完了後に明示的に<code>github-contributions</code>メソッドを呼び出す実装に変更。</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// コンポーネントを読み込む関数</span>
-<span class="hljs-comment">// 既存のloadComponent部分</span>
+<pre><code class="language-javascript">// コンポーネントを読み込む関数
+// 既存のloadComponent部分
 
-<span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'componentsLoaded'</span>, () =&gt; {
-    <span class="hljs-comment">// header-component が読み込まれた後、明示的にコントリビューショングリッドを初期化</span>
-    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> renderContributionGrid === <span class="hljs-string">'function'</span>) {
+document.addEventListener(&#39;componentsLoaded&#39;, () =&gt; {
+    // header-component が読み込まれた後、明示的にコントリビューショングリッドを初期化
+    if (typeof renderContributionGrid === &#39;function&#39;) {
         renderContributionGrid();
-    } <span class="hljs-keyword">else</span> {
-        <span class="hljs-comment">// github-contributions.js が読み込まれていない場合は読み込む</span>
-        <span class="hljs-keyword">const</span> script = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'script'</span>);
-        script.src = <span class="hljs-string">'/js/github-contributions.js'</span>;
-        script.onload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> renderContributionGrid === <span class="hljs-string">'function'</span>) {
+    } else {
+        // github-contributions.js が読み込まれていない場合は読み込む
+        const script = document.createElement(&#39;script&#39;);
+        script.src = &#39;/js/github-contributions.js&#39;;
+        script.onload = function() {
+            if (typeof renderContributionGrid === &#39;function&#39;) {
                 renderContributionGrid();
             }
         };
-        <span class="hljs-built_in">document</span>.head.appendChild(script);
+        document.head.appendChild(script);
     }
 });
-</div></code></pre>
-<h3 id="%E9%96%8B%E7%99%BA%E3%83%BB%E3%83%86%E3%82%B9%E3%83%88%E3%83%95%E3%83%AD%E3%83%BC%E3%81%AE%E5%88%B6%E7%B4%84-%F0%9F%A7%AA">開発・テストフローの制約 🧪</h3>
+</code></pre>
+<h3>開発・テストフローの制約 🧪</h3>
 <p>開発過程でもう一つ苦労したのは、GitHub Pagesに依存した実装のため、完全な動作検証が実際のデプロイ環境でしか行えない点でした。コミット→CI処理→デプロイ完了というサイクルを経なければ実際の動作が確認できず、開発効率が低下する場面もありました。</p>
 <p>ここはまた今度開発用サーバーを立ち上げてなんとかしようと思っています。</p>
-<h2 id="%E5%AD%A6%E3%81%B3%E3%81%A8%E5%BE%97%E3%82%89%E3%82%8C%E3%81%9F%E7%9F%A5%E8%A6%8B-%F0%9F%92%AD">学びと得られた知見 💭</h2>
+<h2>学びと得られた知見 💭</h2>
 <p>このプロジェクトから得られた主な学びは以下の通りです：</p>
 <ol>
 <li><strong>制約からの創造性</strong> 💫: 「無料でやる」という制約が、むしろ創造的な解決策を生み出すきっかけになりました</li>
@@ -206,16 +123,16 @@ client.Credentials = <span class="hljs-keyword">new</span> Credentials(_config[<
 <li><strong>GitHubエコシステムの理解</strong> 🌐: GitHub ActionsやAPIなど、GitHubプラットフォームの機能をより深く理解できました</li>
 <li><strong>フロントエンドとバックエンドの分離</strong> 🧩: 静的サイトと動的データ取得の分離設計の重要性を実感しました</li>
 </ol>
-<h2 id="%E6%9C%80%E7%B5%82%E7%9A%84%E3%81%AA%E6%88%90%E6%9E%9C-%F0%9F%8F%86">最終的な成果 🏆</h2>
+<h2>最終的な成果 🏆</h2>
 <p>最終的に完成したコントリビューショングリッドは、GitHub Pagesサイトのヘッダーに美しく組み込まれ、140日分の活動履歴を一目で確認できるようになりました。黒いヘッダー背景に緑色のグラデーションで表現されたアクティビティグリッドは、サイト全体に視覚的な彩りを加えています。</p>
-<h2 id="%E3%81%BE%E3%81%A8%E3%82%81-%F0%9F%93%9D">まとめ 📝</h2>
+<h2>まとめ 📝</h2>
 <p>静的サイトでの制約の中、動的なデータを表示するという挑戦は、多くの学びと創造的な解決策をもたらしました。「制限があるなかで色々試行錯誤する」というのが、エンジニアリングの本質の一つだと再認識できた貴重な経験となりました。</p>
-<p>この実装が、同様の課題に取り組む方々の参考になれば幸いです。またコントリビューショングリッドを目に見える場所に置くことで、GitHub活動のモチベーション向上にも確かに効果がありました。</p>
-
+<p>この実装が、同様の課題に取り組む方々の参考になれば幸いです。また、コントリビューショングリッドを目に見える場所に置くことで、GitHub活動のモチベーション向上にも確かに効果がありました。</p>
 <hr>
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
-<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+<p>最後までお読みいただき、ありがとうございました。何か質問や感想があれば、コメントやSNSでぜひ共有してください！ 👋</p>
 
-<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>

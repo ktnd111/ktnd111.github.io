@@ -1,100 +1,20 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>csharp-aspnet-dependency-injection.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASP.NET CoreのDI（Dependency Injection）入門</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<h1 id="aspnet-core%E3%81%AEdi%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89">ASP.NET CoreのDI完全ガイド</h1>
-<h2 id="di%E3%81%A3%E3%81%A6%E4%BD%95">DIって何？</h2>
+  <article class="markdown-body">
+    <h1>ASP.NET CoreのDI完全ガイド</h1>
+<h2>DIって何？</h2>
 <p>プログラムの部品と部品の結びつきを緩くして、テストや修正がしやすくするための仕組みです。ASP.NET Coreには標準で組み込まれています。</p>
-<h2 id="di%E3%81%AE%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88">DIのメリット</h2>
+<h2>DIのメリット</h2>
 <ul>
 <li>テストが書きやすい</li>
 <li>コードの再利用が簡単</li>
@@ -102,161 +22,158 @@
 <li>コードの見通しが良くなる</li>
 <li>バグが見つけやすい</li>
 </ul>
-<h2 id="di%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9">DIの使い方</h2>
-<h3 id="1-%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%82%92%E7%99%BB%E9%8C%B2%E3%81%99%E3%82%8B">1. サービスを登録する</h3>
+<h2>DIの使い方</h2>
+<h3>1. サービスを登録する</h3>
 <p>まずは<code>Program.cs</code>でサービスを登録します：</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">var</span> builder = WebApplication.CreateBuilder(args);
+<pre><code class="language-csharp">var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped&lt;IUserService, UserService&gt;();
-</div></code></pre>
-<h3 id="2-%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AE%E5%AF%BF%E5%91%BD%E3%82%92%E6%B1%BA%E3%82%81%E3%82%8B">2. サービスの寿命を決める</h3>
+</code></pre>
+<h3>2. サービスの寿命を決める</h3>
 <p>サービスには3つの寿命があります：</p>
-<h4 id="transient%E6%AF%8E%E5%9B%9E%E6%96%B0%E3%81%97%E3%81%8F%E4%BD%9C%E3%82%8B">Transient（毎回新しく作る）</h4>
-<pre class="hljs"><code><div>services.AddTransient&lt;IMyService, MyService&gt;();
-</div></code></pre>
+<h4>Transient（毎回新しく作る）</h4>
+<pre><code class="language-csharp">services.AddTransient&lt;IMyService, MyService&gt;();
+</code></pre>
 <ul>
-<li>使う場面：
-<ul>
+<li>使う場面：<ul>
 <li>毎回新しいインスタンスが必要な時</li>
 <li>メモリを気にする時</li>
 <li>スレッドセーフにしたい時</li>
 </ul>
 </li>
 </ul>
-<h4 id="scoped%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%81%AE%E9%96%93%E3%81%A0%E3%81%91%E4%BD%BF%E3%81%84%E5%9B%9E%E3%81%99">Scoped（リクエストの間だけ使い回す）</h4>
-<pre class="hljs"><code><div>services.AddScoped&lt;IMyService, MyService&gt;();
-</div></code></pre>
+<h4>Scoped（リクエストの間だけ使い回す）</h4>
+<pre><code class="language-csharp">services.AddScoped&lt;IMyService, MyService&gt;();
+</code></pre>
 <ul>
-<li>使う場面：
-<ul>
+<li>使う場面：<ul>
 <li>データベース接続</li>
 <li>リクエスト中だけ情報を保持したい時</li>
 <li>複数のクラスで同じ処理を共有したい時</li>
 </ul>
 </li>
 </ul>
-<h4 id="singleton%E3%82%A2%E3%83%97%E3%83%AA%E5%85%A8%E4%BD%93%E3%81%A71%E3%81%A4%E3%81%A0%E3%81%91">Singleton（アプリ全体で1つだけ）</h4>
-<pre class="hljs"><code><div>services.AddSingleton&lt;IMyService, MyService&gt;();
-</div></code></pre>
+<h4>Singleton（アプリ全体で1つだけ）</h4>
+<pre><code class="language-csharp">services.AddSingleton&lt;IMyService, MyService&gt;();
+</code></pre>
 <ul>
-<li>使う場面：
-<ul>
+<li>使う場面：<ul>
 <li>アプリの設定情報</li>
 <li>キャッシュ</li>
 <li>共有リソース</li>
 </ul>
 </li>
 </ul>
-<h3 id="3-%E5%AE%9F%E8%A3%85%E4%BE%8B">3. 実装例</h3>
+<h3>3. 実装例</h3>
 <p>ユーザー情報を扱うサービスの例：</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// インターフェース</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IUserService</span>
+<pre><code class="language-csharp">// インターフェース
+public interface IUserService
 {
-    <span class="hljs-function">Task&lt;User&gt; <span class="hljs-title">GetUserAsync</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> id</span>)</span>;
+    Task&lt;User&gt; GetUserAsync(int id);
     Task&lt;IEnumerable&lt;User&gt;&gt; GetAllUsersAsync();
-    <span class="hljs-function">Task <span class="hljs-title">UpdateUserAsync</span>(<span class="hljs-params">User user</span>)</span>;
+    Task UpdateUserAsync(User user);
 }
 
-<span class="hljs-comment">// 実装</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">UserService</span> : <span class="hljs-title">IUserService</span>
+// 実装
+public class UserService : IUserService
 {
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IDbContext _dbContext;
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ILogger&lt;UserService&gt; _logger;
+    private readonly IDbContext _dbContext;
+    private readonly ILogger&lt;UserService&gt; _logger;
     
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">UserService</span>(<span class="hljs-params">IDbContext dbContext, ILogger&lt;UserService&gt; logger</span>)</span>
+    public UserService(IDbContext dbContext, ILogger&lt;UserService&gt; logger)
     {
         _dbContext = dbContext;
         _logger = logger;
     }
     
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;User&gt; <span class="hljs-title">GetUserAsync</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> id</span>)</span>
+    public async Task&lt;User&gt; GetUserAsync(int id)
     {
-        _logger.LogInformation(<span class="hljs-string">$"Getting user with ID: <span class="hljs-subst">{id}</span>"</span>);
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> _dbContext.Users.FindAsync(id);
+        _logger.LogInformation($&quot;Getting user with ID: {id}&quot;);
+        return await _dbContext.Users.FindAsync(id);
     }
     
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;IEnumerable&lt;User&gt;&gt; GetAllUsersAsync()
+    public async Task&lt;IEnumerable&lt;User&gt;&gt; GetAllUsersAsync()
     {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> _dbContext.Users.ToListAsync();
+        return await _dbContext.Users.ToListAsync();
     }
     
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">UpdateUserAsync</span>(<span class="hljs-params">User user</span>)</span>
+    public async Task UpdateUserAsync(User user)
     {
         _dbContext.Users.Update(user);
-        <span class="hljs-keyword">await</span> _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
     }
 }
 
-<span class="hljs-comment">// コントローラーで使う</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">UserController</span> : <span class="hljs-title">ControllerBase</span>
+// コントローラーで使う
+public class UserController : ControllerBase
 {
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IUserService _userService;
+    private readonly IUserService _userService;
     
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">UserController</span>(<span class="hljs-params">IUserService userService</span>)</span>
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }
     
-    [<span class="hljs-meta">HttpGet(<span class="hljs-meta-string">"{id}"</span>)</span>]
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;ActionResult&lt;User&gt;&gt; GetUser(<span class="hljs-keyword">int</span> id)
+    [HttpGet(&quot;{id}&quot;)]
+    public async Task&lt;ActionResult&lt;User&gt;&gt; GetUser(int id)
     {
-        <span class="hljs-keyword">var</span> user = <span class="hljs-keyword">await</span> _userService.GetUserAsync(id);
-        <span class="hljs-keyword">if</span> (user == <span class="hljs-literal">null</span>)
-            <span class="hljs-keyword">return</span> NotFound();
+        var user = await _userService.GetUserAsync(id);
+        if (user == null)
+            return NotFound();
             
-        <span class="hljs-keyword">return</span> user;
+        return user;
     }
     
-    [<span class="hljs-meta">HttpGet</span>]
-    <span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;ActionResult&lt;IEnumerable&lt;User&gt;&gt;&gt; GetAllUsers()
+    [HttpGet]
+    public async Task&lt;ActionResult&lt;IEnumerable&lt;User&gt;&gt;&gt; GetAllUsers()
     {
-        <span class="hljs-keyword">return</span> Ok(<span class="hljs-keyword">await</span> _userService.GetAllUsersAsync());
+        return Ok(await _userService.GetAllUsersAsync());
     }
     
-    [<span class="hljs-meta">HttpPut(<span class="hljs-meta-string">"{id}"</span>)</span>]
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;IActionResult&gt; <span class="hljs-title">UpdateUser</span>(<span class="hljs-params"><span class="hljs-keyword">int</span> id, User user</span>)</span>
+    [HttpPut(&quot;{id}&quot;)]
+    public async Task&lt;IActionResult&gt; UpdateUser(int id, User user)
     {
-        <span class="hljs-keyword">if</span> (id != user.Id)
-            <span class="hljs-keyword">return</span> BadRequest();
+        if (id != user.Id)
+            return BadRequest();
             
-        <span class="hljs-keyword">await</span> _userService.UpdateUserAsync(user);
-        <span class="hljs-keyword">return</span> NoContent();
+        await _userService.UpdateUserAsync(user);
+        return NoContent();
     }
 }
-</div></code></pre>
-<h3 id="4-%E3%82%88%E3%81%8F%E4%BD%BF%E3%81%86%E7%B5%84%E3%81%BF%E8%BE%BC%E3%81%BF%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9">4. よく使う組み込みサービス</h3>
+</code></pre>
+<h3>4. よく使う組み込みサービス</h3>
 <p>ASP.NET Coreには便利な組み込みサービスがたくさんあります：</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// ログ</span>
-<span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ILogger&lt;MyClass&gt; _logger;
+<pre><code class="language-csharp">// ログ
+private readonly ILogger&lt;MyClass&gt; _logger;
 
-<span class="hljs-comment">// 設定</span>
-<span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IConfiguration _config;
+// 設定
+private readonly IConfiguration _config;
 
-<span class="hljs-comment">// キャッシュ</span>
-<span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IMemoryCache _cache;
+// キャッシュ
+private readonly IMemoryCache _cache;
 
-<span class="hljs-comment">// HTTPクライアント</span>
-<span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IHttpClientFactory _clientFactory;
-</div></code></pre>
-<h2 id="di%E3%82%92%E4%B8%8A%E6%89%8B%E3%81%8F%E4%BD%BF%E3%81%86%E3%82%B3%E3%83%84">DIを上手く使うコツ</h2>
-<h3 id="1-%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%83%BC%E3%82%B9%E3%82%92%E4%BD%BF%E3%81%86">1. インターフェースを使う</h3>
+// HTTPクライアント
+private readonly IHttpClientFactory _clientFactory;
+</code></pre>
+<h2>DIを上手く使うコツ</h2>
+<h3>1. インターフェースを使う</h3>
 <ul>
 <li>テストが楽になる</li>
 <li>モックが作りやすい</li>
 <li>実装の切り替えが簡単</li>
 </ul>
-<h3 id="2-%E3%82%B3%E3%83%B3%E3%82%B9%E3%83%88%E3%83%A9%E3%82%AF%E3%82%BF%E3%81%A7%E5%8F%97%E3%81%91%E5%8F%96%E3%82%8B">2. コンストラクタで受け取る</h3>
+<h3>2. コンストラクタで受け取る</h3>
 <ul>
 <li>必要な部品が一目で分かる</li>
 <li>初期化漏れを防げる</li>
 <li>テストコードが書きやすい</li>
 </ul>
-<h3 id="3-%E5%AF%BF%E5%91%BD%E3%81%AF%E7%94%A8%E9%80%94%E3%81%AB%E5%90%88%E3%82%8F%E3%81%9B%E3%81%A6%E9%81%B8%E3%81%B6">3. 寿命は用途に合わせて選ぶ</h3>
+<h3>3. 寿命は用途に合わせて選ぶ</h3>
 <ul>
 <li>メモリの使用量を考える</li>
 <li>パフォーマンスに注意</li>
 <li>スコープを意識する</li>
 </ul>
-<h3 id="4-di%E3%81%AE%E3%82%A2%E3%83%B3%E3%83%81%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">4. DIのアンチパターン</h3>
+<h3>4. DIのアンチパターン</h3>
 <p>避けるべき使い方：</p>
 <ul>
 <li>サービスロケーターを使う</li>
@@ -264,34 +181,34 @@ builder.Services.AddScoped&lt;IUserService, UserService&gt;();
 <li>具象クラスを直接注入する</li>
 <li>寿命の長いクラスに寿命の短いクラスを注入する</li>
 </ul>
-<h2 id="%E3%83%86%E3%82%B9%E3%83%88%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E4%BE%8B">テストコードの例</h2>
+<h2>テストコードの例</h2>
 <p>DIを使うとテストが書きやすくなります：</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">UserControllerTests</span>
+<pre><code class="language-csharp">public class UserControllerTests
 {
-    [<span class="hljs-meta">Fact</span>]
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">GetUser_ExistingId_ReturnsUser</span>(<span class="hljs-params"></span>)</span>
+    [Fact]
+    public async Task GetUser_ExistingId_ReturnsUser()
     {
-        <span class="hljs-comment">// Arrange</span>
-        <span class="hljs-keyword">var</span> mockUserService = <span class="hljs-keyword">new</span> Mock&lt;IUserService&gt;();
-        <span class="hljs-keyword">var</span> expectedUser = <span class="hljs-keyword">new</span> User { Id = <span class="hljs-number">1</span>, Name = <span class="hljs-string">"Test User"</span> };
+        // Arrange
+        var mockUserService = new Mock&lt;IUserService&gt;();
+        var expectedUser = new User { Id = 1, Name = &quot;Test User&quot; };
         mockUserService
-            .Setup(x =&gt; x.GetUserAsync(<span class="hljs-number">1</span>))
+            .Setup(x =&gt; x.GetUserAsync(1))
             .ReturnsAsync(expectedUser);
             
-        <span class="hljs-keyword">var</span> controller = <span class="hljs-keyword">new</span> UserController(mockUserService.Object);
+        var controller = new UserController(mockUserService.Object);
         
-        <span class="hljs-comment">// Act</span>
-        <span class="hljs-keyword">var</span> result = <span class="hljs-keyword">await</span> controller.GetUser(<span class="hljs-number">1</span>);
+        // Act
+        var result = await controller.GetUser(1);
         
-        <span class="hljs-comment">// Assert</span>
-        <span class="hljs-keyword">var</span> actionResult = Assert.IsType&lt;ActionResult&lt;User&gt;&gt;(result);
-        <span class="hljs-keyword">var</span> user = Assert.IsType&lt;User&gt;(actionResult.Value);
+        // Assert
+        var actionResult = Assert.IsType&lt;ActionResult&lt;User&gt;&gt;(result);
+        var user = Assert.IsType&lt;User&gt;(actionResult.Value);
         Assert.Equal(expectedUser.Id, user.Id);
         Assert.Equal(expectedUser.Name, user.Name);
     }
 }
-</div></code></pre>
-<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+</code></pre>
+<h2>まとめ</h2>
 <ul>
 <li>DIはASP.NET Coreの重要な機能</li>
 <li>テストしやすく、メンテナンスしやすいコードが書ける</li>
@@ -301,5 +218,8 @@ builder.Services.AddScoped&lt;IUserService, UserService&gt;();
 </ul>
 <p>これでDIを使って、クリーンでメンテナンスしやすいコードが書けます！</p>
 
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>

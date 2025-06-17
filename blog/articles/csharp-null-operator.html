@@ -1,109 +1,30 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>csharp-null-operator.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>undefined</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<h2 id="%E3%81%A8--%E3%81%A7%22null-%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%EF%BC%8B%E4%BB%A3%E5%85%A5%22%E3%82%92-1-%E8%A1%8C%E3%81%AB">— ?? と ??= で&quot;null チェック＋代入&quot;を 1 行に —</h2>
-<h3 id="%E5%AF%BE%E8%B1%A1%E8%AA%AD%E8%80%85">対象読者</h3>
+  <article class="markdown-body">
+    <h1>C#「null 合体演算子」</h1>
+<h2>— ?? と ??= で&quot;null チェック＋代入&quot;を 1 行に —</h2>
+<h3>対象読者</h3>
 <ul>
 <li>C# 初〜中級者</li>
 <li><code>if (x == null)...</code> を減らしてコードをスッキリさせたい人</li>
 </ul>
-<h2 id="1-%E3%81%AA%E3%81%9C----%E3%81%8C%E4%BE%BF%E5%88%A9%E3%81%AA%E3%81%AE%E3%81%8B">1. なぜ ?? / ??= が便利なのか</h2>
+<h2>1. なぜ ?? / ??= が便利なのか</h2>
 <p>「null なら既定値を使う」「null なら初期化する」といった処理のたびに、</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (userName == <span class="hljs-literal">null</span>)
+<pre><code class="language-csharp">if (userName == null)
 {
-    userName = <span class="hljs-string">"Guest"</span>;
+    userName = &quot;Guest&quot;;
 }
-</div></code></pre>
+</code></pre>
 <p>このような3行 if を書くのって正直ちょっと面倒です。</p>
 <p><code>??</code> や <code>??=</code> を使えば、そうしたコードを1行にまとめられます。</p>
 <ul>
@@ -112,7 +33,7 @@
 <li>LINQ や式メンバーと相性がよく、柔軟に使える</li>
 </ul>
 <p>しかもこれ、実際に使ってみると「あ、これ良いやつだ」と体感できる系です。</p>
-<h2 id="2-%E5%9F%BA%E6%9C%AC%E6%96%87%E6%B3%95">2. 基本文法</h2>
+<h2>2. 基本文法</h2>
 <table>
 <thead>
 <tr>
@@ -122,8 +43,7 @@
 <th>典型用途</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><code>x ?? y</code></td>
 <td>x が null なら y</td>
 <td>x または y</td>
@@ -135,33 +55,32 @@
 <td>代入後の x</td>
 <td>遅延初期化・キャッシュ処理</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>※どちらも右結合です。優先順位は ?: より高く、|| より低め。
 （参考：<a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/#operator-precedence">C# Operator Precedence - Microsoft Docs</a>）</p>
-<h2 id="3--%E3%81%AE%E4%BD%BF%E3%81%84%E3%81%A9%E3%81%93%E3%82%8D">3. ?? の使いどころ</h2>
-<h3 id="3-1-%E6%97%A2%E5%AE%9A%E5%80%A4%E3%81%AE%E9%81%A9%E7%94%A8">3-1. 既定値の適用</h3>
-<pre class="hljs"><code><div><span class="hljs-keyword">string</span> displayName = user.DisplayName ?? <span class="hljs-string">"（名無し）"</span>;
-</div></code></pre>
+<h2>3. ?? の使いどころ</h2>
+<h3>3-1. 既定値の適用</h3>
+<pre><code class="language-csharp">string displayName = user.DisplayName ?? &quot;（名無し）&quot;;
+</code></pre>
 <p>「nullだったら&quot;名無し&quot;で表示」といった典型例ですね。</p>
-<h3 id="3-2-%E3%82%B3%E3%83%B3%E3%83%95%E3%82%A3%E3%82%B0%E5%80%A4%E3%81%AE%E3%83%95%E3%82%A7%E3%83%BC%E3%83%AB%E3%82%BB%E3%83%BC%E3%83%95">3-2. コンフィグ値のフェールセーフ</h3>
-<pre class="hljs"><code><div><span class="hljs-keyword">int</span> port = <span class="hljs-keyword">int</span>.TryParse(cfg[<span class="hljs-string">"Port"</span>], <span class="hljs-keyword">out</span> <span class="hljs-keyword">var</span> p) ? p : (<span class="hljs-keyword">int</span>?)<span class="hljs-literal">null</span> 
-           ?? <span class="hljs-number">8080</span>;
-</div></code></pre>
+<h3>3-2. コンフィグ値のフェールセーフ</h3>
+<pre><code class="language-csharp">int port = int.TryParse(cfg[&quot;Port&quot;], out var p) ? p : (int?)null 
+           ?? 8080;
+</code></pre>
 <p>設定値がパースできなかった場合に 8080 などのデフォルト値を入れておくテク。</p>
-<h3 id="3-3-null-%E6%9D%A1%E4%BB%B6%E6%BC%94%E7%AE%97%E5%AD%90--%E3%81%A8%E4%BD%B5%E7%94%A8">3-3. null 条件演算子 (?.) と併用</h3>
-<pre class="hljs"><code><div><span class="hljs-keyword">var</span> country = order?.ShippingAddress?.Country ?? <span class="hljs-string">"JP"</span>;
-</div></code></pre>
+<h3>3-3. null 条件演算子 (?.) と併用</h3>
+<pre><code class="language-csharp">var country = order?.ShippingAddress?.Country ?? &quot;JP&quot;;
+</code></pre>
 <p>これもよくある使い方。null なら &quot;JP&quot; として処理を進める感じ。やりすぎるとデバッグが大変なので程よく使うのが良いかなと。</p>
-<h2 id="4--%E3%81%A7%22%E9%81%85%E5%BB%B6%E5%88%9D%E6%9C%9F%E5%8C%96%22">4. ??= で&quot;遅延初期化&quot;</h2>
-<h3 id="4-1-%E5%8D%98%E7%B4%94%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5">4-1. 単純キャッシュ</h3>
-<pre class="hljs"><code><div><span class="hljs-keyword">private</span> Dictionary&lt;<span class="hljs-keyword">int</span>, Product&gt;? _cache;
+<h2>4. ??= で&quot;遅延初期化&quot;</h2>
+<h3>4-1. 単純キャッシュ</h3>
+<pre><code class="language-csharp">private Dictionary&lt;int, Product&gt;? _cache;
 
-<span class="hljs-keyword">public</span> Dictionary&lt;<span class="hljs-keyword">int</span>, Product&gt; Cache
+public Dictionary&lt;int, Product&gt; Cache
 {
-    <span class="hljs-keyword">get</span> =&gt; _cache ??= LoadProducts();
+    get =&gt; _cache ??= LoadProducts();
 }
-</div></code></pre>
+</code></pre>
 <p>一度しか呼ばない処理をキャッシュして、以降は使い回したい時に便利。</p>
 <p>この <code>_cache ??= LoadProducts()</code> の式、</p>
 <ul>
@@ -180,15 +99,15 @@
 <p>💬 補足：「キャッシュ」と言っても、これはアプリ内の話で、CPUのキャッシュメモリやブラウザのキャッシュとは別物です。
 <code>cache</code> の語源はフランス語の <em>cacher</em>（隠す）で、「とりあえずすぐ使えるように大事にとっとく」みたいなニュアンス。Webアプリではブラウザが保持するキャッシュ、デスクトップアプリなら OS が一時ファイルとしてキャッシュを持つこともありますが、ここで言うキャッシュは「アプリケーション内でオブジェクトを使い回すための一時保管場所」と捉えてOKです。</p>
 </blockquote>
-<h3 id="4-2-%E3%83%AB%E3%83%BC%E3%83%97%E5%86%85%E3%81%AE%E3%82%B3%E3%83%AC%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E7%94%9F%E6%88%90hashset-%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E4%BB%A3%E6%9B%BF%E3%82%82">4-2. ループ内のコレクション生成（HashSet を使った代替も）</h3>
+<h3>4-2. ループ内のコレクション生成（HashSet を使った代替も）</h3>
 <p>このパターン、見た目はシンプルですがかなり実用的です。</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">var</span> groups = <span class="hljs-keyword">new</span> Dictionary&lt;<span class="hljs-keyword">string</span>, List&lt;Item&gt;&gt;();
+<pre><code class="language-csharp">var groups = new Dictionary&lt;string, List&lt;Item&gt;&gt;();
 
-<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> item <span class="hljs-keyword">in</span> items)
+foreach (var item in items)
 {
-    (groups[item.Category] ??= <span class="hljs-keyword">new</span>()).Add(item);
+    (groups[item.Category] ??= new()).Add(item);
 }
-</div></code></pre>
+</code></pre>
 <p>初めて出てきたカテゴリだけ <code>new()</code> してリストを生成。
 2回目以降は既存のリストに <code>.Add()</code> するだけ。</p>
 <p>このコードは、カテゴリごとに <code>Item</code> をまとめたいときに便利です。
@@ -200,7 +119,7 @@ SQL でいうところの <code>GROUP BY</code> に近い集約のイメージ�
 <p>意外とこのパターン、日常のバッチ処理や集計ロジックでよく使われています。</p>
 <p>ちなみに「カテゴリが重複しないようにだけしておきたい（＝ユニークにしたい）」という目的なら、<code>Dictionary&lt;string, List&lt;Item&gt;&gt;</code> ではなく <code>HashSet&lt;string&gt;</code> を使うのも手です。
 <a href="https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-collections-generic-hashset-t">HashSetの詳細はMicrosoft Docsを参照</a></p>
-<h2 id="5-%E3%82%88%E3%81%8F%E3%81%82%E3%82%8Bq--a">5. よくあるQ &amp; A</h2>
+<h2>5. よくあるQ &amp; A</h2>
 <table>
 <thead>
 <tr>
@@ -208,8 +127,7 @@ SQL でいうところの <code>GROUP BY</code> に近い集約のイメージ�
 <th>解説</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>値型でも使える？</td>
 <td><code>int?</code> などの nullable 型なら OK。int 単体には意味なし。</td>
 </tr>
@@ -225,20 +143,18 @@ SQL でいうところの <code>GROUP BY</code> に近い集約のイメージ�
 <td>null許容参照型 (string?) との併用</td>
 <td><code>??</code> の後は非 null とみなされるため <code>!</code> 演算子は原則不要。</td>
 </tr>
-</tbody>
-</table>
-<h2 id="6-%E5%AE%9F%E5%8B%99-tips">6. 実務 Tips</h2>
+</tbody></table>
+<h2>6. 実務 Tips</h2>
 <ul>
 <li><code>if (x == null)</code> が2行以上連続してたら <code>??</code> / <code>??=</code> にできないか見直す</li>
 <li>戻り値にデフォルトを返すか、例外を投げるかはチームで方針を決めておくと◎</li>
-<li><code>?. + ??</code> は便利だけど、ネストが深くなると可読性が犠牲になる
-<ul>
+<li><code>?. + ??</code> は便利だけど、ネストが深くなると可読性が犠牲になる<ul>
 <li>DTO 変換時に一度フラットにする</li>
 <li>局所変数に割って読みやすさ優先</li>
 </ul>
 </li>
 </ul>
-<h2 id="7-%E3%81%BE%E3%81%A8%E3%82%81">7. まとめ</h2>
+<h2>7. まとめ</h2>
 <p><code>??</code> や <code>??=</code> は、</p>
 <blockquote>
 <p>「null だったら 1 行で片付けよう」</p>
@@ -248,10 +164,9 @@ SQL でいうところの <code>GROUP BY</code> に近い集約のイメージ�
 <p><strong>ネストを減らし、バグも減らし、レビューもラクになる。</strong></p>
 <p>こういう&quot;ちょっとした工夫&quot;が、実はコード全体のクオリティを底上げしてくれたりするんですよね。</p>
 <p>最初は既存コードの <code>if (x == null)</code> を見つけて <code>??</code> に書き換えてみるところから。ぜひ試してみてください。</p>
-<hr>
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
-<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
 
-<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>

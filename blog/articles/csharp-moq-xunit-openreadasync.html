@@ -1,186 +1,106 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>csharp-moq-xunit-openreadasync.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[Moq & xUnit] BlobClient.OpenReadAsyncをモック化する方法</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<p>Azure Storage Blobsのクライアント（BlobClientやBlobBaseClientなど）を使用したコードの単体テストで、OpenReadAsyncメソッドが呼ばれる箇所で返すストリームをモック化したいケースがあります。</p>
+  <article class="markdown-body">
+    <p>Azure Storage Blobsのクライアント（BlobClientやBlobBaseClientなど）を使用したコードの単体テストで、OpenReadAsyncメソッドが呼ばれる箇所で返すストリームをモック化したいケースがあります。</p>
 <p>しかし<code>Mock&lt;BlobClient&gt;().Setup(x =&gt; x.OpenReadAsync()).ReturnsAsync(...)</code>と単純に記述しても、戻り値がnullになってしまったりセットアップがマッチしなかったりする問題が発生することがあります。</p>
 <p>この記事では、MoqとxUnitを使ってOpenReadAsyncをモック化する際の重要なポイントを解説します。</p>
-<h2 id="%E3%83%87%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E5%BC%95%E6%95%B0%E3%82%92%E5%90%AB%E3%82%81%E3%81%9F%E3%82%B7%E3%82%B0%E3%83%8D%E3%83%81%E3%83%A3%E3%81%AE%E7%A2%BA%E8%AA%8D">デフォルト引数を含めたシグネチャの確認</h2>
+<h2>デフォルト引数を含めたシグネチャの確認</h2>
 <p>OpenReadAsyncのシグネチャは呼び出し側から見ると引数なしに見えますが、コンパイラがデフォルト引数を補完しています。</p>
 <p>実際には以下のように4つの引数を持つメソッドとして定義されています。</p>
-<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">virtual</span> Task&lt;Stream&gt; <span class="hljs-title">OpenReadAsync</span>(<span class="hljs-params">
-    <span class="hljs-keyword">long</span> position = <span class="hljs-number">0</span>,
-    <span class="hljs-keyword">int</span>? bufferSize = <span class="hljs-literal">null</span>,
-    BlobRequestConditions conditions = <span class="hljs-literal">null</span>,
-    CancellationToken cancellationToken = <span class="hljs-keyword">default</span>
-</span>)</span>;
-</div></code></pre>
+<pre><code class="language-csharp">public virtual Task&lt;Stream&gt; OpenReadAsync(
+    long position = 0,
+    int? bufferSize = null,
+    BlobRequestConditions conditions = null,
+    CancellationToken cancellationToken = default
+);
+</code></pre>
 <p>呼び出しコードで<code>OpenReadAsync()</code>と記述していても、内部的には<code>OpenReadAsync(0, null, null, default)</code>のように4つの引数が渡されています。</p>
 <p>Moqで戻り値の設定をする際は、この実際のシグネチャに合わせた設定が必要になります。</p>
-<h2 id="%E5%AE%9F%E8%A3%85%E6%89%8B%E9%A0%86">実装手順</h2>
-<h3 id="1-%E3%83%86%E3%82%B9%E3%83%88%E7%94%A8%E3%83%80%E3%83%9F%E3%83%BC%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%E3%83%A0%E3%81%AE%E4%BD%9C%E6%88%90">1. テスト用ダミーストリームの作成</h3>
+<h2>実装手順</h2>
+<h3>1. テスト用ダミーストリームの作成</h3>
 <p>まずはテストコードでモックが返すダミーストリームを<code>MemoryStream</code>などで作成します。</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// テスト用ダミーストリームの作成</span>
-<span class="hljs-keyword">var</span> dummyStream = <span class="hljs-keyword">new</span> MemoryStream();
-<span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> writer = <span class="hljs-keyword">new</span> StreamWriter(dummyStream, leaveOpen: <span class="hljs-literal">true</span>))
+<pre><code class="language-csharp">// テスト用ダミーストリームの作成
+var dummyStream = new MemoryStream();
+using (var writer = new StreamWriter(dummyStream, leaveOpen: true))
 {
-    writer.Write(<span class="hljs-string">"Dummy data for testing"</span>);
+    writer.Write(&quot;Dummy data for testing&quot;);
     writer.Flush();
 }
-<span class="hljs-comment">// StreamReaderなどで読み取れるように先頭に戻す</span>
-dummyStream.Position = <span class="hljs-number">0</span>;
-</div></code></pre>
+// StreamReaderなどで読み取れるように先頭に戻す
+dummyStream.Position = 0;
+</code></pre>
 <p>補足※: <code>leaveOpen: true</code> はストリームを開きっぱなしにするオプションです。Writerが破棄されてもStreamを閉じずにおいておくことで、後続の読み込みでエラーを回避します。</p>
-<h3 id="2-moq%E3%81%A7%E3%81%AE%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97">2. Moqでのセットアップ</h3>
+<h3>2. Moqでのセットアップ</h3>
 <p>OpenReadAsync の実際のシグネチャに合わせてモックを設定します。</p>
-<pre class="hljs"><code><div><span class="hljs-keyword">var</span> blobClientMock = <span class="hljs-keyword">new</span> Mock&lt;BlobClient&gt;();
+<pre><code class="language-csharp">var blobClientMock = new Mock&lt;BlobClient&gt;();
 blobClientMock
     .Setup(b =&gt; b.OpenReadAsync(
-        It.IsAny&lt;<span class="hljs-keyword">long</span>&gt;(),
-        It.IsAny&lt;<span class="hljs-keyword">int</span>?&gt;(),
+        It.IsAny&lt;long&gt;(),
+        It.IsAny&lt;int?&gt;(),
         It.IsAny&lt;BlobRequestConditions&gt;(),
         It.IsAny&lt;CancellationToken&gt;()))
     .ReturnsAsync(dummyStream);
-</div></code></pre>
+</code></pre>
 <p>この設定により、テスト対象コードがOpenReadAsync()を引数なしで呼び出しても、デフォルト引数を含めて4つのパラメータがMoqのSetupにマッチし、ダミーストリームを返すことができます。</p>
-<h3 id="3-%E3%83%86%E3%82%B9%E3%83%88%E5%AF%BE%E8%B1%A1%E3%82%B3%E3%83%BC%E3%83%89%E3%81%B8%E3%81%AE%E3%83%A2%E3%83%83%E3%82%AF%E6%B3%A8%E5%85%A5">3. テスト対象コードへのモック注入</h3>
+<h3>3. テスト対象コードへのモック注入</h3>
 <p>テスト対象クラスのコンストラクタやDI（依存性注入）を通じて、<code>blobClientMock.Object</code>を渡します。
 ここで注意すべき点は以下の2つです。</p>
 <ul>
 <li>テスト対象で<code>new BlobClient(...)</code>と直接インスタンス化していないか</li>
 <li>他のモックやFactoryが適切にモック化できているか</li>
 </ul>
-<pre class="hljs"><code><div>// テスト対象クラスにモックを注入
+<pre><code class="language-csharp:sample">// テスト対象クラスにモックを注入
 var target = new TestTarget(blobClientMock.Object);
 var result = await target.ProcessBlobAsync();
-</div></code></pre>
-<h2 id="%E3%82%88%E3%81%8F%E3%81%82%E3%82%8B%E3%83%8F%E3%83%9E%E3%82%8A%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88">よくあるハマりポイント</h2>
-<h3 id="%E3%83%87%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E5%BC%95%E6%95%B0%E3%82%92%E7%84%A1%E8%A6%96%E3%81%97%E3%81%9F%E5%BC%95%E6%95%B0%E3%81%AA%E3%81%97%E3%81%AEsetup">デフォルト引数を無視した引数なしのSetup</h3>
-<pre class="hljs"><code><div><span class="hljs-comment">// 例）これだと呼び出しにマッチしない可能性がある</span>
+</code></pre>
+<h2>よくあるハマりポイント</h2>
+<h3>デフォルト引数を無視した引数なしのSetup</h3>
+<pre><code class="language-csharp">// 例）これだと呼び出しにマッチしない可能性がある
 blobClientMock
     .Setup(b =&gt; b.OpenReadAsync())
     .ReturnsAsync(dummyStream);
-</div></code></pre>
+</code></pre>
 <p>引数なしのメソッドシグネチャは定義されておらず、デフォルト引数付きの4つのパラメータを持つシグネチャのみが存在します。そのため、Moqは「引数4つあり」としてSetupを記述する必要があります。</p>
-<h3 id="%E3%83%A2%E3%83%83%E3%82%AF%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%8C%E4%BD%BF%E7%94%A8%E3%81%95%E3%82%8C%E3%81%A6%E3%81%84%E3%81%AA%E3%81%84">モックインスタンスが使用されていない</h3>
+<h3>モックインスタンスが使用されていない</h3>
 <p>テスト対象内部で直接<code>new BlobClient(...)</code>を使用している場合、モックではなく実際のインスタンスが呼び出され、テスト時にnullが返るなどの問題が発生します。</p>
-<pre class="hljs"><code><div><span class="hljs-comment">// 避けるべき実装</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">BadImplementation</span>
+<pre><code class="language-csharp">// 避けるべき実装
+public class BadImplementation
 {
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">ProcessAsync</span>(<span class="hljs-params"></span>)</span>
+    public async Task ProcessAsync()
     {
-        <span class="hljs-keyword">var</span> client = <span class="hljs-keyword">new</span> BlobClient(...); <span class="hljs-comment">// モック化できない</span>
+        var client = new BlobClient(...); // モック化できない
     }
 }
-</div></code></pre>
-<pre class="hljs"><code><div><span class="hljs-comment">// 推奨される実装</span>
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">GoodImplementation</span>
+</code></pre>
+<pre><code class="language-csharp">// 推奨される実装
+public class GoodImplementation
 {
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> BlobClient _client;
+    private readonly BlobClient _client;
     
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">GoodImplementation</span>(<span class="hljs-params">BlobClient client</span>)</span>
+    public GoodImplementation(BlobClient client)
     {
         _client = client;
     }
 }
-</div></code></pre>
+</code></pre>
 <p>依存を切り離せば、必要なときに必要な状態の要素を注入できるようになります。
 テストで動作を差し替えたい箇所は、コンストラクタインジェクションやFactoryメソッドのモックを通じてテスト側で用意したモックを渡すように構成することが重要です。</p>
-<h2 id="%E3%82%B7%E3%82%B0%E3%83%8D%E3%83%81%E3%83%A3%E7%A2%BA%E8%AA%8D%E3%81%AEtips">シグネチャ確認のTips</h2>
+<h2>シグネチャ確認のTips</h2>
 <p>Visual StudioやVS Codeでは、呼び出し箇所でF12キーを押すとそのメソッドの定義へ移動できます。Azure SDKや.NETのクラスも、F12でソースコードまたはメタデータを確認できます。</p>
-<p>例として<code>DeleteIfExists</code>を確認すると以下のように表示されます。</p>
+<p>例として<code>DeleteIfExists</code>を確認すると以下のように表示されます。
 <img src="https://storage.googleapis.com/zenn-user-upload/fa0d7becf199-20250221.png" alt="">
-<p>「本当に引数がないメソッドなのか、デフォルト引数があるだけなのか」を把握することで、Moqのセットアップを適切に記述することができます。</p>
-<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+「本当に引数がないメソッドなのか、デフォルト引数があるだけなのか」を把握することで、Moqのセットアップを適切に記述することができます。</p>
+<h2>まとめ</h2>
 <ul>
 <li>OpenReadAsync()は引数なしで呼び出せますが、実際には4つのデフォルト引数を持つメソッドです</li>
 <li>Moqでマッチさせるには、実際のメソッドシグネチャを意識してIt.IsAny&lt;&gt;()や具体値をセットアップする必要があります</li>
@@ -188,14 +108,15 @@ blobClientMock
 <li>F12などでメソッド定義を確認し、正しいSetupを記述しましょう</li>
 </ul>
 <p>これらのポイントを押さえることで、Azure Blob Storageのクライアント呼び出しをスムーズにモック化することができます。</p>
-<h2 id="%E5%8F%82%E8%80%83">参考</h2>
-<a href="https://learn.microsoft.com/ja-jp/dotnet/api/azure.storage.blobs.specialized.blobbaseclient.openreadasync?view=azure-dotnet#azure-storage-blobs-specialized-blobbaseclient-openreadasync(azure-storage-blobs-models-blobopenreadoptions-system-threading-cancellationtoken)" target="_blank">BlobBaseClient.OpenReadAsync メソッド</a>
+<h2>参考</h2>
+<p><a href="https://learn.microsoft.com/ja-jp/dotnet/api/azure.storage.blobs.specialized.blobbaseclient.openreadasync?view=azure-dotnet#azure-storage-blobs-specialized-blobbaseclient-openreadasync(azure-storage-blobs-models-blobopenreadoptions-system-threading-cancellationtoken)">https://learn.microsoft.com/ja-jp/dotnet/api/azure.storage.blobs.specialized.blobbaseclient.openreadasync?view=azure-dotnet#azure-storage-blobs-specialized-blobbaseclient-openreadasync(azure-storage-blobs-models-blobopenreadoptions-system-threading-cancellationtoken)</a></p>
 <hr>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
+ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。
+<a href="https://onewedge.co.jp/">https://onewedge.co.jp/</a></p>
 
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
-<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
-
-<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
-
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>

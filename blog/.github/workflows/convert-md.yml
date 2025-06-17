@@ -1,0 +1,42 @@
+name: Convert Markdown to HTML
+
+on:
+  push:
+    paths:
+      - 'blog/articles/md/**'
+      - 'blog/scripts/**'
+      - 'blog/package.json'
+  pull_request:
+    paths:
+      - 'blog/articles/md/**'
+      - 'blog/scripts/**'
+      - 'blog/package.json'
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: |
+          cd blog
+          npm install
+          
+      - name: Convert Markdown to HTML
+        run: |
+          cd blog
+          npm run convert
+          
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add blog/articles/*.html blog/articles.json
+          git commit -m "Update HTML files and articles.json" || exit 0
+          git push 

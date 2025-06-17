@@ -1,132 +1,50 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>devops-pipelines-pit.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-<link rel="stylesheet" href="file:///g%3A/sourcefile/github-markdown-css/github-markdown.css" type="text/css">
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azure DevOps Pipelinesの無料枠を使うときの落とし穴と解決策</title>
+  <link rel="stylesheet" href="../css/github-markdown.css">
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<p>「CI/CDパイプラインを導入したいな」と思い立ち、マイクロソフトが提供するAzure DevOpsのパイプラインを試してみることにしました。無料で使えるという触れ込みに誘われて、あまり深く考えずに「デフォルト設定でさくっと動かしてみよう」と安易に考えていた私を待っていたのは、思いがけない落とし穴でした。この記事では、Azure DevOps Pipelinesを使い始めようとした時にぶつかった壁と、その解決方法をお伝えしたいと思います。</p>
-<h2 id="%E5%95%8F%E9%A1%8C1%E4%B8%A6%E5%88%97%E5%AE%9F%E8%A1%8C%E6%A8%A9%E9%99%90%E3%81%8C%E3%81%AA%E3%81%84">問題1：並列実行権限がない！</h2>
+  <article class="markdown-body">
+    <p>「CI/CDパイプラインを導入したいな」と思い立ち、マイクロソフトが提供するAzure DevOpsのパイプラインを試してみることにしました。無料で使えるという触れ込みに誘われて、あまり深く考えずに「デフォルト設定でさくっと動かしてみよう」と安易に考えていた私を待っていたのは、思いがけない落とし穴でした。この記事では、Azure DevOps Pipelinesを使い始めようとした時にぶつかった壁と、その解決方法をお伝えしたいと思います。</p>
+<h2>問題1：並列実行権限がない！</h2>
 <p>ASP.NETプロジェクトのビルド自動化のために、マイクロソフトの公式ドキュメントに従ってパイプラインを設定しました。YAMLファイルも用意して「いざ実行！」と思ったその瞬間、以下のエラーメッセージが表示されました。</p>
-<pre class="hljs"><code><div>##[error]No hosted parallelism has been purchased or granted. To request a free parallelism grant, please fill out the following form https://aka.ms/azpipelines-parallelism-request
-</div></code></pre>
+<pre><code>##[error]No hosted parallelism has been purchased or granted. To request a free parallelism grant, please fill out the following form https://aka.ms/azpipelines-parallelism-request
+</code></pre>
 <p>調べてみると、Azure DevOpsのパイプラインは確かに無料で使えるものの、Microsoftのホステッドエージェント（実行環境）を使うには「並列実行権限」が必要だということが分かりました。</p>
 <p><strong>重要な変更点（2023年4月〜現在）</strong>：2023年4月以降、Microsoftは無料アカウントへの並列実行権限の自動付与を停止し、申請制に変更しました。この方針は本記事執筆時点（2025年3月）でも継続しているので、最新情報は<a href="https://learn.microsoft.com/ja-jp/azure/devops/pipelines/licensing/concurrent-jobs">公式ドキュメント</a>で確認してください。</p>
-<h2 id="%E5%95%8F%E9%A1%8C2%E3%82%BB%E3%83%AB%E3%83%95%E3%83%9B%E3%82%B9%E3%83%88%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E6%9C%AA%E8%A8%AD%E5%AE%9A">問題2：セルフホストエージェント未設定</h2>
+<h2>問題2：セルフホストエージェント未設定</h2>
 <p>「申請が承認されるまで待つのはちょっと面倒だな」と思い、セルフホストエージェント（自分のマシンやサーバーで実行する方法）を試してみることにしました。YAMLファイルを以下のように変更しましたが・・・</p>
-<pre class="hljs"><code><div><span class="hljs-attr">pool:</span>
-  <span class="hljs-attr">name:</span> <span class="hljs-string">Default</span>  <span class="hljs-comment"># セルフホストエージェントプール</span>
-</div></code></pre>
+<pre><code class="language-yaml">pool:
+  name: Default  # セルフホストエージェントプール
+</code></pre>
 <p>でも、今度は別のエラーが出てきました。</p>
-<pre class="hljs"><code><div>##[error]No agent found in pool Default which satisfies the specified demands: msbuild, visualstudio, vstest, Agent.Version -gtVersion 2.163.1
-</div></code></pre>
+<pre><code>##[error]No agent found in pool Default which satisfies the specified demands: msbuild, visualstudio, vstest, Agent.Version -gtVersion 2.163.1
+</code></pre>
 <p>「そういえば、エージェントのセットアップしてなかったな...」と気づいたところです。ASP.NETのビルドにはVisual Studioなど特定のツールが必要で、それらがインストールされたエージェントがなければ実行できません。</p>
-<h2 id="%E8%A7%A3%E6%B1%BA%E7%AD%96%E7%94%B3%E8%AB%8B%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E3%81%AE%E6%8F%90%E5%87%BA%E3%81%A8%E6%89%BF%E8%AA%8D">解決策：申請フォームの提出と承認</h2>
-<p>結局、最初のエラーメッセージに書かれていた申請フォーム（https://aka.ms/azpipelines-parallelism-request） に記入して無料使用枠を申請しておきました。</p>
+<h2>解決策：申請フォームの提出と承認</h2>
+<p>結局、最初のエラーメッセージに書かれていた申請フォーム（<a href="https://aka.ms/azpipelines-parallelism-request%EF%BC%89">https://aka.ms/azpipelines-parallelism-request）</a> に記入して無料使用枠を申請しておきました。</p>
 <p>が、どうやらある程度の日数がかかるそうなので自前の環境に用意したほうが早いとの結論に至り・・・せっかくなのでセルフホストエージェントを作成しました。</p>
-<h2 id="%E3%82%BB%E3%83%AB%E3%83%95%E3%83%9B%E3%82%B9%E3%83%88%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88">セルフホストエージェント</h2>
+<h2>セルフホストエージェント</h2>
 <p>もしホステッドエージェントの申請を待ちたくない場合や、特殊な環境が必要な場合は、セルフホストエージェントを正しく設定する方法もあります。セルフホストエージェントは無料で利用できるため、並列実行枠の申請が不要です。</p>
-<h3 id="windows%E5%90%91%E3%81%91%E3%82%BB%E3%83%AB%E3%83%95%E3%83%9B%E3%82%B9%E3%83%88%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%81%AE%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97%E6%89%8B%E9%A0%86%E8%A9%B3%E7%B4%B0%E7%89%88">Windows向けセルフホストエージェントのセットアップ手順（詳細版）</h3>
-<h4 id="1-%E6%BA%96%E5%82%99">1. 準備</h4>
+<h3>Windows向けセルフホストエージェントのセットアップ手順（詳細版）</h3>
+<h4>1. 準備</h4>
 <ul>
-<li>
-<p><strong>必要なもの</strong></p>
+<li><p><strong>必要なもの</strong></p>
 <ul>
 <li>Azure DevOps組織へのアクセス権限</li>
 <li>Personal Access Token (PAT)</li>
 <li>エージェントをインストールするWindows PC/サーバー</li>
 </ul>
 </li>
-<li>
-<p><strong>PATの作成手順</strong></p>
+<li><p><strong>PATの作成手順</strong></p>
 <ol>
-<li>Azure DevOpsのウェブサイト (https://dev.azure.com) にログイン</li>
+<li>Azure DevOpsのウェブサイト (<a href="https://dev.azure.com">https://dev.azure.com</a>) にログイン</li>
 <li>右上のユーザーアイコンをクリック → [Personal access tokens]
 <img src="https://storage.googleapis.com/zenn-user-upload/45cd8e3d8ef8-20250305.png" alt=""></li>
 <li>[New Token] をクリック</li>
@@ -139,7 +57,7 @@
 </ol>
 </li>
 </ul>
-<h4 id="2-%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%81%AE%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E3%81%A8%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB">2. エージェントのダウンロードとインストール</h4>
+<h4>2. エージェントのダウンロードとインストール</h4>
 <ol>
 <li>Azure DevOpsのウェブサイトにログイン</li>
 <li>組織設定 → Agent pools へ移動
@@ -150,8 +68,7 @@
 <li>ダウンロードしたzipファイルを好きなフォルダに展開（例えば <code>C:\agent</code>）</li>
 <li>管理者権限でコマンドプロンプトを開き、展開したフォルダに移動します。<code>cd C:\agent</code></li>
 <li>設定スクリプトを実行します。<code>config.cmd</code></li>
-<li>以下の情報を入力してください。
-<ul>
+<li>以下の情報を入力してください。<ul>
 <li>サーバーURL：<code>https://dev.azure.com/あなたの組織名</code></li>
 <li>認証タイプ：<code>PAT</code></li>
 <li>PAT：先ほど作成したトークン</li>
@@ -163,18 +80,18 @@
 </ol>
 <p>なんやかんや設定すると・・・以下のように設定できたことが確認できます。
 <img src="https://storage.googleapis.com/zenn-user-upload/6485a98105c6-20250305.png" alt=""></p>
-<h4 id="3-%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%81%AE%E8%B5%B7%E5%8B%95%E6%96%B9%E6%B3%952%E3%81%A4%E3%81%AE%E9%81%B8%E6%8A%9E%E8%82%A2">3. エージェントの起動方法（2つの選択肢）</h4>
+<h4>3. エージェントの起動方法（2つの選択肢）</h4>
 <p><strong>オプション1：インタラクティブモード（テスト用）</strong></p>
-<pre class="hljs"><code><div>.\run.cmd
-</div></code></pre>
+<pre><code>.\run.cmd
+</code></pre>
 <p>このモードはテストに便利ですが、コマンドウィンドウを閉じるとエージェントも終了してしまいます。
 開発環境は普段使いのPCで、後述のようにサービス化しなくていいならこのままでOKです。自分はサービス化せず、使うときだけrunしようかなと思ってます。</p>
 <p><strong>オプション2：Windowsサービスとしてインストール</strong></p>
-<pre class="hljs"><code><div>.\config.cmd --runAsService
-</div></code></pre>
+<pre><code>.\config.cmd --runAsService
+</code></pre>
 <p>または詳細オプション付きで。</p>
-<pre class="hljs"><code><div>.\config.cmd --unattended --url https://dev.azure.com/あなたの組織名 --auth pat --token あなたのPAT --pool Default --agent エージェント名 --runAsService
-</div></code></pre>
+<pre><code>.\config.cmd --unattended --url https://dev.azure.com/あなたの組織名 --auth pat --token あなたのPAT --pool Default --agent エージェント名 --runAsService
+</code></pre>
 <p>サービスとしてインストールするメリット</p>
 <ul>
 <li>PCを再起動しても自動的にエージェントが起動します</li>
@@ -187,61 +104,57 @@
 <li>定期的にAzure等サービスと通信してしまう（モバイル環境などでの消費注意）</li>
 </ul>
 <p>タスクスケジューラで実行させたり、専用マシンを使うなどすれば常時起動サービスでもいいかもしれません。自分の場合はそんなに頻繁に使用しないため、その都度実行する形で落ち着きました。</p>
-<h4 id="4-%E5%BF%85%E8%A6%81%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB">4. 必要なツールのインストール</h4>
+<h4>4. 必要なツールのインストール</h4>
 <p>エージェントがセットアップされたマシンに、ビルドに必要なツールをインストールしましょう。</p>
 <ul>
 <li>ASP.NET Framework開発用：Visual Studio、MSBuild、VSTest</li>
 <li>ASP.NET Core開発用：.NET SDK</li>
 <li>その他プロジェクトに必要なツール</li>
 </ul>
-<h4 id="5-yaml%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E4%BF%AE%E6%AD%A3">5. YAMLファイルの修正</h4>
+<h4>5. YAMLファイルの修正</h4>
 <p>パイプラインのYAMLファイルを以下のように変更します。</p>
-<pre class="hljs"><code><div><span class="hljs-attr">trigger:</span>
-<span class="hljs-bullet">-</span> <span class="hljs-string">master</span>  <span class="hljs-comment"># または main</span>
+<pre><code class="language-yaml">trigger:
+- master  # または main
 
-<span class="hljs-attr">pool:</span>
-  <span class="hljs-attr">name:</span> <span class="hljs-string">Default</span>  <span class="hljs-comment"># セルフホストエージェントのプール名</span>
+pool:
+  name: Default  # セルフホストエージェントのプール名
 
-<span class="hljs-attr">variables:</span>
-  <span class="hljs-attr">solution:</span> <span class="hljs-string">'**/*.sln'</span>
-  <span class="hljs-attr">buildPlatform:</span> <span class="hljs-string">'Any CPU'</span>
-  <span class="hljs-attr">buildConfiguration:</span> <span class="hljs-string">'Release'</span>
+variables:
+  solution: &#39;**/*.sln&#39;
+  buildPlatform: &#39;Any CPU&#39;
+  buildConfiguration: &#39;Release&#39;
 
-<span class="hljs-attr">steps:</span>
-<span class="hljs-comment"># 必要なタスク</span>
-<span class="hljs-bullet">-</span> <span class="hljs-attr">task:</span> <span class="hljs-string">NuGetToolInstaller@1</span>
-<span class="hljs-comment"># 以下省略...</span>
-</div></code></pre>
+steps:
+# 必要なタスク
+- task: NuGetToolInstaller@1
+# 以下省略...
+</code></pre>
 <p>正しくセットアップされたエージェントは、Azure DevOpsの組織ページの「Project Settings」→「Agent pools」で確認できます。エージェント名の横に緑色のステータスが表示されていれば、うまく動いています。
 <img src="https://storage.googleapis.com/zenn-user-upload/6fc6d21cf055-20250305.png" alt="">
 <img src="https://storage.googleapis.com/zenn-user-upload/7e6fc5b666f9-20250305.png" alt=""></p>
-<h2 id="%E5%AD%A6%E3%82%93%E3%81%A0%E6%95%99%E8%A8%93">学んだ教訓</h2>
+<h2>学んだ教訓</h2>
 <ol>
-<li>
-<p><strong>ドキュメントはじっくり読もう</strong>
+<li><p><strong>ドキュメントはじっくり読もう</strong>
 公式ドキュメントには無料利用の制限について書いてあったのですが、最初に読み飛ばしてしまったため混乱してしまいました。特に「料金」や「制限」に関する部分はしっかり確認するべしですね。</p>
 </li>
-<li>
-<p><strong>パイプラインのホスト環境を理解しよう</strong></p>
+<li><p><strong>パイプラインのホスト環境を理解しよう</strong></p>
 <ul>
 <li><strong>Microsoftホステッドエージェント</strong>：Microsoftが提供する実行環境です。無料枠は申請制になっています。最新のツール環境が整っていますが、並列実行に制限があります。</li>
 <li><strong>セルフホストエージェント</strong>：自前の環境です。セットアップは必要ですが無料枠の制限を受けません。自分好みの環境が作れます。</li>
 </ul>
 </li>
-<li>
-<p><strong>適切なエージェント環境を選ぼう</strong></p>
+<li><p><strong>適切なエージェント環境を選ぼう</strong></p>
 <ul>
 <li>ASP.NET Frameworkなら<code>windows-latest</code>がいいでしょう</li>
 <li>ASP.NET Coreなら<code>ubuntu-latest</code>が使えます（コストパフォーマンスがいいんです）</li>
 <li>Dockerコンテナをビルドするなら<code>ubuntu-latest</code>が便利です</li>
 </ul>
 </li>
-<li>
-<p><strong>運用前にテスト実行してみよう</strong>
+<li><p><strong>運用前にテスト実行してみよう</strong>
 本格的な開発を始める前に、シンプルなパイプラインで実行が可能かテストしておくと、問題を早めに見つけられます。</p>
 </li>
 </ol>
-<h2 id="azure-devops%E3%81%A8%E4%BB%96%E3%81%AEcicd%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AE%E6%AF%94%E8%BC%83">Azure DevOpsと他のCI/CDサービスの比較</h2>
+<h2>Azure DevOpsと他のCI/CDサービスの比較</h2>
 <p>Azure DevOps Pipelinesを選ぶ前に、他の主要なCI/CDサービスとの比較も見てみるといいかもしれません。</p>
 <table>
 <thead>
@@ -253,8 +166,7 @@
 <th>特徴</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><strong>Azure DevOps Pipelines</strong></td>
 <td>1並列ジョブ（申請制）</td>
 <td>やや複雑</td>
@@ -282,56 +194,56 @@
 <td>限定的</td>
 <td>高速な実行、シンプルな設定</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>特にMicrosoft技術スタック（ASP.NET、Azureなど）を使用するプロジェクトでは、Azure DevOps PipelinesとGitHub Actionsが使いやすいと思います。GitHubリポジトリを使っているなら、設定が簡単でより多くの無料枠があるGitHub Actionsもいい選択肢かもしれませんね。
 GithubIOで作ったページはActionsで自動的に実施されています。
-https://ktnd111.github.io/</p>
-<h2 id="%E3%81%BE%E3%81%A8%E3%82%81">まとめ</h2>
+<a href="https://ktnd111.github.io/">https://ktnd111.github.io/</a></p>
+<h2>まとめ</h2>
 <p>Azure DevOps Pipelinesは強力なCI/CDツールですが、無料で使い始めるには少しばかりの「お作法」があることが分かりました。申請手続きさえ済ませれば、個人開発や小さなチームには十分な無料枠が用意されています。</p>
 <p>最終的に動作したパイプライン設定はこちらです。ほとんどデフォルトのままです。</p>
-<pre class="hljs"><code><div><span class="hljs-comment"># ASP.NET</span>
-<span class="hljs-comment"># Build and test ASP.NET projects.</span>
-<span class="hljs-comment"># Add steps that publish symbols, save build artifacts, deploy, and more:</span>
-<span class="hljs-comment"># https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4</span>
+<pre><code class="language-yaml"># ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
 
-<span class="hljs-attr">trigger:</span>
-<span class="hljs-bullet">-</span> <span class="hljs-string">master</span>
+trigger:
+- master
 
-<span class="hljs-attr">pool:</span>
-  <span class="hljs-attr">name:</span> <span class="hljs-string">default</span>
+pool:
+  name: default
 
-<span class="hljs-attr">variables:</span>
-  <span class="hljs-attr">solution:</span> <span class="hljs-string">'**/*.sln'</span>
-  <span class="hljs-attr">buildPlatform:</span> <span class="hljs-string">'Any CPU'</span>
-  <span class="hljs-attr">buildConfiguration:</span> <span class="hljs-string">'Release'</span>
+variables:
+  solution: &#39;**/*.sln&#39;
+  buildPlatform: &#39;Any CPU&#39;
+  buildConfiguration: &#39;Release&#39;
 
-<span class="hljs-attr">steps:</span>
-<span class="hljs-bullet">-</span> <span class="hljs-attr">task:</span> <span class="hljs-string">NuGetToolInstaller@1</span>
+steps:
+- task: NuGetToolInstaller@1
 
-<span class="hljs-bullet">-</span> <span class="hljs-attr">task:</span> <span class="hljs-string">NuGetCommand@2</span>
-  <span class="hljs-attr">inputs:</span>
-    <span class="hljs-attr">restoreSolution:</span> <span class="hljs-string">'$(solution)'</span>
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: &#39;$(solution)&#39;
 
-<span class="hljs-bullet">-</span> <span class="hljs-attr">task:</span> <span class="hljs-string">VSBuild@1</span>
-  <span class="hljs-attr">inputs:</span>
-    <span class="hljs-attr">solution:</span> <span class="hljs-string">'$(solution)'</span>
-    <span class="hljs-attr">msbuildArgs:</span> <span class="hljs-string">'/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'</span>
-    <span class="hljs-attr">platform:</span> <span class="hljs-string">'$(buildPlatform)'</span>
-    <span class="hljs-attr">configuration:</span> <span class="hljs-string">'$(buildConfiguration)'</span>
+- task: VSBuild@1
+  inputs:
+    solution: &#39;$(solution)&#39;
+    msbuildArgs: &#39;/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation=&quot;$(build.artifactStagingDirectory)&quot;&#39;
+    platform: &#39;$(buildPlatform)&#39;
+    configuration: &#39;$(buildConfiguration)&#39;
 
-<span class="hljs-bullet">-</span> <span class="hljs-attr">task:</span> <span class="hljs-string">VSTest@2</span>
-  <span class="hljs-attr">inputs:</span>
-    <span class="hljs-attr">platform:</span> <span class="hljs-string">'$(buildPlatform)'</span>
-    <span class="hljs-attr">configuration:</span> <span class="hljs-string">'$(buildConfiguration)'</span>
-
-</div></code></pre>
+- task: VSTest@2
+  inputs:
+    platform: &#39;$(buildPlatform)&#39;
+    configuration: &#39;$(buildConfiguration)&#39;
+</code></pre>
 <p>DevOpsの世界は奥が深いですが、最初のハードルを越えれば、開発の効率化にとても役立ってくれるはずです。みなさんも無料枠の申請をお忘れなく！そして、プロジェクトの要件に合わせていろいろなCI/CDサービスを比較してみてください。</p>
 <hr>
-<p><strong>IT業界に、ITエンジニアに貢献する企業</strong></p>
-<p>ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。</p>
+<p><strong>IT業界に、ITエンジニアに貢献する企業</strong>
+ONE WEDGEはServerlessシステム開発を中核技術としてWeb系システム開発、AWS/GCPを利用した業務システム・サービス開発、PWAを用いたモバイル開発、Alexaスキル開発など、元気と技術力を武器にお客様に真摯に向き合う価値創造企業です。
+<a href="https://onewedge.co.jp/">https://onewedge.co.jp/</a></p>
 
-<a href="https://onewedge.co.jp/" target="_blank">ONE WEDGE株式会社</a>
-
+  </article>
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>
